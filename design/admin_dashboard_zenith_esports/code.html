@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Agency FB and Stretch Pro would be hosted fonts, using high-impact alternatives for simulation -->
+<style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;700&display=swap');
+        
+        body {
+            font-family: 'Instrument Sans', sans-serif;
+            background-color: #131313;
+        }
+        .font-agency { font-family: 'Space Grotesk', sans-serif; text-transform: uppercase; } /* Placeholder for Agency FB */
+        .font-stretch { font-family: 'Space Grotesk', sans-serif; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; } /* Placeholder for Stretch Pro */
+        
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        .zenith-gradient {
+            background: linear-gradient(135deg, #dbb462 0%, #f9d07a 100%);
+        }
+
+        .glass-panel {
+            background: rgba(31, 31, 31, 0.7);
+            backdrop-filter: blur(24px);
+        }
+
+        /* Hide scrollbar but keep functionality */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-dim": "#131313",
+                      "inverse-primary": "#785a0e",
+                      "tertiary": "#e3d4ae",
+                      "surface-variant": "#353535",
+                      "primary-fixed": "#ffdfa0",
+                      "outline-variant": "#4e4638",
+                      "on-background": "#e2e2e2",
+                      "outline": "#9a8f7f",
+                      "on-surface-variant": "#d1c5b3",
+                      "tertiary-fixed-dim": "#d4c5a0",
+                      "surface-container-high": "#2a2a2a",
+                      "on-tertiary-container": "#53492c",
+                      "background": "#131313",
+                      "surface-container": "#1f1f1f",
+                      "on-primary-fixed-variant": "#5c4300",
+                      "error-container": "#93000a",
+                      "on-error-container": "#ffdad6",
+                      "inverse-on-surface": "#303030",
+                      "surface-tint": "#e9c16e",
+                      "secondary-container": "#484949",
+                      "secondary": "#c6c6c6",
+                      "tertiary-fixed": "#f1e1bb",
+                      "surface-container-low": "#1b1b1b",
+                      "on-secondary": "#2f3131",
+                      "on-secondary-fixed": "#1a1c1c",
+                      "on-primary-container": "#5f4500",
+                      "on-primary-fixed": "#261a00",
+                      "on-tertiary": "#383015",
+                      "surface": "#131313",
+                      "primary": "#f9d07a",
+                      "on-secondary-fixed-variant": "#464747",
+                      "secondary-fixed": "#e3e2e2",
+                      "error": "#ffb4ab",
+                      "primary-fixed-dim": "#e9c16e",
+                      "primary-container": "#dbb462",
+                      "on-surface": "#e2e2e2",
+                      "tertiary-container": "#c6b894",
+                      "on-primary": "#402d00",
+                      "on-secondary-container": "#b8b8b8",
+                      "surface-bright": "#393939",
+                      "surface-container-lowest": "#0e0e0e",
+                      "on-error": "#690005",
+                      "secondary-fixed-dim": "#c6c6c6",
+                      "surface-container-highest": "#353535",
+                      "inverse-surface": "#e2e2e2",
+                      "on-tertiary-fixed-variant": "#50462a",
+                      "on-tertiary-fixed": "#221b04"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0px",
+                      "lg": "0px",
+                      "xl": "0px",
+                      "full": "9999px"
+              },
+              "fontFamily": {
+                      "headline": ["Space Grotesk"],
+                      "body": ["Instrument Sans"],
+                      "label": ["Space Grotesk"]
+              }
+            },
+          },
+        }
+      </script>
+</head>
+<body class="bg-surface text-on-surface selection:bg-primary selection:text-on-primary">
+<!-- TopNavBar Execution -->
+<nav class="fixed top-0 w-full z-50 h-20 bg-[#131313] dark:bg-[#131313] flex justify-between items-center px-12 w-full mx-auto">
+<div class="flex items-center gap-8">
+<span class="text-3xl font-black italic tracking-tighter text-[#dbb462] dark:text-[#dbb462] font-agency">ZENITH</span>
+<div class="hidden md:flex items-center gap-6">
+<a class="text-[#d1c5b3] dark:text-[#d1c5b3] opacity-60 font-stretch text-[10px] tracking-widest hover:bg-[#2a2a2a] transition-all duration-300 ease-out px-3 py-2" href="#">LIVESTREAMS</a>
+<a class="text-[#d1c5b3] dark:text-[#d1c5b3] opacity-60 font-stretch text-[10px] tracking-widest hover:bg-[#2a2a2a] transition-all duration-300 ease-out px-3 py-2" href="#">TOURNAMENTS</a>
+<a class="text-[#dbb462] dark:text-[#dbb462] border-b-2 border-[#dbb462] pb-1 font-stretch text-[10px] tracking-widest px-3 py-2" href="#">DASHBOARD</a>
+<a class="text-[#d1c5b3] dark:text-[#d1c5b3] opacity-60 font-stretch text-[10px] tracking-widest hover:bg-[#2a2a2a] transition-all duration-300 ease-out px-3 py-2" href="#">RANKINGS</a>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="hidden lg:flex items-center bg-surface-container px-4 py-2 border-b border-outline-variant/30">
+<span class="material-symbols-outlined text-outline text-sm mr-2">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-xs font-stretch text-on-surface-variant placeholder:opacity-30 w-48" placeholder="COMMAND SEARCH..." type="text"/>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-[#d1c5b3] hover:text-[#dbb462] transition-colors">notifications</button>
+<button class="material-symbols-outlined text-[#d1c5b3] hover:text-[#dbb462] transition-colors">settings</button>
+<button class="bg-primary-container text-on-primary font-stretch text-[10px] px-6 py-2 transition-transform duration-150 active:scale-95">LOGIN</button>
+</div>
+</div>
+</nav>
+<div class="flex pt-20 h-screen overflow-hidden">
+<!-- SideNavBar Execution -->
+<aside class="hidden md:flex flex-col h-full py-8 bg-[#131313] dark:bg-[#131313] w-64 border-r border-[#4e4638]/15 shrink-0">
+<div class="px-8 mb-10">
+<h2 class="text-xl font-bold text-[#dbb462] font-agency tracking-tighter">COMMAND CENTER</h2>
+<p class="text-[10px] font-stretch text-[#d1c5b3] opacity-50 tracking-widest mt-1">ADMIN OVERVIEW</p>
+</div>
+<nav class="flex-grow space-y-1">
+<a class="flex items-center gap-4 px-8 py-4 text-[#d1c5b3] dark:text-[#d1c5b3] opacity-50 font-stretch text-[10px] tracking-widest hover:bg-[#2a2a2a] transition-all duration-200 expo-out" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span>Overview</span>
+</a>
+<a class="flex items-center gap-4 px-8 py-4 text-[#dbb462] dark:text-[#dbb462] bg-[#1f1f1f] border-l-4 border-[#dbb462] font-stretch text-[10px] tracking-widest transition-all duration-200 expo-out" href="#">
+<span class="material-symbols-outlined">sports_esports</span>
+<span>Matches</span>
+</a>
+<a class="flex items-center gap-4 px-8 py-4 text-[#d1c5b3] dark:text-[#d1c5b3] opacity-50 font-stretch text-[10px] tracking-widest hover:bg-[#2a2a2a] transition-all duration-200 expo-out" href="#">
+<span class="material-symbols-outlined">app_registration</span>
+<span>Registration</span>
+</a>
+<a class="flex items-center gap-4 px-8 py-4 text-[#d1c5b3] dark:text-[#d1c5b3] opacity-50 font-stretch text-[10px] tracking-widest hover:bg-[#2a2a2a] transition-all duration-200 expo-out" href="#">
+<span class="material-symbols-outlined">group</span>
+<span>Players</span>
+</a>
+<a class="flex items-center gap-4 px-8 py-4 text-[#d1c5b3] dark:text-[#d1c5b3] opacity-50 font-stretch text-[10px] tracking-widest hover:bg-[#2a2a2a] transition-all duration-200 expo-out" href="#">
+<span class="material-symbols-outlined">tune</span>
+<span>Settings</span>
+</a>
+</nav>
+<div class="px-6 mt-auto">
+<button class="w-full zenith-gradient text-on-primary font-stretch text-[10px] py-4 shadow-xl active:scale-[0.98] transition-transform">
+                    CREATE TOURNAMENT
+                </button>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-grow overflow-y-auto no-scrollbar bg-surface p-8 lg:p-12">
+<header class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+<div>
+<h1 class="text-6xl font-black font-agency italic tracking-tighter text-on-surface">TOURNAMENT OPS</h1>
+<p class="text-on-surface-variant font-stretch text-[10px] mt-2 opacity-70">REAL-TIME MANAGEMENT &amp; GRID LOGISTICS</p>
+</div>
+<div class="flex gap-4">
+<button class="flex items-center gap-2 border border-outline-variant/30 px-6 py-3 font-stretch text-[10px] hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-sm">download</span>
+                        EXPORT CSV
+                    </button>
+<button class="flex items-center gap-2 zenith-gradient text-on-primary px-6 py-3 font-stretch text-[10px] hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined text-sm">group_add</span>
+                        SPLIT GROUPS (20)
+                    </button>
+</div>
+</header>
+<!-- Stat Strip (Tonal Layering Principle) -->
+<div class="bg-surface-container-lowest grid grid-cols-2 md:grid-cols-4 gap-px border-b border-outline-variant/10 mb-12">
+<div class="p-6">
+<p class="text-[8px] font-stretch text-secondary mb-1">TOTAL ENTRIES</p>
+<p class="text-3xl font-agency font-bold text-primary tracking-tighter">1,240</p>
+</div>
+<div class="p-6 bg-surface-container-low">
+<p class="text-[8px] font-stretch text-secondary mb-1">ACTIVE GROUPS</p>
+<p class="text-3xl font-agency font-bold text-primary tracking-tighter">62</p>
+</div>
+<div class="p-6">
+<p class="text-[8px] font-stretch text-secondary mb-1">PENDING APPROVAL</p>
+<p class="text-3xl font-agency font-bold text-primary tracking-tighter">18</p>
+</div>
+<div class="p-6 bg-surface-container-low">
+<p class="text-[8px] font-stretch text-secondary mb-1">SERVER UPTIME</p>
+<p class="text-3xl font-agency font-bold text-primary tracking-tighter">99.98%</p>
+</div>
+</div>
+<!-- Bento Grid Section -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Main CRUD Table Section -->
+<div class="lg:col-span-8 bg-surface-container-low p-1">
+<div class="overflow-x-auto">
+<table class="w-full border-collapse">
+<thead>
+<tr class="bg-surface-container text-left">
+<th class="px-6 py-4 font-stretch text-[9px] text-on-surface-variant">TOURNAMENT ID</th>
+<th class="px-6 py-4 font-stretch text-[9px] text-on-surface-variant">REGION</th>
+<th class="px-6 py-4 font-stretch text-[9px] text-on-surface-variant">TIER</th>
+<th class="px-6 py-4 font-stretch text-[9px] text-on-surface-variant">STATUS</th>
+<th class="px-6 py-4 font-stretch text-[9px] text-on-surface-variant text-right">ACTIONS</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/10">
+<tr class="hover:bg-surface-container transition-colors group">
+<td class="px-6 py-6 font-agency text-lg font-bold">VORTEX_PREMIER_S4</td>
+<td class="px-6 py-6 font-stretch text-[10px]">NA_EAST</td>
+<td class="px-6 py-6">
+<span class="text-primary font-stretch text-[9px] bg-primary/10 px-2 py-1">LEGENDARY</span>
+</td>
+<td class="px-6 py-6">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div>
+<span class="font-stretch text-[9px]">APPROVED</span>
+</div>
+</td>
+<td class="px-6 py-6 text-right">
+<button class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">edit_note</button>
+<button class="material-symbols-outlined text-outline-variant group-hover:text-error transition-colors ml-4">delete_sweep</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container transition-colors group">
+<td class="px-6 py-6 font-agency text-lg font-bold">TITAN_CLASH_INVITATIONAL</td>
+<td class="px-6 py-6 font-stretch text-[10px]">EU_WEST</td>
+<td class="px-6 py-6">
+<span class="text-secondary font-stretch text-[9px] bg-secondary/10 px-2 py-1">PRO</span>
+</td>
+<td class="px-6 py-6">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.6)] animate-pulse"></div>
+<span class="font-stretch text-[9px]">PENDING</span>
+</div>
+</td>
+<td class="px-6 py-6 text-right">
+<button class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">edit_note</button>
+<button class="material-symbols-outlined text-outline-variant group-hover:text-error transition-colors ml-4">delete_sweep</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container transition-colors group">
+<td class="px-6 py-6 font-agency text-lg font-bold">NOVA_CUP_QUALIFIERS</td>
+<td class="px-6 py-6 font-stretch text-[10px]">ASIA_PACIFIC</td>
+<td class="px-6 py-6">
+<span class="text-on-surface-variant font-stretch text-[9px] bg-surface-variant/20 px-2 py-1">AMATEUR</span>
+</td>
+<td class="px-6 py-6">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.6)]"></div>
+<span class="font-stretch text-[9px]">REJECTED</span>
+</div>
+</td>
+<td class="px-6 py-6 text-right">
+<button class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">edit_note</button>
+<button class="material-symbols-outlined text-outline-variant group-hover:text-error transition-colors ml-4">delete_sweep</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container transition-colors group">
+<td class="px-6 py-6 font-agency text-lg font-bold">ORBITAL_STRIKE_S1</td>
+<td class="px-6 py-6 font-stretch text-[10px]">LATAM</td>
+<td class="px-6 py-6">
+<span class="text-secondary font-stretch text-[9px] bg-secondary/10 px-2 py-1">PRO</span>
+</td>
+<td class="px-6 py-6">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div>
+<span class="font-stretch text-[9px]">APPROVED</span>
+</div>
+</td>
+<td class="px-6 py-6 text-right">
+<button class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">edit_note</button>
+<button class="material-symbols-outlined text-outline-variant group-hover:text-error transition-colors ml-4">delete_sweep</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Automatic Group Splitting Preview -->
+<div class="lg:col-span-4 space-y-8">
+<div class="bg-surface-container p-8 relative overflow-hidden">
+<div class="relative z-10">
+<h3 class="font-stretch text-[10px] text-primary mb-6">GROUP LOGISTICS</h3>
+<div class="space-y-4">
+<div class="bg-surface-container-low p-4 flex justify-between items-center border-l-2 border-primary">
+<div>
+<p class="font-agency text-xl font-bold">GROUP_ALPHA_01</p>
+<p class="text-[9px] font-stretch text-on-surface-variant">20 / 20 SLOTS FILLED</p>
+</div>
+<span class="material-symbols-outlined text-primary">check_circle</span>
+</div>
+<div class="bg-surface-container-low p-4 flex justify-between items-center border-l-2 border-primary">
+<div>
+<p class="font-agency text-xl font-bold">GROUP_BETA_02</p>
+<p class="text-[9px] font-stretch text-on-surface-variant">20 / 20 SLOTS FILLED</p>
+</div>
+<span class="material-symbols-outlined text-primary">check_circle</span>
+</div>
+<div class="bg-surface-container-low p-4 flex justify-between items-center border-l-2 border-outline-variant/30">
+<div>
+<p class="font-agency text-xl font-bold">GROUP_GAMMA_03</p>
+<p class="text-[9px] font-stretch text-on-surface-variant">12 / 20 SLOTS FILLED</p>
+</div>
+<span class="material-symbols-outlined text-outline-variant animate-spin">sync</span>
+</div>
+</div>
+<button class="w-full mt-6 py-4 border border-primary/20 text-primary font-stretch text-[9px] hover:bg-primary hover:text-on-primary transition-all">
+                                REBALANCE ALL GROUPS
+                            </button>
+</div>
+<div class="absolute -right-12 -bottom-12 opacity-5 pointer-events-none">
+<span class="material-symbols-outlined text-[180px]">hub</span>
+</div>
+</div>
+<!-- System Broadcast -->
+<div class="bg-surface-container-highest p-8">
+<h3 class="font-stretch text-[10px] text-secondary mb-4">SYSTEM BROADCAST</h3>
+<div class="space-y-3">
+<div class="flex gap-3">
+<span class="text-[9px] font-stretch text-primary">14:02</span>
+<p class="text-[11px] text-on-surface-variant">Auto-split initiated for Tournament ID #992.</p>
+</div>
+<div class="flex gap-3">
+<span class="text-[9px] font-stretch text-primary">13:45</span>
+<p class="text-[11px] text-on-surface-variant">CSV Export "Global_Rankings_Q3" successful.</p>
+</div>
+<div class="flex gap-3">
+<span class="text-[9px] font-stretch text-error">12:10</span>
+<p class="text-[11px] text-on-surface-variant">Region "ASIA_PACIFIC" latency spike detected.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Asset Preview Asymmetric Component -->
+<div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+<div class="relative group">
+<img alt="Cinematic wide shot of high-end gaming arena with obsidian surfaces and sharp gold lighting accents" class="w-full h-80 object-cover opacity-60 grayscale hover:grayscale-0 transition-all duration-700" data-alt="Cinematic wide shot of high-end gaming arena with obsidian surfaces and sharp gold lighting accents" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBolFAGh0oH3d6dM8RJGCppKI3lbatjM2rNx_RkNqIzGyqTUTPDBXxjcCRCr3P_u9D3GhvrDNcSQkblLxClWequ8dnR2Bb6AkwZIVuVlkJyidno7EP7PRURG4XWXt6qdvRWibnoKsgo8M53MiMdeggf9656mMF_NDBYbujyumE8yCOo-564Yb6WFjAG6GqQMNK1EarW7scb0nuVk6n8_14-WZC1nKiwhLJyIjX8RbnYaMZYuE4bXk9v-ejnCvMKCRooZ2A27XaSmaA"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface to-transparent"></div>
+<div class="absolute bottom-6 left-6">
+<p class="font-stretch text-[8px] text-primary">ARENA STATUS</p>
+<h4 class="font-agency text-3xl font-black italic tracking-tighter">SEOUL_MAIN_STAGE</h4>
+</div>
+</div>
+<div class="pr-12">
+<h3 class="text-4xl font-agency font-bold italic tracking-tighter mb-4">COMMANDER'S LOG</h3>
+<p class="text-on-surface-variant leading-relaxed text-sm mb-6">
+                        Operational efficiency is at peak performance. Automatic group splitting has reduced administrative overhead by 42%. All tournament status transitions are logged and immutable within the Obsidian mainframe.
+                    </p>
+<a class="text-primary font-stretch text-[10px] border-b-2 border-primary/20 pb-1 hover:border-primary transition-all" href="#">VIEW DETAILED ANALYTICS →</a>
+</div>
+</div>
+</main>
+</div>
+<!-- Footer Execution -->
+<footer class="bg-[#1b1b1b] dark:bg-[#1b1b1b] w-full py-12 px-12 border-t border-[#4e4638]/15 z-50">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center max-w-7xl mx-auto">
+<div class="flex flex-col gap-4">
+<span class="text-lg font-black text-[#dbb462] font-agency italic tracking-tighter">ZENITH</span>
+<p class="font-stretch text-[8px] tracking-[0.2em] uppercase text-[#d1c5b3] opacity-40">
+                    © 2024 ZENITH ESPORTS. FORGED IN OBSIDIAN.
+                </p>
+</div>
+<div class="flex flex-wrap gap-8 md:justify-end">
+<a class="font-stretch text-[8px] tracking-[0.2em] uppercase text-[#d1c5b3] opacity-40 hover:text-[#dbb462] hover:opacity-100 transition-opacity duration-300" href="#">PRIVACY POLICY</a>
+<a class="font-stretch text-[8px] tracking-[0.2em] uppercase text-[#d1c5b3] opacity-40 hover:text-[#dbb462] hover:opacity-100 transition-opacity duration-300" href="#">TERMS OF SERVICE</a>
+<a class="font-stretch text-[8px] tracking-[0.2em] uppercase text-[#d1c5b3] opacity-40 hover:text-[#dbb462] hover:opacity-100 transition-opacity duration-300" href="#">SUPPORT</a>
+<a class="font-stretch text-[8px] tracking-[0.2em] uppercase text-[#d1c5b3] opacity-40 hover:text-[#dbb462] hover:opacity-100 transition-opacity duration-300" href="#">SPONSORS</a>
+</div>
+</div>
+</footer>
+</body></html>

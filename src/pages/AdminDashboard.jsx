@@ -1,0 +1,1349 @@
+import React, { useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
+import {
+  Download, Users, CheckCircle2, XCircle, Split,
+  Plus, Edit2, Trash2, BarChart3, Settings,
+  Eye, X, ToggleLeft, ToggleRight, Clock, Calendar,
+  FileText, Map, ListOrdered, Search, RefreshCw,
+} from 'lucide-react';
+import { useAuth } from '../hooks/useAuth';
+import { useSupabaseDB } from '../hooks/useSupabaseDB';
+import { useTournaments } from '../hooks/useTournaments';
+import { partitionTeamsIntoGroups, assignGroupsToSupabase } from '../utils/groupPartitioner';
+import { exportRegistrationsToXLSX } from '../utils/xlsxExport';
+import { computeTournamentStatus } from '../utils/tournamentStatus';
+import GradientButton from '../components/ui/GradientButton';
+import StatusBadge from '../components/ui/StatusBadge';
+import Modal from '../components/ui/Modal';
+import GhostInput from '../components/ui/GhostInput';
+import { uploadFile } from '../utils/storage';
+import toast from 'react-hot-toast';
+
+// ─────────────────────────────────────────────────────────────
+// Main Dashboard
+// ─────────────────────────────────────────────────────────────
+export default function AdminDashboard() {
+  const { user, isAdmin, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
+
+  const {
+    data: registrations,
+    add: addReg,
+    update: updateReg,
+    remove: removeReg,
+  } = useSupabaseDB('registrations', { field: 'created_at', direction: 'desc' });
+
+  const { tournaments, add: addTournament, update: updateTournament, remove: removeTournament } = useTournaments();
+
+  const [activeTab, setActiveTab] = useState('tournaments');
+  // Tournament create/edit modal
+  const [tournamentModal, setTournamentModal] = useState({ open: false, data: null });
+  // Per-tournament registration panel
+  const [regsModal, setRegsModal] = useState(null); // tournament object
+  // Per-tournament groups panel
+  const [groupsModal, setGroupsModal] = useState(null); // tournament object
+  // Inline registration edit modal
+  const [registrationModal, setRegistrationModal] = useState({ open: false, data: null, tournamentId: null });
+
+  // Auth guard
+  React.useEffect(() => {
+    if (!authLoading && (!user || !isAdmin)) {
+      navigate('/');
+    }
+  }, [user, isAdmin, authLoading, navigate]);
+
+  // ── Registration actions ──
+  async function handleApprove(reg) {
+    await updateReg(reg.id, { status: 'approved' });
+    toast.success(`${reg.team_name} approved!`);
+  }
+  async function handleReject(reg) {
+    await updateReg(reg.id, { status: 'rejected' });
+    toast.success(`${reg.team_name} rejected`);
+  }
+  async function handleDelete(reg) {
+    if (!confirm(`Delete ${reg.team_name}? This cannot be undone.`)) return;
+    await removeReg(reg.id);
+    toast.success('Registration deleted');
+  }
+
+  // ── XLSX Export (tournament-scoped) ──
+  function handleExport(tournament) {
+    const filtered = registrations.filter((r) => r.tournament_id === tournament.id);
+    // Strip out all characters that are unsafe for Windows filenames
+    const safeTitle = tournament.title.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+    exportRegistrationsToXLSX(filtered, `zenith_${safeTitle}`);
+    toast.success(`XLSX exported: ${filtered.length} records`);
+  }
+
+  if (authLoading) return <LoadingScreen />;
+  if (!isAdmin) return null;
+
+  return (
+    <div className="min-h-screen bg-[#131313] pt-20">
+      <div className="flex animate-page-enter">
+
+        {/* ── Sidebar ── */}
+        <aside className="hidden md:flex flex-col w-64 bg-[#131313] border-r border-[rgba(78,70,56,0.15)] min-h-[calc(100vh-5rem)] shrink-0">
+          <div className="p-8">
+            <h2 className="font-agency text-xl font-bold text-[#f9d07a] tracking-tight">COMMAND CENTER</h2>
+            <p className="font-stretch text-[8px] tracking-widest text-[#d1c5b3] opacity-40 mt-1">ADMIN OVERVIEW</p>
+          </div>
+
+          <nav className="flex-1 space-y-1">
+            {[
+              { id: 'tournaments', icon: BarChart3, label: 'Tournaments' },
+              { id: 'settings',    icon: Settings,  label: 'Settings'    },
+            ].map(({ id, icon: Icon, label }) => (
+              <button
+                key={id}
+                onClick={() => setActiveTab(id)}
+                className={`
+                  w-full flex items-center gap-4 px-8 py-4
+                  font-stretch text-[10px] tracking-widest text-left
+                  transition-all duration-200 ease-out
+                  ${activeTab === id
+                    ? 'text-[#f9d07a] bg-[#1f1f1f] border-l-4 border-[#f9d07a]'
+                    : 'text-[#d1c5b3] opacity-50 hover:opacity-100 hover:bg-[#2a2a2a]'
+                  }
+                `}
+              >
+                <Icon size={18} />
+                {label}
+              </button>
+            ))}
+          </nav>
+
+          <div className="px-6 pb-8">
+            <GradientButton
+              className="w-full"
+              onClick={() => setTournamentModal({ open: true, data: null })}
+              icon={Plus}
+            >
+              CREATE TOURNAMENT
+            </GradientButton>
+          </div>
+        </aside>
+
+        {/* ── Main ── */}
+        <main className="flex-1 p-8 lg:p-12 overflow-auto">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+            <div>
+              <h1 className="font-agency text-5xl md:text-6xl font-black italic tracking-tighter">
+                TOURNAMENT OPS
+              </h1>
+              <p className="font-stretch text-[9px] tracking-widest text-[#d1c5b3] opacity-50 mt-2">
+                REAL-TIME MANAGEMENT & GRID LOGISTICS
+              </p>
+            </div>
+            <div className="flex md:hidden">
+              <GradientButton onClick={() => setTournamentModal({ open: true, data: null })} icon={Plus}>
+                CREATE
+              </GradientButton>
+            </div>
+          </div>
+
+          {activeTab === 'tournaments' && (
+            <TournamentsTab
+              tournaments={tournaments}
+              registrations={registrations}
+              onEdit={(t) => setTournamentModal({ open: true, data: t })}
+              onDelete={async (t) => {
+                if (!confirm(`CAUTION: This will delete the tournament "${t.title}" and ALL associated registrations. Proceed?`)) return;
+                
+                const toastId = toast.loading('Initiating tactical deletion...');
+                try {
+                  // Manually delete dependent registrations first to satisfy foreign key constraints
+                  // if ON DELETE CASCADE is not set in the DB.
+                  const { error: regErr } = await supabase
+                    .from('registrations')
+                    .delete()
+                    .eq('tournament_id', t.id);
+                  
+                  if (regErr) throw regErr;
+                  
+                  // Now delete the tournament
+                  await removeTournament(t.id);
+                  toast.success('Tournament and all data purged successfully.', { id: toastId });
+                } catch (err) {
+                  console.error('Purge Failed:', err);
+                  toast.error(`Purge Failed: ${err.message}`, { id: toastId });
+                }
+              }}
+              onViewRegs={(t) => setRegsModal(t)}
+              onViewGroups={(t) => setGroupsModal(t)}
+              onExport={handleExport}
+            />
+          )}
+
+          {activeTab === 'settings' && <SettingsTab user={user} />}
+        </main>
+      </div>
+
+      {/* ── Tournament Create/Edit Modal ── */}
+      <TournamentModal
+        isOpen={tournamentModal.open}
+        onClose={() => setTournamentModal({ open: false, data: null })}
+        tournament={tournamentModal.data}
+        onSave={async (data, file) => {
+          try {
+            let posterUrl = data.poster_url;
+            if (file) {
+              toast.loading('Uploading poster...', { id: 'upload-poster' });
+              posterUrl = await uploadFile('ze-posters', file, `poster_${Date.now()}`);
+              toast.success('Poster uploaded!', { id: 'upload-poster' });
+            }
+            // Compute and store status
+            const withStatus = { ...data, poster_url: posterUrl };
+            withStatus.status = computeTournamentStatus(withStatus);
+            if (!withStatus.start_date) withStatus.start_date = null;
+            if (!withStatus.registration_deadline) withStatus.registration_deadline = null;
+            if (!withStatus.registration_open_date) withStatus.registration_open_date = null;
+
+            if (tournamentModal.data) {
+              await updateTournament(tournamentModal.data.id, withStatus);
+              toast.success('Tournament updated!');
+            } else {
+              await addTournament(withStatus);
+              toast.success('Tournament created!');
+            }
+            setTournamentModal({ open: false, data: null });
+          } catch (err) {
+            toast.error(`Failed: ${err.message}`, { id: 'upload-poster', duration: 8000 });
+            throw err;
+          }
+        }}
+      />
+
+      {/* ── Registrations Panel Modal ── */}
+      {regsModal && (
+        <TournamentRegsModal
+          tournament={regsModal}
+          registrations={registrations.filter((r) => r.tournament_id === regsModal.id)}
+          onClose={() => setRegsModal(null)}
+          onApprove={handleApprove}
+          onReject={handleReject}
+          onDelete={handleDelete}
+          onExport={() => handleExport(regsModal)}
+          onEdit={(reg) => {
+            setRegistrationModal({ open: true, data: reg, tournamentId: regsModal.id });
+            setRegsModal(null);
+          }}
+          onAdd={() => {
+            setRegistrationModal({ open: true, data: null, tournamentId: regsModal.id });
+            setRegsModal(null);
+          }}
+        />
+      )}
+
+      {/* ── Groups Panel Modal ── */}
+      {groupsModal && (
+        <TournamentGroupsModal
+          tournament={groupsModal}
+          registrations={registrations.filter(
+            (r) => r.tournament_id === groupsModal.id && r.status === 'approved'
+          )}
+          allRegistrations={registrations.filter((r) => r.tournament_id === groupsModal.id)}
+          updateReg={updateReg}
+          onClose={() => setGroupsModal(null)}
+        />
+      )}
+
+      {/* ── Registration Add/Edit Modal ── */}
+      <RegistrationModal
+        isOpen={registrationModal.open}
+        onClose={() => setRegistrationModal({ open: false, data: null, tournamentId: null })}
+        registration={registrationModal.data}
+        tournament={tournaments.find((t) => t.id === registrationModal.tournamentId) || null}
+        onSave={async (data, file) => {
+          try {
+            let logoUrl = data.logo_url;
+            if (file) {
+              toast.loading('Uploading logo...', { id: 'upload-logo' });
+              logoUrl = await uploadFile('ze-logos', file, `logo_${Date.now()}`);
+              toast.success('Logo uploaded!', { id: 'upload-logo' });
+            }
+            const finalData = { ...data, logo_url: logoUrl };
+            if (registrationModal.data) {
+              await updateReg(registrationModal.data.id, finalData);
+              toast.success('Registration updated!');
+            } else {
+              await addReg({ ...finalData, status: finalData.status || 'pending' });
+              toast.success('Registration added!');
+            }
+            setRegistrationModal({ open: false, data: null, tournamentId: null });
+          } catch (err) {
+            toast.error(`Failed: ${err.message}`, { id: 'upload-logo' });
+            throw err;
+          }
+        }}
+      />
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Tournaments Tab
+// ─────────────────────────────────────────────────────────────
+function TournamentsTab({ tournaments, registrations, onEdit, onDelete, onViewRegs, onViewGroups, onExport }) {
+  return (
+    <div className="space-y-4">
+      {tournaments.length === 0 ? (
+        <div className="text-center py-20 bg-[#1b1b1b]">
+          <p className="font-stretch text-[10px] tracking-widest text-[#d1c5b3] opacity-30">
+            NO TOURNAMENTS YET — CREATE ONE ABOVE
+          </p>
+        </div>
+      ) : (
+        tournaments.map((t) => {
+          const regCount = registrations.filter(
+            (r) => r.tournament_id === t.id && r.status !== 'rejected'
+          ).length;
+          const pendingCount = registrations.filter(
+            (r) => r.tournament_id === t.id && r.status === 'pending'
+          ).length;
+
+          return (
+            <div
+              key={t.id}
+              className="bg-[#1b1b1b] border border-[rgba(78,70,56,0.2)] hover:border-[rgba(78,70,56,0.4)] transition-colors"
+            >
+              {/* Header Row */}
+              <div className="flex items-center justify-between p-6 border-b border-[rgba(78,70,56,0.1)]">
+                <div className="flex items-center gap-6">
+                  <StatusBadge status={t.status} />
+                  <div>
+                    <p className="font-agency text-2xl font-bold">{t.title}</p>
+                    <p className="font-stretch text-[9px] text-[#d1c5b3] opacity-40 tracking-widest mt-0.5">
+                      {t.game || 'PUBG MOBILE'} &bull; {regCount}/{t.max_teams || 64} TEAMS
+                      {pendingCount > 0 && (
+                        <span className="text-[#f9d07a] ml-2">• {pendingCount} PENDING</span>
+                      )}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => onEdit(t)}
+                    title="Edit Tournament"
+                    className="text-[#f9d07a] hover:opacity-70 transition-opacity p-2"
+                  >
+                    <Edit2 size={16} />
+                  </button>
+                  <button
+                    onClick={() => onDelete(t)}
+                    title="Delete Tournament"
+                    className="text-[#ffb4ab] hover:opacity-70 transition-opacity p-2"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-wrap gap-0 divide-x divide-[rgba(78,70,56,0.15)]">
+                <ActionBtn
+                  icon={Eye}
+                  label="View Registrations"
+                  badge={pendingCount > 0 ? pendingCount : null}
+                  onClick={() => onViewRegs(t)}
+                />
+                <ActionBtn
+                  icon={Split}
+                  label="View Groups"
+                  onClick={() => onViewGroups(t)}
+                />
+                <ActionBtn
+                  icon={Download}
+                  label="Export XLSX"
+                  onClick={() => onExport(t)}
+                />
+              </div>
+            </div>
+          );
+        })
+      )}
+    </div>
+  );
+}
+
+function ActionBtn({ icon: Icon, label, badge, onClick }) {
+  return (
+    <button
+      onClick={onClick}
+      className="flex items-center gap-2 px-6 py-3 font-stretch text-[9px] tracking-widest text-[#d1c5b3] opacity-50 hover:opacity-100 hover:bg-[#2a2a2a] transition-all flex-1 md:flex-none"
+    >
+      <Icon size={14} />
+      {label}
+      {badge && (
+        <span className="bg-[#f9d07a] text-[#402d00] font-bold text-[8px] px-1.5 py-0.5 rounded-full">
+          {badge}
+        </span>
+      )}
+    </button>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Tournament Registrations Modal
+// ─────────────────────────────────────────────────────────────
+function TournamentRegsModal({ tournament, registrations, onClose, onApprove, onReject, onDelete, onExport, onEdit, onAdd }) {
+  const [search, setSearch] = useState('');
+  const [filterStatus, setFilterStatus] = useState('all');
+
+  const filtered = registrations
+    .filter((r) => filterStatus === 'all' || r.status === filterStatus)
+    .filter((r) =>
+      search
+        ? r.team_name?.toLowerCase().includes(search.toLowerCase()) ||
+          r.real_name?.toLowerCase().includes(search.toLowerCase())
+        : true
+    );
+
+  const stats = {
+    total:    registrations.length,
+    pending:  registrations.filter((r) => r.status === 'pending').length,
+    approved: registrations.filter((r) => r.status === 'approved').length,
+    rejected: registrations.filter((r) => r.status === 'rejected').length,
+  };
+
+  return (
+    <div className="fixed inset-0 z-[9999] flex items-start justify-center bg-black/80 backdrop-blur-sm overflow-y-auto py-8">
+      <div className="bg-[#131313] border border-[rgba(78,70,56,0.3)] w-full max-w-6xl mx-4 flex flex-col max-h-[90vh]">
+
+        {/* Modal Header */}
+        <div className="flex items-center justify-between px-8 py-5 border-b border-[rgba(78,70,56,0.2)] flex-shrink-0">
+          <div>
+            <h2 className="font-agency text-2xl font-bold text-[#f9d07a]">REGISTRATIONS</h2>
+            <p className="font-stretch text-[9px] tracking-widest text-[#d1c5b3] opacity-50 mt-1">
+              {tournament.title.toUpperCase()}
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={onExport}
+              className="flex items-center gap-2 border border-[rgba(78,70,56,0.3)] px-4 py-2 font-stretch text-[9px] tracking-widest text-[#d1c5b3] hover:bg-[#2a2a2a] transition-colors"
+            >
+              <Download size={13} /> EXPORT XLSX
+            </button>
+            <button
+              onClick={onAdd}
+              className="flex items-center gap-2 bg-[#f9d07a]/10 border border-[#f9d07a]/30 text-[#f9d07a] px-4 py-2 font-stretch text-[9px] tracking-widest hover:bg-[#f9d07a]/20 transition-colors"
+            >
+              <Plus size={13} /> ADD
+            </button>
+            <button onClick={onClose} className="text-[#d1c5b3] hover:text-white transition-colors p-1">
+              <X size={20} />
+            </button>
+          </div>
+        </div>
+
+        {/* Stats strip */}
+        <div className="grid grid-cols-4 border-b border-[rgba(78,70,56,0.15)] flex-shrink-0">
+          {[
+            { label: 'TOTAL',    value: stats.total },
+            { label: 'PENDING',  value: stats.pending,  hi: true },
+            { label: 'APPROVED', value: stats.approved },
+            { label: 'REJECTED', value: stats.rejected, hi: true },
+          ].map(({ label, value, hi }) => (
+            <div key={label} className={`p-4 ${hi ? 'bg-[#1b1b1b]' : ''}`}>
+              <p className="font-stretch text-[7px] text-[#c6c6c6] tracking-widest">{label}</p>
+              <p className="font-agency text-2xl font-bold text-[#f9d07a]">{value}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Filters */}
+        <div className="flex gap-3 px-6 py-4 border-b border-[rgba(78,70,56,0.1)] flex-wrap flex-shrink-0">
+          <div className="flex items-center gap-2 bg-[#1f1f1f] border border-[rgba(78,70,56,0.3)] px-3 py-2">
+            <Search size={12} className="text-[#d1c5b3] opacity-40" />
+            <input
+              type="text"
+              placeholder="Search teams..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="bg-transparent text-[11px] font-stretch tracking-widest text-[#d1c5b3] placeholder:opacity-30 w-36 focus:outline-none"
+            />
+          </div>
+          {['all', 'pending', 'approved', 'rejected'].map((s) => (
+            <button
+              key={s}
+              onClick={() => setFilterStatus(s)}
+              className={`font-stretch text-[9px] tracking-widest px-4 py-2 transition-all ${
+                filterStatus === s
+                  ? 'bg-[#f9d07a] text-[#402d00]'
+                  : 'border border-[rgba(78,70,56,0.3)] text-[#d1c5b3] opacity-50 hover:opacity-100'
+              }`}
+            >
+              {s.toUpperCase()}
+            </button>
+          ))}
+        </div>
+
+        {/* Table */}
+        <div className="overflow-y-auto flex-1">
+          <table className="w-full border-collapse">
+            <thead className="sticky top-0 bg-[#1a1a1a] z-10">
+              <tr>
+                {['TEAM', 'REAL NAME', 'WHATSAPP', 'PLAYERS', 'STATUS', 'GROUP', 'ACTIONS'].map((h) => (
+                  <th key={h} className="px-4 py-3 font-stretch text-[8px] text-[#d1c5b3] tracking-widest opacity-50 text-left">
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="px-4 py-16 text-center font-stretch text-[9px] text-[#d1c5b3] opacity-20 tracking-widest">
+                    NO REGISTRATIONS FOUND
+                  </td>
+                </tr>
+              ) : (
+                filtered.map((reg) => (
+                  <tr key={reg.id} className="border-b border-[rgba(78,70,56,0.08)] group hover:bg-[#1a1a1a] transition-colors">
+                    <td className="px-4 py-4">
+                      <div className="flex items-center gap-3">
+                        {reg.logo_url ? (
+                          <img src={reg.logo_url} alt="" className="w-8 h-8 object-cover rounded-full border border-[#4e4638] flex-shrink-0" />
+                        ) : (
+                          <div className="w-8 h-8 bg-[#2a2a2a] rounded-full flex items-center justify-center font-agency text-sm text-[#f9d07a] font-bold flex-shrink-0">
+                            {reg.team_name?.[0]}
+                          </div>
+                        )}
+                        <span className="font-agency font-bold text-base whitespace-nowrap">{reg.team_name}</span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 font-body text-sm text-[#d1c5b3] opacity-70">{reg.real_name || '—'}</td>
+                    <td className="px-4 py-4 font-body text-xs text-[#d1c5b3] opacity-50">{reg.whatsapp_number}</td>
+                    <td className="px-4 py-4">
+                      <span className="font-stretch text-[9px] text-[#f9d07a] tracking-widest">
+                        {reg.player_ids?.length || 0} PLAYERS
+                      </span>
+                    </td>
+                    <td className="px-4 py-4">
+                      <StatusBadge status={reg.status} />
+                    </td>
+                    <td className="px-4 py-4 font-stretch text-[9px] text-[#d1c5b3] opacity-40 tracking-widest">
+                      {reg.group_id || '—'}
+                    </td>
+                    <td className="px-4 py-4">
+                      <div className="flex gap-2 opacity-20 group-hover:opacity-100 transition-opacity">
+                        {reg.status === 'pending' && (
+                          <>
+                            <button onClick={() => onApprove(reg)} title="Approve" className="text-emerald-400 hover:text-emerald-300">
+                              <CheckCircle2 size={16} />
+                            </button>
+                            <button onClick={() => onReject(reg)} title="Reject" className="text-red-400 hover:text-red-300">
+                              <XCircle size={16} />
+                            </button>
+                          </>
+                        )}
+                        <button onClick={() => onEdit(reg)} title="Edit" className="text-[#f9d07a] hover:opacity-70">
+                          <Edit2 size={16} />
+                        </button>
+                        <button onClick={() => onDelete(reg)} title="Delete" className="text-[#9a8f7f] hover:text-[#ffb4ab]">
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Tournament Groups Modal
+// ─────────────────────────────────────────────────────────────
+function TournamentGroupsModal({ tournament, registrations, allRegistrations, updateReg, onClose }) {
+  const [groupingInProgress, setGroupingInProgress] = useState(false);
+
+  // Build group map from assigned registrations
+  const assignedRegs = allRegistrations.filter((r) => r.group_id);
+  const groupMap = {};
+  assignedRegs.forEach((r) => {
+    if (!groupMap[r.group_id]) groupMap[r.group_id] = [];
+    groupMap[r.group_id].push(r);
+  });
+  const groupNames = Object.keys(groupMap).sort((a, b) => {
+    const n1 = parseInt(a.replace('Group ', ''), 10);
+    const n2 = parseInt(b.replace('Group ', ''), 10);
+    return n1 - n2;
+  });
+
+  // Auto-split if none assigned
+  React.useEffect(() => {
+    const unassigned = registrations.filter((r) => !r.group_id);
+    if (unassigned.length > 0 && assignedRegs.length === 0 && !groupingInProgress) {
+      const autoSplit = async () => {
+        setGroupingInProgress(true);
+        try {
+          const { groupsCreated, teamsAssigned } = await assignGroupsToSupabase(unassigned, updateReg, 20);
+          toast.success(`SYSTEM: ${teamsAssigned} teams auto-assigned to ${groupsCreated} groups`);
+        } catch (err) {
+          console.error('Auto-grouping failed:', err);
+        } finally {
+          setGroupingInProgress(false);
+        }
+      };
+      autoSplit();
+    }
+  }, [registrations.length, assignedRegs.length, groupingInProgress]);
+
+  async function handleSplit() {
+    const unassigned = registrations.filter((r) => !r.group_id);
+    if (unassigned.length === 0) {
+      toast.error('No unassigned approved teams found');
+      return;
+    }
+    setGroupingInProgress(true);
+    try {
+      const { groupsCreated, teamsAssigned } = await assignGroupsToSupabase(unassigned, updateReg, 20);
+      toast.success(`${teamsAssigned} teams assigned to ${groupsCreated} groups!`);
+    } catch (err) {
+      toast.error('Group split failed');
+    } finally {
+      setGroupingInProgress(false);
+    }
+  }
+
+  async function handleReset() {
+    if (!confirm(`Reset all group assignments for ${tournament.title}?`)) return;
+    for (const reg of assignedRegs) {
+      await updateReg(reg.id, { group_id: null });
+    }
+    toast.success('All group assignments reset');
+  }
+
+  return (
+    <div className="fixed inset-0 z-[9999] flex items-start justify-center bg-black/80 backdrop-blur-sm overflow-y-auto py-8">
+      <div className="bg-[#131313] border border-[rgba(78,70,56,0.3)] w-full max-w-5xl mx-4">
+
+        {/* Header */}
+        <div className="flex items-center justify-between px-8 py-5 border-b border-[rgba(78,70,56,0.2)]">
+          <div>
+            <h2 className="font-agency text-2xl font-bold text-[#f9d07a]">GROUPS</h2>
+            <p className="font-stretch text-[9px] tracking-widest text-[#d1c5b3] opacity-50 mt-1">
+              {tournament.title.toUpperCase()} &bull; {registrations.length} APPROVED TEAMS
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            {groupNames.length > 0 && (
+              <button
+                onClick={handleReset}
+                className="border border-[rgba(78,70,56,0.3)] px-4 py-2 font-stretch text-[9px] tracking-widest text-[#d1c5b3] hover:bg-[#2a2a2a] transition-colors"
+              >
+                RESET ALL
+              </button>
+            )}
+            <GradientButton icon={Split} onClick={handleSplit} disabled={groupingInProgress}>
+              {groupingInProgress ? 'SPLITTING...' : 'AUTO-SPLIT (20)'}
+            </GradientButton>
+            <button onClick={onClose} className="text-[#d1c5b3] hover:text-white transition-colors p-1 ml-2">
+              <X size={20} />
+            </button>
+          </div>
+        </div>
+
+        {/* Groups Grid */}
+        <div className="p-8">
+          {groupNames.length === 0 ? (
+            <div className="text-center py-16 bg-[#1b1b1b]">
+              <p className="font-stretch text-[10px] tracking-widest text-[#d1c5b3] opacity-30 mb-2">
+                NO GROUPS ASSIGNED YET
+              </p>
+              <p className="text-[#d1c5b3] opacity-20 text-sm">
+                Approve teams first, then click AUTO-SPLIT.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              {groupNames.map((groupName) => {
+                const teams = groupMap[groupName];
+                const isFull = teams.length >= 20;
+                return (
+                  <div key={groupName} className={`bg-[#1f1f1f] p-5 border-l-4 ${isFull ? 'border-[#dbb462]' : 'border-[rgba(78,70,56,0.3)]'}`}>
+                    <div className="flex justify-between items-start mb-3">
+                      <div>
+                        <p className="font-agency text-xl font-bold">{groupName.toUpperCase()}</p>
+                        <p className="font-stretch text-[9px] text-[#d1c5b3] opacity-50 tracking-widest">
+                          {teams.length} / 20 SLOTS
+                        </p>
+                      </div>
+                      {isFull ? <CheckCircle2 size={18} className="text-[#f9d07a]" /> : <Clock size={18} className="text-[#9a8f7f] opacity-40" />}
+                    </div>
+                    <div className="w-full bg-[#353535] h-0.5 mb-3">
+                      <div className="zenith-gradient h-full" style={{ width: `${(teams.length / 20) * 100}%` }} />
+                    </div>
+                    <div className="space-y-1.5 max-h-40 overflow-y-auto no-scrollbar">
+                      {teams.map((t) => (
+                        <div key={t.id} className="flex items-center gap-2">
+                          <span className="w-1.5 h-1.5 bg-[#dbb462] rounded-full flex-shrink-0" />
+                          <span className="font-body text-xs text-[#d1c5b3] opacity-60 truncate">{t.team_name}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Settings Tab
+// ─────────────────────────────────────────────────────────────
+function SettingsTab({ user }) {
+  return (
+    <div className="max-w-lg space-y-6">
+      {/* Admin Profile */}
+      <div className="bg-[#1f1f1f] p-8">
+        <h3 className="font-stretch text-[10px] tracking-widest text-[#f9d07a] mb-6">ADMIN PROFILE</h3>
+        <div className="space-y-4">
+          <InfoRow label="EMAIL">{user?.email}</InfoRow>
+          <InfoRow label="ROLE"><span className="font-stretch text-[9px] tracking-widest text-[#f9d07a]">ADMINISTRATOR</span></InfoRow>
+          <InfoRow label="USER ID" mono>{user?.id}</InfoRow>
+        </div>
+      </div>
+
+      {/* Database */}
+      <div className="bg-[#1f1f1f] p-8">
+        <h3 className="font-stretch text-[10px] tracking-widest text-[#f9d07a] mb-4">DATABASE SETUP</h3>
+        <p className="text-[#d1c5b3] opacity-50 text-xs leading-relaxed mb-4">
+          Run this SQL in your Supabase SQL Editor to enable all features (auto-status, briefing, schedule, roadmap):
+        </p>
+        <pre className="bg-[#0e0e0e] border border-[rgba(78,70,56,0.3)] p-4 text-[10px] text-[#f9d07a] overflow-x-auto leading-relaxed font-mono whitespace-pre-wrap">
+{`ALTER TABLE public.tournaments
+  ADD COLUMN IF NOT EXISTS registration_open_date
+    timestamp with time zone,
+  ADD COLUMN IF NOT EXISTS is_completed
+    boolean DEFAULT false,
+  ADD COLUMN IF NOT EXISTS briefing text,
+  ADD COLUMN IF NOT EXISTS schedule
+    jsonb DEFAULT '[]',
+  ADD COLUMN IF NOT EXISTS roadmap
+    jsonb DEFAULT '[]';
+
+-- Allows public realtime stats to fetch total users securely
+create or replace function public.get_total_users()
+returns integer
+language sql
+security definer
+as $$
+  select count(*)::integer from public.users;
+$$;`}
+        </pre>
+      </div>
+
+      {/* Supabase RLS */}
+      <div className="bg-[#1f1f1f] p-8">
+        <h3 className="font-stretch text-[10px] tracking-widest text-[#f9d07a] mb-4">SECURITY REMINDER</h3>
+        <p className="text-[#d1c5b3] opacity-50 text-xs leading-relaxed">
+          Ensure Supabase Row Level Security (RLS) is enabled on all tables. Check&nbsp;
+          <span className="text-[#dbb462]">Supabase Dashboard → Table Editor → RLS</span> to verify policies are active.
+          Only admins should be able to INSERT/UPDATE/DELETE tournaments and UPDATE registrations.
+        </p>
+      </div>
+
+      {/* Registration Overhaul SQL */}
+      <div className="bg-[#1f1f1f] p-8 border border-[#dbb462]/30">
+        <h3 className="font-stretch text-[10px] tracking-widest text-[#f9d07a] mb-4">REGISTRATION OVERHAUL (REQUIRED SQL)</h3>
+        <p className="text-[#d1c5b3] opacity-50 text-xs leading-relaxed mb-4">
+          Run this SQL to add the Real Name field and ensure Character ID uniqueness checks:
+        </p>
+        <pre className="bg-[#0e0e0e] border border-[rgba(78,70,56,0.3)] p-4 text-[10px] text-[#f9d07a] font-mono whitespace-pre-wrap">
+{`-- Add real_name column to registrations
+ALTER TABLE public.registrations 
+  ADD COLUMN IF NOT EXISTS real_name TEXT;
+
+-- Recommended: Add index to player_ids for faster uniqueness checks
+-- CREATE INDEX IF NOT EXISTS idx_registrations_player_ids ON public.registrations USING GIN (player_ids);`}
+        </pre>
+      </div>
+    </div>
+  );
+}
+
+function InfoRow({ label, children, mono }) {
+  return (
+    <div className="flex justify-between py-3 border-b border-[rgba(78,70,56,0.15)] last:border-0">
+      <span className="font-stretch text-[9px] tracking-widest text-[#d1c5b3] opacity-50">{label}</span>
+      <span className={`${mono ? 'font-mono text-xs text-[#d1c5b3] opacity-40 truncate max-w-[200px]' : 'font-body text-sm text-[#e2e2e2]'}`}>
+        {children}
+      </span>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Tournament Create/Edit Modal
+// ─────────────────────────────────────────────────────────────
+function TournamentModal({ isOpen, onClose, tournament, onSave }) {
+  const emptyForm = {
+    title: '',
+    description: '',
+    briefing: '',
+    game: 'PUBG Mobile',
+    max_teams: 64,
+    prize_pool: '',
+    registration_open_date: '',
+    registration_deadline: '',
+    start_date: '',
+    poster_url: '',
+    is_completed: false,
+  };
+
+  const [form, setForm] = useState(emptyForm);
+  const [scheduleRows, setScheduleRows] = useState([]);
+  const [roadmapRows, setRoadmapRows] = useState([]);
+  const [file, setFile] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [section, setSection] = useState('basic'); // basic | content | schedule | roadmap
+
+  const parseJSON = (val) => {
+    if (!val) return [];
+    if (Array.isArray(val)) return val;
+    try { return JSON.parse(val); } catch { return []; }
+  };
+
+  React.useEffect(() => {
+    if (tournament) {
+      setForm({
+        title:                    tournament.title || '',
+        description:              tournament.description || '',
+        briefing:                 tournament.briefing || '',
+        game:                     tournament.game || 'PUBG Mobile',
+        max_teams:                tournament.max_teams || 64,
+        prize_pool:               tournament.prize_pool || '',
+        registration_open_date:   tournament.registration_open_date
+          ? new Date(tournament.registration_open_date).toISOString().slice(0, 16) : '',
+        registration_deadline:    tournament.registration_deadline
+          ? new Date(tournament.registration_deadline).toISOString().slice(0, 16) : '',
+        start_date:               tournament.start_date
+          ? new Date(tournament.start_date).toISOString().slice(0, 10) : '',
+        poster_url:               tournament.poster_url || '',
+        is_completed:             tournament.is_completed || false,
+      });
+      setScheduleRows(
+        parseJSON(tournament.schedule).map((r) => ({ ...r, id: Math.random() }))
+      );
+      setRoadmapRows(
+        parseJSON(tournament.roadmap).map((r) => ({ ...r, id: Math.random() }))
+      );
+    } else {
+      setForm(emptyForm);
+      setScheduleRows([]);
+      setRoadmapRows([]);
+    }
+    setFile(null);
+    setSection('basic');
+  }, [tournament, isOpen]);
+
+  // ── Schedule helpers ──
+  function addScheduleRow() {
+    setScheduleRows((p) => [...p, { id: Math.random(), date: '', time: '', event: '' }]);
+  }
+  function updSched(id, field, value) {
+    setScheduleRows((p) => p.map((r) => (r.id === id ? { ...r, [field]: value } : r)));
+  }
+  function delSched(id) {
+    setScheduleRows((p) => p.filter((r) => r.id !== id));
+  }
+
+  // ── Roadmap helpers ──
+  function addRoadmapRow() {
+    setRoadmapRows((p) => [...p, { id: Math.random(), phase: '', title: '', description: '' }]);
+  }
+  function updRoad(id, field, value) {
+    setRoadmapRows((p) => p.map((r) => (r.id === id ? { ...r, [field]: value } : r)));
+  }
+  function delRoad(id) {
+    setRoadmapRows((p) => p.filter((r) => r.id !== id));
+  }
+
+  async function handleSave() {
+    if (!form.title.trim()) { toast.error('Title required'); return; }
+    setSaving(true);
+    try {
+      const parsedMaxTeams = form.max_teams === '' || form.max_teams === null ? null : parseInt(form.max_teams, 10);
+      const finalData = {
+        ...form,
+        max_teams: parsedMaxTeams,
+        schedule: scheduleRows.map(({ date, time, event }) => ({ date, time, event })),
+        roadmap:  roadmapRows.map(({ phase, title, description }) => ({ phase, title, description })),
+      };
+      await onSave(finalData, file);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  const computedStatus = computeTournamentStatus(form);
+
+  // Section tabs inside modal
+  const modalSections = [
+    { id: 'basic',    label: 'Basic',    icon: BarChart3 },
+    { id: 'content',  label: 'Briefing', icon: FileText },
+    { id: 'schedule', label: 'Schedule', icon: ListOrdered },
+    { id: 'roadmap',  label: 'Roadmap',  icon: Map },
+  ];
+
+  const inputCls = 'w-full bg-[#131313] border border-[rgba(78,70,56,0.3)] p-2.5 text-sm text-[#e2e2e2] focus:outline-none focus:border-[#f9d07a] transition-colors font-mono placeholder:opacity-30';
+  const labelCls = 'font-stretch text-[9px] tracking-widest text-[#d1c5b3] uppercase block mb-1';
+
+  return (
+    <Modal isOpen={isOpen} onClose={onClose} title={tournament ? 'EDIT TOURNAMENT' : 'CREATE TOURNAMENT'}>
+      {/* Section nav */}
+      <div className="flex gap-1 mb-6 -mx-1">
+        {modalSections.map(({ id, label, icon: Icon }) => (
+          <button
+            key={id}
+            onClick={() => setSection(id)}
+            className={`flex items-center gap-1.5 flex-1 justify-center py-2 font-stretch text-[9px] tracking-widest transition-all ${
+              section === id ? 'bg-[#f9d07a] text-[#402d00]' : 'bg-[#1f1f1f] text-[#d1c5b3] opacity-50 hover:opacity-100'
+            }`}
+          >
+            <Icon size={11} /> {label}
+          </button>
+        ))}
+      </div>
+
+      {/* ── BASIC ── */}
+      {section === 'basic' && (
+        <div className="space-y-5">
+          {/* Poster */}
+          <div className="flex gap-4">
+            <div className="w-24 h-32 bg-[#0e0e0e] border border-[rgba(78,70,56,0.3)] flex-shrink-0 flex items-center justify-center overflow-hidden">
+              {file ? (
+                <img src={URL.createObjectURL(file)} alt="Preview" className="w-full h-full object-cover" />
+              ) : form.poster_url ? (
+                <img src={form.poster_url} alt="Poster" className="w-full h-full object-cover" />
+              ) : (
+                <BarChart3 className="text-[#d1c5b3] opacity-20" size={28} />
+              )}
+            </div>
+            <div className="flex-1 space-y-2">
+              <label className={labelCls}>Event Poster</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => setFile(e.target.files[0])}
+                className="w-full text-[10px] text-[#d1c5b3] file:mr-4 file:py-2 file:px-4 file:border-0 file:bg-[#1f1f1f] file:text-[#f9d07a] file:font-stretch file:text-[9px] file:cursor-pointer hover:file:bg-[#2a2a2a]"
+              />
+              <p className="text-[9px] text-[#d1c5b3] opacity-30">Recommended: 16:9 or 3:4 ratio</p>
+            </div>
+          </div>
+
+          <GhostInput
+            label="Tournament Title"
+            value={form.title}
+            onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
+            placeholder="e.g. ZENITH OPEN S1"
+            required
+          />
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <label className={labelCls}>Game</label>
+              <select
+                value={form.game}
+                onChange={(e) => setForm((f) => ({ ...f, game: e.target.value }))}
+                className={inputCls}
+              >
+                <option>PUBG Mobile</option>
+                <option>Warzone</option>
+                <option>Free Fire</option>
+                <option>Valorant</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div className="space-y-1">
+              <div className="flex items-center justify-between">
+                <label className={labelCls}>Max Teams</label>
+                <div className="flex items-center gap-2 mb-1">
+                  <input
+                    type="checkbox"
+                    id="unlimitedTeams"
+                    checked={form.max_teams === '' || form.max_teams === null}
+                    onChange={(e) => setForm((f) => ({ ...f, max_teams: e.target.checked ? '' : 64 }))}
+                    className="accent-[#dbb462]"
+                  />
+                  <label htmlFor="unlimitedTeams" className="font-stretch text-[8px] text-[#dbb462] cursor-pointer tracking-widest uppercase">
+                    Unset (Unlimited)
+                  </label>
+                </div>
+              </div>
+              <input
+                type="number"
+                value={form.max_teams === null ? '' : form.max_teams}
+                onChange={(e) => setForm((f) => ({ ...f, max_teams: e.target.value }))}
+                disabled={form.max_teams === '' || form.max_teams === null}
+                className={inputCls + (form.max_teams === '' || form.max_teams === null ? ' opacity-30 cursor-not-allowed' : '')}
+                placeholder="Unlimited"
+              />
+            </div>
+          </div>
+
+          <GhostInput
+            label="Prize Pool (PKR)"
+            type="number"
+            value={form.prize_pool}
+            onChange={(e) => setForm((f) => ({ ...f, prize_pool: e.target.value }))}
+            placeholder="50000"
+          />
+
+          {/* ── Dates & Auto Status ── */}
+          <div className="bg-[#0e0e0e] border border-[rgba(78,70,56,0.2)] p-4 space-y-3">
+            <div className="flex items-center justify-between mb-3">
+              <span className="font-stretch text-[9px] tracking-widest text-[#d1c5b3] opacity-50">AUTO-COMPUTED STATUS</span>
+              <span className={`font-stretch text-[9px] tracking-widest px-3 py-1 border ${
+                computedStatus === 'active'    ? 'text-emerald-400 border-emerald-500/30' :
+                computedStatus === 'completed' ? 'text-[#9a8f7f] border-[rgba(78,70,56,0.3)]' :
+                'text-[#f9d07a] border-[#f9d07a]/30'
+              }`}>
+                {computedStatus.toUpperCase()}
+              </span>
+            </div>
+
+            <div className="space-y-1">
+              <label className={labelCls}>Registration Opens</label>
+              <input
+                type="datetime-local"
+                value={form.registration_open_date}
+                onChange={(e) => setForm((f) => ({ ...f, registration_open_date: e.target.value }))}
+                className={inputCls}
+              />
+            </div>
+            <div className="space-y-1">
+              <label className={labelCls}>Registration Deadline</label>
+              <input
+                type="datetime-local"
+                value={form.registration_deadline}
+                onChange={(e) => setForm((f) => ({ ...f, registration_deadline: e.target.value }))}
+                className={inputCls}
+              />
+            </div>
+            <div className="space-y-1">
+              <label className={labelCls}>Tournament Start Date</label>
+              <input
+                type="date"
+                value={form.start_date}
+                onChange={(e) => setForm((f) => ({ ...f, start_date: e.target.value }))}
+                className={inputCls}
+              />
+            </div>
+
+            {/* Completed toggle */}
+            <div className="flex items-center justify-between pt-2 border-t border-[rgba(78,70,56,0.15)]">
+              <span className="font-stretch text-[9px] tracking-widest text-[#d1c5b3] opacity-70">
+                MARK AS COMPLETED
+              </span>
+              <button
+                onClick={() => setForm((f) => ({ ...f, is_completed: !f.is_completed }))}
+                className={`transition-colors ${form.is_completed ? 'text-[#f9d07a]' : 'text-[#4e4638]'}`}
+              >
+                {form.is_completed
+                  ? <ToggleRight size={28} />
+                  : <ToggleLeft size={28} />
+                }
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── BRIEFING ── */}
+      {section === 'content' && (
+        <div className="space-y-4">
+          <div className="space-y-1">
+            <label className={labelCls}>Short Description (shown on cards)</label>
+            <textarea
+              value={form.description}
+              onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
+              placeholder="Brief one-liner about the tournament..."
+              rows={2}
+              className="w-full bg-[#131313] border border-[rgba(78,70,56,0.3)] p-3 text-sm text-[#e2e2e2] focus:outline-none focus:border-[#f9d07a] transition-colors resize-none"
+            />
+          </div>
+          <div className="space-y-1">
+            <label className={labelCls}>Full Briefing (shown in Overview tab)</label>
+            <textarea
+              value={form.briefing}
+              onChange={(e) => setForm((f) => ({ ...f, briefing: e.target.value }))}
+              placeholder="Detailed tournament rules, format, eligibility, etc."
+              rows={10}
+              className="w-full bg-[#131313] border border-[rgba(78,70,56,0.3)] p-3 text-sm text-[#e2e2e2] focus:outline-none focus:border-[#f9d07a] transition-colors resize-none leading-relaxed"
+            />
+          </div>
+        </div>
+      )}
+
+      {/* ── SCHEDULE ── */}
+      {section === 'schedule' && (
+        <div className="space-y-3">
+          <p className="font-stretch text-[9px] tracking-widest text-[#d1c5b3] opacity-40">
+            Add events in chronological order. They will be displayed on the Schedule tab.
+          </p>
+
+          {scheduleRows.length === 0 && (
+            <div className="text-center py-8 bg-[#0e0e0e]">
+              <p className="font-stretch text-[9px] text-[#d1c5b3] opacity-30 tracking-widest">NO EVENTS YET</p>
+            </div>
+          )}
+
+          <div className="space-y-2 max-h-64 overflow-y-auto no-scrollbar">
+            {scheduleRows.map((row) => (
+              <div key={row.id} className="grid grid-cols-[1fr_1fr_2fr_auto] gap-2 items-center">
+                <input
+                  type="date"
+                  value={row.date}
+                  onChange={(e) => updSched(row.id, 'date', e.target.value)}
+                  className={inputCls}
+                />
+                <input
+                  type="time"
+                  value={row.time}
+                  onChange={(e) => updSched(row.id, 'time', e.target.value)}
+                  className={inputCls}
+                />
+                <input
+                  type="text"
+                  placeholder="Event title (e.g. Group Stage Day 1)"
+                  value={row.event}
+                  onChange={(e) => updSched(row.id, 'event', e.target.value)}
+                  className={inputCls}
+                />
+                <button onClick={() => delSched(row.id)} className="text-[#ffb4ab] hover:opacity-70 p-1">
+                  <X size={16} />
+                </button>
+              </div>
+            ))}
+          </div>
+
+          <button
+            onClick={addScheduleRow}
+            className="flex items-center gap-2 border border-dashed border-[rgba(78,70,56,0.4)] px-4 py-3 w-full font-stretch text-[9px] tracking-widest text-[#d1c5b3] opacity-50 hover:opacity-100 hover:bg-[#1f1f1f] transition-all"
+          >
+            <Plus size={14} /> ADD EVENT
+          </button>
+        </div>
+      )}
+
+      {/* ── ROADMAP ── */}
+      {section === 'roadmap' && (
+        <div className="space-y-3">
+          <p className="font-stretch text-[9px] tracking-widest text-[#d1c5b3] opacity-40">
+            Define tournament phases. They will appear as a timeline on the Roadmap tab.
+          </p>
+
+          {roadmapRows.length === 0 && (
+            <div className="text-center py-8 bg-[#0e0e0e]">
+              <p className="font-stretch text-[9px] text-[#d1c5b3] opacity-30 tracking-widest">NO PHASES YET</p>
+            </div>
+          )}
+
+          <div className="space-y-3 max-h-64 overflow-y-auto no-scrollbar">
+            {roadmapRows.map((row) => (
+              <div key={row.id} className="bg-[#0e0e0e] border border-[rgba(78,70,56,0.2)] p-3 space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="font-stretch text-[8px] tracking-widest text-[#dbb462] opacity-60">PHASE</span>
+                  <button onClick={() => delRoad(row.id)} className="text-[#ffb4ab] hover:opacity-70">
+                    <X size={14} />
+                  </button>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <input
+                    type="text"
+                    placeholder="Phase label (e.g. Phase 1)"
+                    value={row.phase}
+                    onChange={(e) => updRoad(row.id, 'phase', e.target.value)}
+                    className={inputCls}
+                  />
+                  <input
+                    type="text"
+                    placeholder="Title (e.g. Registration)"
+                    value={row.title}
+                    onChange={(e) => updRoad(row.id, 'title', e.target.value)}
+                    className={inputCls}
+                  />
+                </div>
+                <textarea
+                  placeholder="Brief description of this phase..."
+                  value={row.description}
+                  onChange={(e) => updRoad(row.id, 'description', e.target.value)}
+                  rows={2}
+                  className="w-full bg-[#131313] border border-[rgba(78,70,56,0.3)] p-2.5 text-sm text-[#e2e2e2] focus:outline-none focus:border-[#f9d07a] transition-colors resize-none"
+                />
+              </div>
+            ))}
+          </div>
+
+          <button
+            onClick={addRoadmapRow}
+            className="flex items-center gap-2 border border-dashed border-[rgba(78,70,56,0.4)] px-4 py-3 w-full font-stretch text-[9px] tracking-widest text-[#d1c5b3] opacity-50 hover:opacity-100 hover:bg-[#1f1f1f] transition-all"
+          >
+            <Plus size={14} /> ADD PHASE
+          </button>
+        </div>
+      )}
+
+      {/* Save button */}
+      <GradientButton className="w-full mt-6" onClick={handleSave} disabled={saving}>
+        {saving ? 'SAVING...' : (tournament ? 'UPDATE TOURNAMENT' : 'CREATE TOURNAMENT')}
+      </GradientButton>
+    </Modal>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Registration Add/Edit Modal
+// ─────────────────────────────────────────────────────────────
+function RegistrationModal({ isOpen, onClose, registration, tournament, onSave }) {
+  const [form, setForm] = useState({
+    team_name: '', city: '', whatsapp_number: '',
+    player_1_id: '', player_2_id: '', player_3_id: '',
+    player_4_id: '', player_5_id: '', player_6_id: '',
+    tournament_id: '', status: 'pending', group_id: '', logo_url: '',
+  });
+  const [file, setFile] = useState(null);
+  const [saving, setSaving] = useState(false);
+
+  React.useEffect(() => {
+    if (registration) {
+      setForm({
+        team_name:       registration.team_name || '',
+        real_name:       registration.real_name || '',
+        whatsapp_number: registration.whatsapp_number || '',
+        player_1_id:     registration.player_ids?.[0] || '',
+        player_2_id:     registration.player_ids?.[1] || '',
+        player_3_id:     registration.player_ids?.[2] || '',
+        player_4_id:     registration.player_ids?.[3] || '',
+        player_5_id:     registration.player_ids?.[4] || '',
+        player_6_id:     registration.player_ids?.[5] || '',
+        tournament_id:   registration.tournament_id || '',
+        status:          registration.status || 'pending',
+        group_id:        registration.group_id || '',
+        logo_url:        registration.logo_url || '',
+      });
+    } else {
+      setForm({
+        team_name: '', city: '', whatsapp_number: '',
+        player_1_id: '', player_2_id: '', player_3_id: '',
+        player_4_id: '', player_5_id: '', player_6_id: '',
+        tournament_id: tournament?.id || '',
+        status: 'pending', group_id: '', logo_url: '',
+      });
+    }
+    setFile(null);
+  }, [registration, isOpen, tournament]);
+
+  async function handleSave() {
+    if (!form.team_name.trim()) { toast.error('Team name required'); return; }
+    if (!form.tournament_id) { toast.error('Tournament required'); return; }
+    setSaving(true);
+    try {
+      const playerIds = [
+        form.player_1_id, form.player_2_id, form.player_3_id,
+        form.player_4_id, form.player_5_id, form.player_6_id,
+      ].filter(Boolean).map((x) => x.trim().toUpperCase());
+      await onSave({ ...form, player_ids: playerIds }, file);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  const inputCls = 'w-full bg-[#131313] border border-[rgba(78,70,56,0.3)] p-2.5 text-sm text-[#e2e2e2] focus:outline-none focus:border-[#f9d07a] transition-colors font-mono placeholder:opacity-30';
+  const labelCls = 'font-stretch text-[9px] tracking-widest text-[#d1c5b3] uppercase block mb-1';
+
+  return (
+    <Modal isOpen={isOpen} onClose={onClose} title={registration ? 'EDIT REGISTRATION' : 'ADD REGISTRATION'}>
+      <div className="space-y-5">
+        {/* Logo */}
+        <div className="flex gap-4 items-center">
+          <div className="w-14 h-14 bg-[#131313] border border-[rgba(78,70,56,0.3)] flex-shrink-0 flex items-center justify-center overflow-hidden rounded-full">
+            {file ? (
+              <img src={URL.createObjectURL(file)} alt="Preview" className="w-full h-full object-cover" />
+            ) : form.logo_url ? (
+              <img src={form.logo_url} alt="Logo" className="w-full h-full object-cover" />
+            ) : (
+              <Users className="text-[#d1c5b3] opacity-20" size={20} />
+            )}
+          </div>
+          <div className="flex-1">
+            <label className={labelCls}>Team Logo</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setFile(e.target.files[0])}
+              className="w-full text-[10px] text-[#d1c5b3] file:mr-3 file:py-1.5 file:px-3 file:border-0 file:bg-[#1f1f1f] file:text-[#f9d07a] file:font-stretch file:text-[9px] file:cursor-pointer"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <GhostInput label="Team Name" value={form.team_name} onChange={(e) => setForm((f) => ({ ...f, team_name: e.target.value }))} required />
+          <GhostInput label="Real Name" value={form.real_name} onChange={(e) => setForm((f) => ({ ...f, real_name: e.target.value }))} />
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <GhostInput label="WhatsApp" value={form.whatsapp_number} onChange={(e) => setForm((f) => ({ ...f, whatsapp_number: e.target.value }))} />
+          <div className="space-y-1">
+            <label className={labelCls}>Status</label>
+            <select value={form.status} onChange={(e) => setForm((f) => ({ ...f, status: e.target.value }))} className={inputCls}>
+              <option value="pending">Pending</option>
+              <option value="approved">Approved</option>
+              <option value="rejected">Rejected</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="space-y-1">
+          <label className={labelCls}>Player Character IDs</label>
+          <div className="grid grid-cols-2 gap-3">
+            {[1, 2, 3, 4, 5, 6].map((num) => (
+              <GhostInput
+                key={num}
+                label={`Player ${num}${num <= 4 ? ' *' : ''}`}
+                value={form[`player_${num}_id`]}
+                onChange={(e) => setForm((f) => ({ ...f, [`player_${num}_id`]: e.target.value }))}
+                placeholder="5XXXXXXXXXX"
+              />
+            ))}
+          </div>
+        </div>
+
+        <GhostInput
+          label="Group ID (Optional)"
+          value={form.group_id}
+          onChange={(e) => setForm((f) => ({ ...f, group_id: e.target.value }))}
+          placeholder="e.g. Group 1"
+        />
+
+        <GradientButton className="w-full" onClick={handleSave} disabled={saving}>
+          {saving ? 'SAVING...' : (registration ? 'UPDATE REGISTRATION' : 'ADD REGISTRATION')}
+        </GradientButton>
+      </div>
+    </Modal>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Loading Screen
+// ─────────────────────────────────────────────────────────────
+function LoadingScreen() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-[#131313] pt-20">
+      <div className="font-agency text-4xl font-bold italic text-[#dbb462] animate-pulse">LOADING...</div>
+    </div>
+  );
+}
