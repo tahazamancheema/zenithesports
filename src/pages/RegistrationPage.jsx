@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ShieldAlert, Users, ChevronLeft, Save } from 'lucide-react';
+import { ShieldAlert, Users, ChevronLeft, Save, Camera, MessageCircle } from 'lucide-react';
 import { useTournaments } from '../hooks/useTournaments';
 import { useRegistration } from '../hooks/useRegistration';
 import { useAuth } from '../hooks/useAuth';
+import { useTournamentCountdown } from '../hooks/useTournamentCountdown';
 import { uploadFile } from '../utils/storage';
 import GhostInput from '../components/ui/GhostInput';
 import GradientButton from '../components/ui/GradientButton';
@@ -46,9 +47,11 @@ export default function RegistrationPage() {
   };
 
   const [file, setFile] = useState(null);
+  const [screenshotFiles, setScreenshotFiles] = useState([null, null, null, null]);
   const [saving, setSaving] = useState(false);
 
   const tournament = tournaments.find(t => t.id === tournamentId);
+  const { phase } = useTournamentCountdown(tournament?.registration_open_date, tournament?.registration_deadline);
 
   useEffect(() => {
     if (aLoading || tLoading) return;
@@ -62,24 +65,40 @@ export default function RegistrationPage() {
       navigate('/tournaments');
       return;
     }
-    
-    // The useRegistration hook handles duplicate checks and user registration status internally
-  }, [user, tournament, aLoading, tLoading, tournamentId, navigate]);
 
-    async function handleRegisterSub(e) {
-    if (e) e.preventDefault();
-    if (!form.team_name.trim()) { toast.error('Callsign (Team Name) is mandatory'); return; }
-    if (!form.real_name.trim()) { toast.error('Real Name is mandatory'); return; }
-    if (!form.whatsapp_number.trim()) { toast.error('WhatsApp Contact is mandatory'); return; }
-    if (!form.player_1_id || !form.player_2_id || !form.player_3_id || !form.player_4_id) {
-      toast.error('Minimum four active combatants required to register.');
-      return;
+    // Guard: Opening phase check
+    if (phase === 'opening') {
+      toast.error('REGISTRATION PENDING. Signal has not been initialized.');
+      navigate(`/tournaments/${tournamentId}`);
     }
-    if (!file) { toast.error('Squad insignia (Team Logo) must be uploaded to the vault.'); return; }
     
+  }, [user, tournament, aLoading, tLoading, tournamentId, navigate, phase]);
+
+  const handleRegisterSub = async (e) => {
+    e.preventDefault();
+    if (!file) return toast.error('Team logo is required for identification.', { id: 'reg' });
+    
+    setSaving(true);
     try {
-      toast.loading('Synchronizing to ze-logos vault...', { id: 'reg' });
-      const logoUrl = await uploadFile('ze-logos', file, `logo_${user.id}`);
+      toast.loading('Synchronizing to secure vaults...', { id: 'reg' });
+      
+      // Upload Team Logo
+      const logoUrl = await uploadFile('ze-logos', file, `logo_${user.id}_${Date.now()}`);
+      
+      // Upload Screenshots
+      const screenshotURLs = [];
+      const configSS = tournament.registration_config?.screenshots || [];
+      
+      for (let i = 0; i < configSS.length; i++) {
+        const sFile = screenshotFiles[i];
+        if (sFile) {
+          toast.loading(`Uploading proof: ${configSS[i].label}...`, { id: 'reg' });
+          const url = await uploadFile('ze-proofs', sFile, `proof_${i}_${user.id}_${Date.now()}`);
+          screenshotURLs.push(url);
+        } else {
+          screenshotURLs.push(null);
+        }
+      }
       
       const playerIds = [
         form.player_1_id,
@@ -97,7 +116,8 @@ export default function RegistrationPage() {
         realName: form.real_name,
         teamLogoURL: logoUrl,
         whatsapp: form.whatsapp_number,
-        playerIDs: playerIds
+        playerIDs: playerIds,
+        screenshotURLs: screenshotURLs
       });
 
       if (result.success) {
@@ -108,28 +128,76 @@ export default function RegistrationPage() {
       }
     } catch (err) {
       toast.error(`Registration uplink failed: ${err.message}`, { id: 'reg' });
+    } finally {
+      setSaving(false);
     }
-  }
+  };
 
   if (tLoading || aLoading) {
     return <div className="min-h-screen bg-[#131313] flex items-center justify-center text-[#d1c5b3] font-stretch tracking-widest text-[10px]">VERIFYING COMMAND CREDENTIALS...</div>;
   }
   if (!tournament) return null;
 
+  if (phase === 'closed') {
+    return (
+      <div className="min-h-screen bg-[#131313] pt-28 pb-20 px-6 md:px-12 flex items-center justify-center animate-page-enter">
+        <div className="max-w-xl w-full space-y-8 text-center">
+          <div className="bg-[#111] border border-[#dbb462]/20 p-10 md:p-16 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-[#dbb462]/5 blur-3xl pointer-events-none" />
+            
+            <div className="flex flex-col items-center gap-6 mb-10">
+              <div className="w-16 h-16 bg-[#dbb462]/10 rounded-full flex items-center justify-center border border-[#dbb462]/20">
+                <MessageCircle size={32} className="text-[#dbb462]" />
+              </div>
+              <h1 className="font-bebas text-6xl text-white uppercase tracking-tight">REGISTRATION CLOSED</h1>
+            </div>
+
+            <p className="font-body text-[#d1c5b3] text-lg leading-relaxed opacity-60 mb-12">
+              Registrations for this tournament have been officially terminated. If you have any issues or require tactical assistance, contact our support unit.
+            </p>
+
+            <a 
+              href="https://wa.me/923390715753" 
+              target="_blank" 
+              rel="noreferrer"
+              className="flex flex-col gap-2 w-full bg-[#1a1a1a] border border-white/5 px-6 py-5 group hover:border-[#dbb462]/40 transition-all text-left"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-2 h-2 rounded-full bg-[#dbb462] animate-pulse" />
+                <span className="font-teko text-[14px] tracking-[0.2em] text-[#d1c5b3] opacity-60 uppercase">Support Unit</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="font-bebas text-2xl text-white uppercase tracking-wider">WhatsApp Support</span>
+                <span className="font-teko text-[18px] tracking-[0.2em] text-[#dbb462] uppercase group-hover:translate-x-1 transition-transform">Join →</span>
+              </div>
+            </a>
+          </div>
+
+          <button 
+            onClick={() => navigate(`/tournaments/${tournamentId}`)}
+            className="font-teko text-[18px] tracking-[0.2em] text-[#dbb462] uppercase hover:underline"
+          >
+            Return to Intel Briefing
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#131313] pt-28 pb-20 px-6 md:px-12 animate-page-enter">
       <div className="max-w-4xl mx-auto space-y-8">
         
-        <button onClick={() => navigate('/tournaments')} className="flex items-center gap-2 text-[#d1c5b3] opacity-60 hover:opacity-100 hover:text-[#f9d07a] transition-colors font-stretch text-[9px] tracking-widest uppercase">
-          <ChevronLeft size={12} /> Abort Registration
+        <button onClick={() => navigate('/tournaments')} className="flex items-center gap-2 text-[#d1c5b3] opacity-60 hover:opacity-100 hover:text-[#dbb462] transition-colors font-teko text-[16px] tracking-widest uppercase">
+          <ChevronLeft size={16} /> Cancel Registration
         </button>
 
-        <div className="border-b border-[rgba(78,70,56,0.15)] pb-6 mb-10">
-          <span className="font-stretch text-[10px] tracking-widest text-[#f9d07a] block mb-2">INITIALIZING ENTRY</span>
-          <h1 className="font-agency text-5xl font-black italic tracking-tighter text-[#e2e2e2] uppercase">
+        <div className="border-b border-white/5 pb-6 mb-10">
+          <span className="font-teko text-[18px] tracking-[0.2em] text-[#dbb462] block mb-2 uppercase">Squad Registration</span>
+          <h1 className="font-bebas text-5xl md:text-7xl tracking-tight text-[#f2f2f2] uppercase">
             {tournament.title}
           </h1>
-          <p className="text-[#d1c5b3] opacity-60 mt-2 font-body text-sm max-w-2xl">{tournament.description}</p>
+          <p className="text-[#d1c5b3] opacity-40 mt-2 font-body text-lg max-w-2xl">{tournament.description}</p>
         </div>
 
         {userDoc && (userDoc.team_name || userDoc.whatsapp_number) && (
@@ -139,27 +207,27 @@ export default function RegistrationPage() {
                 <Users size={20} />
               </div>
               <div className="text-left">
-                <p className="font-agency text-xl font-bold text-[#e2e2e2]">SAVED ROSTER DETECTED</p>
-                <p className="font-stretch text-[8px] tracking-[0.2em] text-[#d1c5b3] opacity-60 uppercase">
-                  Would you like to import data from your player profile?
+                <p className="font-bebas text-2xl text-white">PROFILE DATA DETECTED</p>
+                <p className="font-teko text-[14px] tracking-[0.1em] text-[#d1c5b3] opacity-60 uppercase">
+                  Would you like to import details from your player profile?
                 </p>
               </div>
             </div>
             <button 
               type="button"
               onClick={handleAutoFill}
-              className="w-full md:w-auto bg-[#dbb462] text-[#402d00] font-stretch text-[10px] tracking-widest px-8 py-3 hover:bg-[#f9d07a] active:scale-95 transition-all font-bold uppercase"
+              className="w-full md:w-auto bg-[#dbb462] text-[#402d00] font-bebas text-xl tracking-widest px-8 py-3 hover:brightness-110 active:scale-95 transition-all uppercase"
             >
-              Import Data
+              Fill From Profile
             </button>
           </div>
         )}
 
         <form onSubmit={handleRegisterSub} className="space-y-12">
           {/* Logo Section */}
-          <div className="bg-[#1b1b1b] border border-[rgba(78,70,56,0.3)] border-l-4 border-l-[#dbb462] p-8">
-            <h2 className="font-agency text-2xl font-bold italic text-[#e2e2e2] mb-6 flex items-center gap-3">
-              <ShieldAlert className="text-[#f9d07a]" size={20} /> INSIGNIA VAULT
+          <div className="bg-[#111] border border-white/5 p-8">
+            <h2 className="font-bebas text-3xl text-white mb-6 flex items-center gap-3">
+              <ShieldAlert className="text-[#dbb462]" size={24} /> TEAM BRANDING
             </h2>
             <div className="flex gap-6 items-center">
               <div className="w-24 h-24 bg-[#131313] border border-[rgba(78,70,56,0.2)] flex-shrink-0 flex items-center justify-center rounded-full overflow-hidden object-cover">
@@ -170,61 +238,114 @@ export default function RegistrationPage() {
                 )}
               </div>
               <div className="flex-1">
-                <label className="font-stretch text-[9px] tracking-widest text-[#d1c5b3] uppercase block mb-3">Team Logo (JPEG/PNG)</label>
+                <label className="font-teko text-[16px] tracking-widest text-[#d1c5b3] uppercase block mb-3 opacity-60">Team Logo (JPEG/PNG)</label>
                 <input 
                   type="file" 
                   accept="image/*"
                   onChange={(e) => setFile(e.target.files[0])}
                   required
-                  className="w-full text-[10px] text-[#d1c5b3] file:mr-4 file:py-2 file:px-6 file:border-0 file:bg-[#1f1f1f] file:text-[#f9d07a] file:font-stretch file:text-[9px] file:cursor-pointer hover:file:bg-[#2a2a2a] file:uppercase file:tracking-widest"
+                  className="w-full text-[14px] text-[#d1c5b3] file:mr-4 file:py-2 file:px-6 file:border-0 file:bg-[#1f1f1f] file:text-[#dbb462] file:font-teko file:text-[16px] file:cursor-pointer hover:file:bg-[#2a2a2a] file:uppercase file:tracking-widest"
                 />
               </div>
             </div>
           </div>
 
           {/* Comms Section */}
-          <div className="bg-[#1b1b1b] border border-[rgba(78,70,56,0.3)] p-8">
-            <h2 className="font-agency text-2xl font-bold italic text-[#e2e2e2] mb-6">SQUAD COMMS</h2>
+          <div className="bg-[#111] border border-white/5 p-8">
+            <h2 className="font-bebas text-3xl text-white mb-6">CONTACT DETAILS</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <GhostInput label="Team Name (Callsign) *" value={form.team_name} onChange={e => setForm(f => ({ ...f, team_name: e.target.value }))} required placeholder="e.g. 100 Thieves" />
-              <GhostInput label="Player's Real Name *" value={form.real_name} onChange={e => setForm(f => ({ ...f, real_name: e.target.value }))} required placeholder="Full name of Captain" />
+              <GhostInput label="Team Name *" value={form.team_name} onChange={e => setForm(f => ({ ...f, team_name: e.target.value }))} required placeholder="Enter full squad name" />
+              <GhostInput label="Point of Contact *" value={form.real_name} onChange={e => setForm(f => ({ ...f, real_name: e.target.value }))} required placeholder="Full name of Captain/Manager" />
               <div className="md:col-span-2">
                 <GhostInput label="WhatsApp Contact Number *" value={form.whatsapp_number} onChange={e => setForm(f => ({ ...f, whatsapp_number: e.target.value }))} required placeholder="+92 3XX XXXXXXX" />
               </div>
             </div>
           </div>
 
-          {/* Roster Section */}
-          <div className="bg-[#1b1b1b] border border-[rgba(78,70,56,0.3)] p-8 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-[#dbb462]/5 rounded-full blur-3xl pointer-events-none" />
-            <h2 className="font-agency text-2xl font-bold italic text-[#e2e2e2] mb-2 flex items-center gap-3">
-              <Users className="text-[#f9d07a]" size={20} /> ACTIVE ROSTER
-            </h2>
-            <p className="font-stretch text-[9px] tracking-widest text-[#d1c5b3] opacity-40 uppercase mb-8">PUBG Mobile Char IDs only (10-14 digits). 4 Required.</p>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
-              {[1, 2, 3, 4, 5, 6].map((num) => (
-                <div key={num} className="relative group">
-                  <span className="absolute -left-3 top-2 font-agency text-xs text-[#d1c5b3] opacity-20 group-hover:opacity-100 transition-opacity">
-                    0{num}
-                  </span>
-                  <GhostInput
-                    id={`player_${num}`}
-                    label={num <= 4 ? `Player ${num} ID *` : `Substitute ${num} ID`}
-                    value={form[`player_${num}_id`]}
-                    onChange={(e) => setForm(f => ({ ...f, [`player_${num}_id`]: e.target.value }))}
-                    placeholder="5XXXXXXXXXX"
-                    required={num <= 4}
-                  />
-                </div>
-              ))}
+          {/* Squad Roster Section */}
+          <div className="bg-[#111] border border-white/5 p-8">
+            <h2 className="font-bebas text-3xl text-white mb-2">SQUAD ROSTER</h2>
+            <p className="font-teko text-[16px] tracking-widest text-[#d1c5b3] opacity-40 uppercase mb-8">
+              Minimum 4 players required. Character IDs must be exactly 10-14 digits.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+              <GhostInput label="Player 1 (Captain) *" value={form.player_1_id} onChange={e => setForm(f => ({ ...f, player_1_id: e.target.value }))} required placeholder="5XXXXXXXXX" />
+              <GhostInput label="Player 2 *" value={form.player_2_id} onChange={e => setForm(f => ({ ...f, player_2_id: e.target.value }))} required placeholder="5XXXXXXXXX" />
+              <GhostInput label="Player 3 *" value={form.player_3_id} onChange={e => setForm(f => ({ ...f, player_3_id: e.target.value }))} required placeholder="5XXXXXXXXX" />
+              <GhostInput label="Player 4 *" value={form.player_4_id} onChange={e => setForm(f => ({ ...f, player_4_id: e.target.value }))} required placeholder="5XXXXXXXXX" />
+              <GhostInput label="Player 5 (Sub)" value={form.player_5_id} onChange={e => setForm(f => ({ ...f, player_5_id: e.target.value }))} placeholder="Optional" />
+              <GhostInput label="Player 6 (Sub)" value={form.player_6_id} onChange={e => setForm(f => ({ ...f, player_6_id: e.target.value }))} placeholder="Optional" />
             </div>
           </div>
 
+          {/* Verification Screenshots Section */}
+          {tournament.registration_config?.screenshots?.length > 0 && (
+            <div className="bg-[#111] border border-white/5 p-8">
+              <h2 className="font-bebas text-3xl text-white mb-2 flex items-center gap-3">
+                <Camera className="text-[#dbb462]" size={24} /> REQUIRED PROOF
+              </h2>
+              <p className="font-teko text-[16px] tracking-widest text-[#d1c5b3] opacity-40 uppercase mb-8">
+                Upload the following required documents to proceed.
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {tournament.registration_config.screenshots.map((ss, idx) => (
+                  <div key={idx} className="space-y-3">
+                    <label className="font-teko text-[16px] tracking-widest text-[#d1c5b3] uppercase block opacity-60">
+                      {ss.label} {ss.required && <span className="text-[#dbb462]">*</span>}
+                    </label>
+                    <div className="relative group min-h-[140px] bg-[#131313] border border-[rgba(78,70,56,0.2)] hover:border-[#dbb462]/30 transition-colors flex flex-col items-center justify-center p-4">
+                      {screenshotFiles[idx] ? (
+                        <div className="relative w-full h-full flex flex-col items-center">
+                           <img src={URL.createObjectURL(screenshotFiles[idx])} alt="Proof" className="h-20 w-auto object-contain mb-2" />
+                           <span className="text-[14px] text-[#dbb462] font-bebas tracking-widest uppercase truncate max-w-full">{screenshotFiles[idx].name}</span>
+                           <button 
+                             type="button" 
+                             onClick={() => {
+                               const next = [...screenshotFiles];
+                               next[idx] = null;
+                               setScreenshotFiles(next);
+                             }}
+                             className="absolute top-0 right-0 text-red-400 opacity-40 hover:opacity-100 p-1 font-bebas text-sm"
+                           >
+                             REMOVE
+                           </button>
+                        </div>
+                      ) : (
+                        <>
+                          <Camera size={24} className="text-[#d1c5b3] opacity-20 mb-2 group-hover:text-[#dbb462] transition-colors" />
+                          <span className="text-[14px] text-[#d1c5b3] opacity-30 group-hover:opacity-60 transition-opacity uppercase tracking-widest font-teko">Select Image</span>
+                        </>
+                      )}
+                      <input 
+                        type="file" 
+                        accept="image/*"
+                        required={ss.required}
+                        onChange={(e) => {
+                          const file = e.target.files[0];
+                          if (file) {
+                            const next = [...screenshotFiles];
+                            next[idx] = file;
+                            setScreenshotFiles(next);
+                          }
+                        }}
+                        className="absolute inset-0 opacity-0 cursor-pointer"
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div className="flex justify-end pt-6">
-            <GradientButton type="submit" size="lg" disabled={submitting} icon={Save} className="w-full md:w-auto px-16">
-              {submitting ? 'UPLOADING TO MAINFRAME...' : 'COMMIT REGISTRATION'}
-            </GradientButton>
+            <button 
+              type="submit" 
+              disabled={submitting}
+              className="btn-obsidian-primary w-full md:w-auto px-20 py-5 font-bebas text-3xl tracking-widest uppercase"
+            >
+              {submitting ? 'PROCESSING...' : 'REGISTER SQUAD'}
+            </button>
           </div>
         </form>
       </div>

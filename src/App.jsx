@@ -25,6 +25,35 @@ const RegistrationPage = lazy(() => import('./pages/RegistrationPage'));
 // Pages that don't show the main footer
 const NO_FOOTER_ROUTES = ['/admin', '/profile'];
 
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() { return { hasError: true }; }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen bg-[#131313] flex items-center justify-center p-8">
+          <div className="max-w-md w-full text-center space-y-6">
+            <h1 className="font-agency text-6xl font-black italic text-[#dbb462]">SYSTEM FAULT</h1>
+            <p className="font-body text-[#d1c5b3] opacity-60">
+              The Zenith engine encountered an unexpected exception. Protocol requires a tactical reset.
+            </p>
+            <button 
+              onClick={() => window.location.reload()}
+              className="zenith-gradient text-[#402d00] font-agency font-bold text-lg px-12 py-4 tracking-widest hover:brightness-110 active:scale-95 transition-all"
+            >
+              INITIALIZE REBOOT
+            </button>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 function PageLoader() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#131313]">
@@ -100,8 +129,8 @@ const TOAST_STYLE = {
     background: '#1f1f1f',
     color: '#e2e2e2',
     border: '1px solid rgba(78, 70, 56, 0.3)',
-    fontFamily: "'Instrument Sans', sans-serif",
-    fontSize: '13px',
+    fontFamily: "'Rajdhani', sans-serif",
+    fontSize: '16px',
     borderRadius: '0px',
   },
   success: { iconTheme: { primary: '#dbb462', secondary: '#402d00' } },
@@ -121,8 +150,10 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <Toaster position="top-right" toastOptions={TOAST_STYLE} />
-        <AppLayout />
+        <ErrorBoundary>
+          <Toaster position="top-right" toastOptions={TOAST_STYLE} />
+          <AppLayout />
+        </ErrorBoundary>
       </AuthProvider>
     </BrowserRouter>
   );

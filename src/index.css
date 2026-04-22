@@ -1,8 +1,8 @@
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Roboto+Condensed:wght@400;700&family=Teko:wght@400;500;600;700&family=Bebas+Neue&family=Michroma&display=swap');
 @import "tailwindcss";
 
 /* ─────────────────────────────────────────
-   ZENITH ESPORTS — Global Design System
-   "The Kinetic Monolith"
+   ZENITH ESPORTS — Technical UI Theme
    ───────────────────────────────────────── */
 
 @theme {
@@ -29,7 +29,7 @@
   --color-on-secondary-container: #b8b8b8;
 
   /* Text */
-  --color-on-surface: #e2e2e2;
+  --color-on-surface: #f2f2f2;
   --color-on-surface-variant: #d1c5b3;
   --color-outline: #9a8f7f;
   --color-outline-variant: #4e4638;
@@ -43,9 +43,11 @@
   --color-surface-tint: #e9c16e;
 
   /* Typography */
-  --font-agency: 'Agency FB', sans-serif;
-  --font-stretch: 'Stretch Pro', sans-serif;
-  --font-body: 'Instrument Sans', sans-serif;
+  --font-bebas: 'Bebas Neue', sans-serif;
+  --font-teko: 'Teko', sans-serif;
+  --font-body: 'Rajdhani', sans-serif;
+  --font-roboto: 'Roboto', sans-serif;
+  --font-michroma: 'Michroma', sans-serif;
 
   /* Border Radius — ZERO (The Monolith Rule) */
   --radius: 0px;
@@ -68,24 +70,56 @@ html {
 
 body {
   background-color: #131313;
-  color: #e2e2e2;
-  font-family: 'Instrument Sans', sans-serif;
-  /* overflow-x: clip (not hidden) — clip blocks horizontal scroll WITHOUT
-     creating a new stacking/clipping context, so italic font overhangs
-     on large headings are never cut off. */
+  color: #f2f2f2;
+  font-family: 'Rajdhani', sans-serif;
   overflow-x: clip;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* ─── Font Utilities ─── */
-.font-agency {
-  font-family: 'Agency FB', sans-serif;
+/* ─── Typography Utilities ─── */
+.font-bebas { font-family: 'Bebas Neue', sans-serif; }
+.font-teko { font-family: 'Teko', sans-serif; }
+.font-rajdhani { font-family: 'Rajdhani', sans-serif; }
+.font-roboto { font-family: 'Roboto', sans-serif; }
+.font-michroma { font-family: 'Michroma', sans-serif; }
+
+/* Clear & Professional Headlines */
+.headline-main {
+  font-family: 'Bebas Neue', sans-serif;
+  text-transform: uppercase;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: #f2f2f2;
 }
 
-.font-stretch {
-  font-family: 'Stretch Pro', sans-serif;
-  letter-spacing: 0.15em;
+.headline-main-gold {
+  font-family: 'Bebas Neue', sans-serif;
+  text-transform: uppercase;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: #dbb462;
+}
+
+.hero-text-huge {
+  font-size: clamp(3.5rem, 12vw, 10rem);
+  line-height: 0.85;
+  font-weight: 400;
+  font-family: 'Bebas Neue', sans-serif;
+}
+
+/* ─── Background System ─── */
+.static-grid {
+  background-image: 
+    linear-gradient(rgba(78, 70, 56, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(78, 70, 56, 0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.static-mesh {
+  background-color: #131313;
+  background-image: radial-gradient(circle at 2px 2px, rgba(78, 70, 56, 0.1) 1px, transparent 0);
+  background-size: 24px 24px;
 }
 
 /* ─── Zenith Gradient ─── */
@@ -98,148 +132,140 @@ body {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  /* Extend the gradient paint area so the gold tail of italic letters
-     is never clipped by the inline text box boundary. */
-  padding-right: 0.15em;
 }
 
-/* ─── Glass Obsidian (Modals / Overlays) ─── */
+/* ─── Components ─── */
 .glass-obsidian {
-  background: rgba(31, 31, 31, 0.85);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  box-shadow: 0px 24px 48px rgba(0, 0, 0, 0.5);
+  background: rgba(14, 14, 14, 0.8);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(219, 180, 98, 0.1);
 }
 
-/* ─── Input Ghost (bottom-border only) ─── */
 .input-ghost {
   background: transparent;
   border: none;
   border-bottom: 2px solid rgba(78, 70, 56, 0.3);
   outline: none;
-  transition: border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: border-color 0.2s ease;
   width: 100%;
   padding: 0.875rem 0;
-  color: #e2e2e2;
-  font-family: 'Instrument Sans', sans-serif;
-  font-size: 1rem;
-}
-
-.input-ghost::placeholder {
-  color: rgba(209, 197, 179, 0.3);
+  color: #f2f2f2;
 }
 
 .input-ghost:focus {
   border-bottom-color: #f9d07a;
 }
 
-.input-ghost.error {
-  border-bottom-color: #ffb4ab;
-}
-
-/* ─── Scrollbar (minimal) ─── */
+/* ─── Scrollbar ─── */
 ::-webkit-scrollbar {
   width: 4px;
-  height: 4px;
 }
-
 ::-webkit-scrollbar-track {
   background: #0e0e0e;
 }
-
 ::-webkit-scrollbar-thumb {
-  background: #4e4638;
+  background: #2a2a2a;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #dbb462;
-}
-
-/* ─── Selection ─── */
-::selection {
-  background: #dbb462;
-  color: #402d00;
-}
-
-/* ─── Transitions — Expo-Out ─── */
-.transition-expo {
-  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-/* ─── LIVE pulse badge ─── */
-@keyframes live-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
-}
-
-.live-dot {
-  animation: live-pulse 1.2s ease-in-out infinite;
-}
-
-/* ─── Stat strip glow ─── */
-@keyframes glow-pulse {
-  0%, 100% { box-shadow: 0 0 6px rgba(233, 193, 110, 0.2); }
-  50% { box-shadow: 0 0 18px rgba(233, 193, 110, 0.5); }
-}
-
-/* ─── Page entrance animation ─── */
-@keyframes fadeSlideUp {
-  from {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* ─── Animations ─── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .animate-page-enter {
-  animation: fadeSlideUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: fadeIn 0.4s ease-out forwards;
 }
 
-/* ─── Ghost border dividers (accessibility fallback) ─── */
-.ghost-border {
-  border-color: rgba(78, 70, 56, 0.15);
-}
-
-/* ─── No scrollbar utility ─── */
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-/* ─── Countdown digit ─── */
-.countdown-digit {
-  font-family: 'Agency FB', sans-serif;
-  font-size: 2.5rem;
-  font-weight: 900;
-  color: #f9d07a;
-  line-height: 1;
-  font-style: italic;
-}
-
-/* ─── Table row hover ─── */
-.table-row-hover:hover {
-  background-color: #1f1f1f;
-  transition: background-color 0.15s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-/* ─── Mobile menu ─── */
-.mobile-menu-enter {
-  animation: fadeSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-/* YouTube iframe responsive */
-.yt-embed-container {
+/* ─── Obsidian Buttons ─── */
+.btn-obsidian-primary {
   position: relative;
-  padding-bottom: 56.25%;
-  height: 0;
   overflow: hidden;
+  background: linear-gradient(90deg, #dbb462 0%, #f9d07a 100%);
+  color: #402d00;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  user-select: none;
+  cursor: pointer;
+  text-decoration: none;
+  box-shadow: 0 10px 30px rgba(219, 180, 98, 0.2);
 }
 
-.yt-embed-container iframe {
+.btn-obsidian-primary:active {
+  transform: scale(0.95);
+}
+
+.btn-obsidian-primary::after {
+  content: '';
   position: absolute;
   top: 0;
-  left: 0;
-  width: 100%;
+  left: -100%;
+  width: 50%;
   height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transform: skewX(-25deg);
+  transition: none;
 }
+
+.btn-obsidian-primary:hover::after {
+  left: 150%;
+  transition: left 0.7s ease-in-out;
+}
+
+.btn-obsidian-ghost {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(219, 180, 98, 0.3);
+  color: #dbb462;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  user-select: none;
+  cursor: pointer;
+  text-decoration: none;
+  background: rgba(219, 180, 98, 0.03);
+}
+
+.btn-obsidian-ghost:hover {
+  background: rgba(219, 180, 98, 0.08);
+  border-color: rgba(219, 180, 98, 0.6);
+  box-shadow: 0 0 20px rgba(219, 180, 98, 0.1);
+}
+
+.btn-obsidian-ghost:active {
+  transform: scale(0.95);
+}
+
+/* Desktop view optimization */
+@media (min-width: 1024px) {
+  .hero-text-huge {
+    font-size: 10rem;
+    line-height: 0.85;
+  }
+}
+
+/* Technical Animations */
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(200%); }
+}
+
+.animate-scanline {
+  animation: scanline 3s linear infinite;
+}
+
+@keyframes techPulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+.tech-pulse {
+  animation: techPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+

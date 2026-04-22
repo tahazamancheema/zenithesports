@@ -39,9 +39,9 @@ export default function StatusBadge({ status }) {
   };
 
   return (
-    <div className={`inline-flex items-center gap-2 px-3 py-1 ${config.bgClass}`}>
-      <span className={`w-2 h-2 rounded-full ${config.dotClass} shadow-md`} />
-      <span className={`font-stretch text-[9px] tracking-widest ${config.textClass}`}>
+    <div className={`inline-flex items-center gap-2 px-3 py-1 ${config.bgClass} border border-white/5`}>
+      <span className={`w-1.5 h-1.5 rounded-full ${config.dotClass} shadow-md`} />
+      <span className={`font-teko text-[16px] tracking-widest ${config.textClass} uppercase font-medium`}>
         {config.label}
       </span>
     </div>

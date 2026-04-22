@@ -101,21 +101,21 @@ export default function ProfilePage() {
         {/* Header */}
         <div className="mb-12 border-b border-[rgba(78,70,56,0.15)] pb-8 flex flex-col md:flex-row gap-6 justify-between items-start md:items-end">
           <div>
-            <span className="font-stretch text-[#f9d07a] text-[10px] tracking-[0.4em] block mb-2">OPERATIVE CENTER</span>
-            <h1 className="font-agency text-5xl md:text-6xl font-black italic tracking-tighter leading-tight pb-2 pr-4 text-[#e2e2e2]">
-              PLAYER <span className="zenith-gradient-text pr-4">PROFILE</span>
+            <span className="font-teko text-[#dbb462] text-[18px] tracking-[0.2em] block mb-2 uppercase">Profile Settings</span>
+            <h1 className="font-bebas text-5xl md:text-7xl tracking-tight text-[#f2f2f2] uppercase">
+              PLAYER <span className="text-[#dbb462]">PROFILE</span>
             </h1>
-            <p className="text-[#d1c5b3] opacity-60 text-sm max-w-md mt-4">
-              Pre-fill your team roster and contact details here. When you enter a tournament, your saved roster will automatically be used to secure your slot faster.
+            <p className="text-[#d1c5b3] opacity-40 text-lg max-w-md mt-4 font-body">
+              Manage your squad details and contact information. Your saved data will auto-fill during tournament registrations.
             </p>
           </div>
-          <div className="flex items-center gap-4 bg-[#1b1b1b] p-4 border border-[rgba(78,70,56,0.3)]">
+          <div className="flex items-center gap-4 bg-[#111] p-4 border border-white/5">
              <div className="w-12 h-12 bg-[#0e0e0e] border border-[#dbb462] flex items-center justify-center">
                <User size={20} className="text-[#dbb462]" />
              </div>
              <div>
-               <p className="font-agency text-xl font-bold">{userDoc?.display_name || 'UNKNOWN'}</p>
-               <p className="font-stretch text-[9px] tracking-widest text-[#d1c5b3] opacity-50">{user?.email}</p>
+               <p className="font-bebas text-2xl text-white">{userDoc?.display_name || 'PLAYER'}</p>
+               <p className="font-teko text-[14px] tracking-widest text-[#d1c5b3] opacity-40 uppercase">{user?.email}</p>
              </div>
           </div>
         </div>
@@ -124,10 +124,10 @@ export default function ProfilePage() {
           
           {/* Left Column - Personal Info */}
           <div className="lg:col-span-5 space-y-8">
-            <div className="bg-[#1b1b1b] p-8 border border-[rgba(78,70,56,0.2)] hover:border-[rgba(78,70,56,0.5)] transition-colors">
-              <div className="flex items-center gap-3 mb-6 border-b border-[rgba(78,70,56,0.15)] pb-4">
+            <div className="bg-[#111] border border-white/5 p-8">
+              <div className="flex items-center gap-3 mb-8 border-b border-white/5 pb-4">
                 <Shield size={16} className="text-[#dbb462]" />
-                <h2 className="font-agency text-2xl font-bold italic tracking-tight">COMMANDER LOG</h2>
+                <h2 className="font-bebas text-3xl text-white">PLAYER INFO</h2>
               </div>
               
               <div className="space-y-6">
@@ -154,17 +154,16 @@ export default function ProfilePage() {
 
           {/* Right Column - Team Roster */}
           <div className="lg:col-span-7 space-y-8">
-            <div className="bg-[#1b1b1b] p-8 border border-[rgba(78,70,56,0.2)] hover:border-[rgba(78,70,56,0.5)] transition-colors relative overflow-hidden">
-              {/* Decorative elements */}
-              <div className="absolute top-0 right-0 w-32 h-32 bg-[#dbb462]/5 rounded-full blur-3xl" />
+            <div className="bg-[#111] border border-white/5 p-8 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-[#dbb462]/5 rounded-sm blur-3xl opacity-20" />
               
-              <div className="flex items-center justify-between mb-8 border-b border-[rgba(78,70,56,0.15)] pb-4 relative z-10">
+              <div className="flex items-center justify-between mb-8 border-b border-white/5 pb-4 relative z-10">
                 <div className="flex items-center gap-3">
                   <Users size={16} className="text-[#dbb462]" />
-                  <h2 className="font-agency text-2xl font-bold italic tracking-tight">SAVED ROSTER</h2>
+                  <h2 className="font-bebas text-3xl text-white uppercase">SAVED SQUAD</h2>
                 </div>
-                <span className="font-stretch text-[8px] tracking-[0.2em] text-[#d1c5b3] opacity-40 uppercase">
-                  PUBG MOBILE CHAR IDs
+                <span className="font-teko text-[14px] tracking-widest text-[#d1c5b3] opacity-40 uppercase">
+                  CHARACTER IDs
                 </span>
               </div>
 
@@ -180,7 +179,7 @@ export default function ProfilePage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {[1, 2, 3, 4, 5, 6].map((num) => (
                     <div key={num} className="relative group">
-                      <span className="absolute -left-3 top-2 font-agency text-xs text-[#d1c5b3] opacity-20 group-hover:opacity-100 transition-opacity">
+                      <span className="absolute -left-6 top-1.5 font-bebas text-sm text-[#dbb462] opacity-20 group-hover:opacity-100 transition-opacity">
                         0{num}
                       </span>
                       <GhostInput
@@ -197,9 +196,13 @@ export default function ProfilePage() {
             </div>
             
             <div className="flex justify-end">
-              <GradientButton type="submit" size="lg" disabled={saving} icon={Save} className="w-full md:w-auto px-12">
-                {saving ? 'UPDATING SYSTEMS...' : 'SAVE CONFIGURATION'}
-              </GradientButton>
+              <button 
+                type="submit" 
+                disabled={saving}
+                className="btn-obsidian-primary w-full md:w-auto px-16 py-5 font-bebas text-3xl tracking-widest uppercase"
+              >
+                {saving ? 'SAVING...' : 'SAVE CHANGES'}
+              </button>
             </div>
           </div>
           

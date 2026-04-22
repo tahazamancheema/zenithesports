@@ -23,15 +23,15 @@ export default function GhostInput({
       {label && (
         <label
           htmlFor={id}
-          className="font-stretch text-[9px] tracking-widest text-[#d1c5b3] uppercase block"
+          className="font-teko text-[16px] tracking-widest text-[#dbb462] uppercase block opacity-60"
         >
           {label}
-          {required && <span className="text-[#f9d07a] ml-1">*</span>}
+          {required && <span className="text-[#dbb462] ml-1">*</span>}
         </label>
       )}
       <div className="relative flex items-center">
         {prefix && (
-          <span className="absolute left-0 text-[#f9d07a] font-bold text-lg select-none">
+          <span className="absolute left-0 text-[#dbb462] font-bebas text-xl select-none">
             {prefix}
           </span>
         )}
@@ -45,7 +45,7 @@ export default function GhostInput({
           disabled={disabled}
           autoComplete={autoComplete}
           className={`
-            input-ghost text-[#e2e2e2] text-base w-full
+            input-ghost text-[#f2f2f2] text-lg w-full font-body
             ${prefix ? 'pl-7' : ''}
             ${error ? 'border-b-[#ffb4ab]' : ''}
             ${disabled ? 'opacity-40 cursor-not-allowed' : ''}
@@ -54,7 +54,7 @@ export default function GhostInput({
         />
       </div>
       {error && (
-        <p className="text-[#ffb4ab] text-[10px] font-stretch tracking-wide mt-1">
+        <p className="text-[#ffb4ab] text-[12px] font-teko tracking-wide mt-1 uppercase">
           ⚠ {error}
         </p>
       )}

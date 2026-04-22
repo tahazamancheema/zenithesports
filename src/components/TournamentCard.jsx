@@ -1,7 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Clock, Users, Trophy, ChevronRight, Calendar, Star } from 'lucide-react';
+import { Clock, Users, Trophy, ChevronRight, Calendar, MessageCircle } from 'lucide-react';
 import RegistrationCountdown from './RegistrationCountdown';
+import { useTournamentCountdown } from '../hooks/useTournamentCountdown';
 
 export default function TournamentCard({ tournament, registrationCount = 0, isUserRegistered = false }) {
   const {
@@ -10,169 +11,139 @@ export default function TournamentCard({ tournament, registrationCount = 0, isUs
     game = 'PUBG Mobile', poster_url,
   } = tournament;
 
+  const { phase } = useTournamentCountdown(registration_open_date, registration_deadline);
   const slotsPercent = max_teams ? Math.min((registrationCount / max_teams) * 100, 100) : null;
-  const isOpen = status === 'active' && (!max_teams || registrationCount < max_teams);
+  const isOpen = status === 'active' && phase === 'closing' && (!max_teams || registrationCount < max_teams);
 
   const statusConfig = {
-    active:    { label: 'REGISTRATIONS OPEN', dot: 'bg-emerald-400', text: 'text-emerald-400', border: 'border-emerald-500/30' },
-    upcoming:  { label: 'COMING SOON',        dot: 'bg-[#f9d07a]',   text: 'text-[#f9d07a]',   border: 'border-[#f9d07a]/30' },
-    completed: { label: 'COMPLETED',          dot: 'bg-[#9a8f7f]',   text: 'text-[#9a8f7f]',   border: 'border-[#9a8f7f]/30' },
+    active:    { label: 'OPEN',      dot: 'bg-emerald-400', text: 'text-emerald-400', border: 'border-emerald-500/30' },
+    upcoming:  { label: 'SOON',      dot: 'bg-[#f9d07a]',   text: 'text-[#f9d07a]',   border: 'border-[#f9d07a]/30' },
+    completed: { label: 'FINISHED',  dot: 'bg-[#9a8f7f]',   text: 'text-[#9a8f7f]',   border: 'border-[#9a8f7f]/30' },
   };
-  const pill = statusConfig[status] || statusConfig.upcoming;
+  
+  const currentStatus = (status === 'active' && phase === 'closed') ? 'completed' : status;
+  const pill = statusConfig[currentStatus] || statusConfig.upcoming;
 
   const fmtDate = (d, opts) => d ? new Date(d).toLocaleDateString('en-PK', opts) : null;
-  const startFormatted    = fmtDate(start_date,             { day: 'numeric', month: 'short', year: 'numeric' });
-  const deadlineFormatted = fmtDate(registration_deadline,  { day: 'numeric', month: 'short', year: 'numeric' });
-  const regOpenFormatted  = fmtDate(registration_open_date, { day: 'numeric', month: 'short' });
-  const prizeFormatted    = prize_pool ? `PKR ${Number(prize_pool).toLocaleString('en-PK')}` : null;
+  const startFormatted = fmtDate(start_date, { day: 'numeric', month: 'short' });
+  const prizeFormatted = prize_pool ? `PKR ${Number(prize_pool).toLocaleString('en-PK')}` : null;
 
   return (
-    <div className="group relative w-full rounded-sm overflow-hidden flex flex-col md:flex-row min-h-[360px] bg-[#0e0e0e] border border-[rgba(78,70,56,0.3)] hover:border-[#dbb462]/60 hover:shadow-[0_0_40px_rgba(219,180,98,0.1)] transition-all duration-500">
+    <div className="group relative w-full bg-[#0e0e0e] border border-white/5 hover:border-[#dbb462]/40 transition-all duration-500 overflow-hidden flex flex-col h-full">
       
-      {/* ── Background Poster Image (Full cover with heavy vignette) ── */}
-      <div className="absolute inset-0 z-0">
+      {/* ── Banner/Poster Area ── */}
+      <div className="relative aspect-[16/9] overflow-hidden group/poster">
         {poster_url ? (
-          <img src={poster_url} alt={title} className="w-full h-full object-cover opacity-20 group-hover:opacity-30 group-hover:scale-105 group-hover:rotate-1 transition-all duration-1000 ease-out" />
+          <img 
+            src={poster_url} 
+            alt={title} 
+            className="w-full h-full object-cover transition-transform duration-1000 group-hover/poster:scale-110" 
+          />
         ) : (
-          <div className="w-full h-full flex flex-col items-center justify-center relative bg-[#0e0e0e]">
-            <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'linear-gradient(rgba(219,180,98,1) 1px, transparent 1px), linear-gradient(90deg, rgba(219,180,98,1) 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
-            <Trophy className="text-[#dbb462]" style={{ opacity: 0.1 }} size={120} />
+          <div className="w-full h-full bg-[#131313] flex items-center justify-center">
+            <Trophy className="text-[#dbb462] opacity-10" size={64} />
           </div>
         )}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#0e0e0e] via-[#0e0e0e]/80 to-transparent w-full md:w-3/4" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0e0e0e] to-transparent" />
+        
+        {/* Technical Scanline Effect */}
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#dbb462]/10 to-transparent h-1/2 w-full -translate-y-full group-hover/poster:animate-scanline pointer-events-none z-10" />
+        <div className="absolute inset-0 bg-[#dbb462]/5 opacity-0 group-hover/poster:opacity-100 transition-opacity pointer-events-none z-0" />
+
+        {/* Overlays */}
+        <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[#0e0e0e] to-transparent" />
+        
+        {/* Prize Badge */}
+        <div className="absolute top-4 right-4 bg-[#0e0e0e]/90 backdrop-blur-md border border-[#dbb462]/30 px-3 py-2 flex flex-col items-center min-w-[100px]">
+          <span className="font-teko text-[14px] text-[#dbb462] tracking-widest leading-none uppercase">Prize Pool</span>
+          <span className="font-bebas text-2xl text-white leading-none mt-1">{prizeFormatted || 'TBA'}</span>
+        </div>
+
+        {/* Status Badge */}
+        <div className="absolute top-4 left-4 flex gap-2">
+           <div className={`flex items-center gap-2 bg-[#0e0e0e]/90 backdrop-blur-md px-3 py-1.5 border ${pill.border}`}>
+              <span className={`w-1.5 h-1.5 rounded-full ${pill.dot} ${status === 'active' && phase === 'closing' ? 'animate-pulse' : ''}`} />
+              <span className={`font-teko text-[14px] tracking-widest uppercase ${pill.text}`}>
+                {pill.label}
+              </span>
+            </div>
+        </div>
       </div>
 
-      {/* ── Left Content (Text & Chips) ── */}
-      <div className="relative z-10 flex-1 p-6 md:p-10 flex flex-col justify-between">
+      {/* ── Info Content ── */}
+      <div className="p-6 md:p-8 flex-1 flex flex-col justify-between relative">
         
-        <div>
-          <div className="flex items-center gap-4 mb-4">
-            <div className={`flex items-center gap-2 bg-[#0e0e0e]/90 backdrop-blur-md px-3 py-1.5 border ${pill.border}`}>
-              <span className={`w-1.5 h-1.5 rounded-full ${pill.dot} ${status === 'active' ? 'animate-pulse' : ''}`} />
-              <span className={`font-stretch text-[8px] tracking-widest uppercase ${pill.text}`}>{pill.label}</span>
-            </div>
-            <span className="font-stretch text-[10px] tracking-widest text-[#dbb462] opacity-80 uppercase px-3 py-1.5 bg-[#dbb462]/10 border border-[#dbb462]/20">
-              {game}
-            </span>
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-4">
+             <span className="font-teko text-[16px] text-[#dbb462] tracking-widest uppercase">{game}</span>
+             <div className="w-1 h-1 rounded-full bg-white/20" />
+             <span className="font-teko text-[16px] text-[#d1c5b3] opacity-60 tracking-widest uppercase">{startFormatted || 'TBA'}</span>
           </div>
 
-          <h3 className="font-agency text-4xl md:text-6xl font-bold italic tracking-tighter leading-none mb-3 text-[#e2e2e2] group-hover:text-white transition-colors uppercase drop-shadow-md">
+          <h3 className="font-bebas text-4xl mb-4 text-[#f2f2f2] group-hover:text-white transition-colors leading-tight line-clamp-1">
             {title}
           </h3>
           
-          {description && (
-            <p className="text-[#d1c5b3] text-sm leading-relaxed line-clamp-2 md:line-clamp-3 mb-8 max-w-2xl" style={{ opacity: 0.6 }}>
-              {description}
-            </p>
-          )}
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex flex-col">
+               <span className="font-teko text-[14px] text-[#d1c5b3] opacity-40 uppercase tracking-widest mb-1">Squads Joined</span>
+               <div className="flex items-center gap-2">
+                  <span className="font-bebas text-2xl text-white">{registrationCount}</span>
+                  <span className="font-bebas text-xl text-white/30">/ {max_teams || '∞'}</span>
+               </div>
+            </div>
+            <div className="w-12 h-12 rounded-full border border-white/5 flex items-center justify-center group-hover:border-[#dbb462]/30 transition-colors">
+               <ChevronRight size={20} className="text-[#dbb462] group-hover:translate-x-1 transition-transform" />
+            </div>
+          </div>
 
-          <div className="flex flex-wrap gap-6 mb-8">
-            {startFormatted && (
-              <div className="flex gap-3 items-center backdrop-blur-sm bg-black/30 p-3 border border-white/5 rounded-sm">
-                <Calendar size={18} className="text-[#dbb462]" />
-                <div>
-                  <p className="font-stretch text-[7px] tracking-widest text-[#d1c5b3] opacity-50 uppercase">MAIN EVENT</p>
-                  <p className="font-agency text-lg font-bold text-[#e2e2e2] leading-none mt-1">{startFormatted}</p>
-                </div>
-              </div>
-            )}
-            {deadlineFormatted && (
-              <div className="flex gap-3 items-center backdrop-blur-sm bg-black/30 p-3 border border-white/5 rounded-sm">
-                <Clock size={18} className="text-[#dbb462]" />
-                <div>
-                  <p className="font-stretch text-[7px] tracking-widest text-[#d1c5b3] opacity-50 uppercase">REG. CLOSES</p>
-                  <p className="font-agency text-lg font-bold text-[#e2e2e2] leading-none mt-1">{deadlineFormatted}</p>
-                </div>
-              </div>
-            )}
-            {regOpenFormatted && !startFormatted && (
-              <div className="flex gap-3 items-center backdrop-blur-sm bg-black/30 p-3 border border-white/5 rounded-sm">
-                <Star size={18} className="text-[#dbb462]" />
-                <div>
-                  <p className="font-stretch text-[7px] tracking-widest text-[#d1c5b3] opacity-50 uppercase">REG. OPENS</p>
-                  <p className="font-agency text-lg font-bold text-[#e2e2e2] leading-none mt-1">{regOpenFormatted}</p>
-                </div>
-              </div>
-            )}
+          {/* Slots Progress */}
+          <div className="w-full bg-white/5 h-1 relative overflow-hidden group-hover:bg-white/10 transition-colors">
+             <div 
+               className="absolute left-0 inset-y-0 zenith-gradient transition-all duration-1000"
+               style={{ width: slotsPercent ? `${slotsPercent}%` : '0%' }}
+             />
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-4 w-full">
-          {isOpen && !isUserRegistered && (
-            <Link to={`/register/${id}`} className="inline-flex flex-1 md:flex-none relative group/btn overflow-hidden">
-              <div className="absolute inset-0 zenith-gradient opacity-100 group-hover/btn:opacity-90 transition-opacity" />
-              <div className="relative w-full z-10 font-stretch text-[11px] tracking-widest text-[#402d00] py-4 px-12 text-center items-center justify-center flex font-bold shadow-[0_0_15px_rgba(219,180,98,0.5)] whitespace-nowrap">
-                PROCESS REGISTRATION <ChevronRight size={14} className="ml-2" strokeWidth={3} />
+        {/* ── Actions ── */}
+        <div className="space-y-3">
+          <div className="flex gap-3">
+            {isOpen && !isUserRegistered ? (
+              <Link 
+                to={`/register/${id}`} 
+                className="btn-obsidian-primary flex-1 py-4 font-bebas text-2xl tracking-widest uppercase"
+              >
+                Register Squad
+              </Link>
+            ) : isUserRegistered ? (
+              <div className="flex-1 bg-[#dbb462]/5 border border-[#dbb462]/20 text-[#dbb462] font-teko text-[22px] py-3 tracking-widest uppercase text-center">
+                Squad Registered
               </div>
-            </Link>
-          )}
+            ) : null}
 
-          {isUserRegistered && (
-            <div className="inline-flex justify-center flex-1 md:flex-none border border-[#dbb462]/30 text-[#dbb462] bg-[#dbb462]/10 font-stretch text-[10px] tracking-widest py-4 px-8 uppercase whitespace-nowrap">
-              ENTRY SUBMITTED
+            <Link 
+              to={`/tournaments/${id}`} 
+              className="btn-obsidian-ghost flex-1 py-4 font-bebas text-xl tracking-widest uppercase"
+            >
+              View Details
+            </Link>
+          </div>
+
+          {phase === 'closed' && (
+            <div className="w-full bg-[#dbb462]/5 border border-[#dbb462]/20 p-3 flex items-center justify-between gap-3 group/wa">
+               <div className="flex items-center gap-2 min-w-0">
+                 <MessageCircle size={14} className="text-[#dbb462] flex-shrink-0" />
+                 <p className="font-teko text-[14px] tracking-widest text-[#d1c5b3] uppercase truncate leading-none">
+                    Support: <span className="text-[#dbb462]">WhatsApp Unit</span>
+                 </p>
+               </div>
+               <a href="https://wa.me/923390715753" target="_blank" rel="noreferrer" className="text-[12px] font-bold text-[#dbb462] hover:underline whitespace-nowrap leading-none">
+                  JOIN →
+               </a>
             </div>
           )}
-
-          <Link to={`/tournaments/${id}`} className="inline-flex justify-center flex-1 md:flex-none border border-[#dbb462]/30 text-[#dbb462] bg-[#dbb462]/5 font-stretch text-[10px] tracking-widest py-4 px-8 hover:bg-[#dbb462]/10 transition-colors uppercase whitespace-nowrap">
-            VIEW DETAILS
-          </Link>
         </div>
       </div>
-
-      {/* ── Right Panel (Stats Block) ── */}
-      <div className="relative z-10 w-full md:w-72 bg-gradient-to-b from-[#111] to-[#0a0a0a] border-t md:border-t-0 md:border-l border-[rgba(78,70,56,0.3)] shadow-2xl flex flex-col justify-center p-8 backdrop-blur-xl">
-        
-        <div className="mb-8">
-          <p className="flex items-center gap-2 font-stretch text-[8px] tracking-widest text-[#d1c5b3] opacity-50 uppercase mb-2">
-            <Trophy size={12} className="text-[#f9d07a]" /> PRIZE POOL
-          </p>
-          <div className="font-agency text-4xl xl:text-5xl font-black italic tracking-tighter zenith-gradient-text drop-shadow-[0_0_15px_rgba(219,180,98,0.3)]">
-            {prizeFormatted || 'TBA'}
-          </div>
-        </div>
-
-        <div className="w-12 h-px bg-[rgba(78,70,56,0.3)] mb-8" />
-
-        <div className="mb-6">
-          <div className="flex justify-between items-end mb-2">
-            <p className="flex items-center gap-2 font-stretch text-[8px] tracking-widest text-[#d1c5b3] opacity-50 uppercase">
-              <Users size={12} className="text-[#f9d07a]" /> TEAMS REGISTERED
-            </p>
-            {slotsPercent !== null && (
-              <span className="font-stretch text-[9px] tracking-widest text-[#f9d07a] font-bold">{Math.round(slotsPercent)}%</span>
-            )}
-          </div>
-          
-          <div className="w-full bg-[#1a1a1a] h-2 rounded-sm mb-3 overflow-hidden border border-[#2a2a2a]">
-            {slotsPercent !== null ? (
-              <div className="zenith-gradient h-full transition-all duration-1000 ease-out shadow-[0_0_10px_rgba(219,180,98,0.5)]" style={{ width: `${slotsPercent}%` }} />
-            ) : (
-              <div className="zenith-gradient h-full w-full opacity-50 animate-pulse" />
-            )}
-          </div>
-          
-          <div className="font-agency text-2xl font-bold tracking-tight">
-            {max_teams ? (
-              <>
-                <span className="text-white">{registrationCount}</span>
-                <span className="text-[#d1c5b3] opacity-40"> / {max_teams}</span>
-              </>
-            ) : (
-              <span className="text-[#dbb462]">{registrationCount} CURRENTLY</span>
-            )}
-          </div>
-        </div>
-
-        {(isOpen || status === 'upcoming') && (
-          <RegistrationCountdown 
-            openDate={registration_open_date} 
-            deadlineDate={registration_deadline} 
-            compact={true} 
-          />
-        )}
-      </div>
-
     </div>
   );
 }

@@ -29,14 +29,14 @@ export default function StatStrip({ overrideStats = null }) {
           `}
         >
           <div className="flex items-center gap-2">
-            {Icon && <Icon size={14} className="text-[#dbb462]" />}
-            <span className="font-stretch text-[8px] text-[#dbb462] tracking-[0.2em] uppercase">
+            {Icon && <Icon size={16} className="text-[#dbb462]" />}
+            <span className="font-teko text-[16px] text-[#dbb462] tracking-[0.2em] font-medium uppercase">
               {label}
             </span>
           </div>
-          <span className={`font-agency text-3xl lg:text-4xl font-bold tracking-tighter ${pulse ? 'text-emerald-400 flex items-center gap-2 drop-shadow-md' : 'text-[#f9d07a] drop-shadow-md'}`}>
+          <span className={`font-bebas text-4xl lg:text-5xl tracking-tight ${pulse ? 'text-emerald-400 flex items-center gap-3' : 'text-white'}`}>
             {pulse && (
-              <span className="w-3 h-3 bg-emerald-400 rounded-full animate-pulse inline-block shadow-[0_0_10px_rgba(52,211,153,0.8)]" />
+              <span className="w-3 h-3 bg-emerald-400 rounded-full animate-pulse inline-block shadow-[0_0_15px_rgba(52,211,153,0.5)]" />
             )}
             {value}
           </span>

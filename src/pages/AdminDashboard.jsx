@@ -129,8 +129,8 @@ export default function AdminDashboard() {
         <main className="flex-1 p-8 lg:p-12 overflow-auto">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
             <div>
-              <h1 className="font-agency text-5xl md:text-6xl font-black italic tracking-tighter">
-                TOURNAMENT OPS
+              <h1 className="font-agency text-4xl md:text-6xl font-black italic tracking-tighter">
+                ZENITH OPS
               </h1>
               <p className="font-stretch text-[9px] tracking-widest text-[#d1c5b3] opacity-50 mt-2">
                 REAL-TIME MANAGEMENT & GRID LOGISTICS
@@ -313,9 +313,9 @@ function TournamentsTab({ tournaments, registrations, onEdit, onDelete, onViewRe
                 <div className="flex items-center gap-6">
                   <StatusBadge status={t.status} />
                   <div>
-                    <p className="font-agency text-2xl font-bold">{t.title}</p>
-                    <p className="font-stretch text-[9px] text-[#d1c5b3] opacity-40 tracking-widest mt-0.5">
-                      {t.game || 'PUBG MOBILE'} &bull; {regCount}/{t.max_teams || 64} TEAMS
+                    <p className="font-agency text-xl md:text-2xl font-bold">{t.title}</p>
+                    <p className="font-stretch text-[8px] md:text-[9px] text-[#d1c5b3] opacity-40 tracking-widest mt-0.5">
+                      {t.game || 'PUBG MOBILE'} &bull; {regCount}/{t.max_teams || 64} SQUADS
                       {pendingCount > 0 && (
                         <span className="text-[#f9d07a] ml-2">• {pendingCount} PENDING</span>
                       )}
@@ -342,23 +342,23 @@ function TournamentsTab({ tournaments, registrations, onEdit, onDelete, onViewRe
 
               {/* Action Buttons */}
               <div className="flex flex-wrap gap-0 divide-x divide-[rgba(78,70,56,0.15)]">
-                <ActionBtn
-                  icon={Eye}
-                  label="View Registrations"
-                  badge={pendingCount > 0 ? pendingCount : null}
-                  onClick={() => onViewRegs(t)}
-                />
-                <ActionBtn
-                  icon={Split}
-                  label="View Groups"
-                  onClick={() => onViewGroups(t)}
-                />
-                <ActionBtn
-                  icon={Download}
-                  label="Export XLSX"
-                  onClick={() => onExport(t)}
-                />
-              </div>
+                  <ActionBtn
+                    icon={Eye}
+                    label="Registrations"
+                    badge={pendingCount > 0 ? pendingCount : null}
+                    onClick={() => onViewRegs(t)}
+                  />
+                  <ActionBtn
+                    icon={Split}
+                    label="Groups"
+                    onClick={() => onViewGroups(t)}
+                  />
+                  <ActionBtn
+                    icon={Download}
+                    label="Export"
+                    onClick={() => onExport(t)}
+                  />
+                </div>
             </div>
           );
         })
@@ -371,9 +371,9 @@ function ActionBtn({ icon: Icon, label, badge, onClick }) {
   return (
     <button
       onClick={onClick}
-      className="flex items-center gap-2 px-6 py-3 font-stretch text-[9px] tracking-widest text-[#d1c5b3] opacity-50 hover:opacity-100 hover:bg-[#2a2a2a] transition-all flex-1 md:flex-none"
+      className="flex items-center justify-center gap-2 px-3 md:px-6 py-3 font-stretch text-[8px] md:text-[9px] tracking-widest text-[#d1c5b3] opacity-50 hover:opacity-100 hover:bg-[#2a2a2a] transition-all flex-1 min-w-[30%]"
     >
-      <Icon size={14} />
+      <Icon size={12} className="md:w-3.5 md:h-3.5" />
       {label}
       {badge && (
         <span className="bg-[#f9d07a] text-[#402d00] font-bold text-[8px] px-1.5 py-0.5 rounded-full">
@@ -419,18 +419,18 @@ function TournamentRegsModal({ tournament, registrations, onClose, onApprove, on
               {tournament.title.toUpperCase()}
             </p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 md:gap-3">
             <button
               onClick={onExport}
-              className="flex items-center gap-2 border border-[rgba(78,70,56,0.3)] px-4 py-2 font-stretch text-[9px] tracking-widest text-[#d1c5b3] hover:bg-[#2a2a2a] transition-colors"
+              className="flex items-center gap-2 border border-[rgba(78,70,56,0.3)] px-3 md:px-4 py-2 font-stretch text-[8px] md:text-[9px] tracking-widest text-[#d1c5b3] hover:bg-[#2a2a2a] transition-colors"
             >
-              <Download size={13} /> EXPORT XLSX
+              <Download size={12} /> <span className="hidden sm:inline">EXPORT</span>
             </button>
             <button
               onClick={onAdd}
-              className="flex items-center gap-2 bg-[#f9d07a]/10 border border-[#f9d07a]/30 text-[#f9d07a] px-4 py-2 font-stretch text-[9px] tracking-widest hover:bg-[#f9d07a]/20 transition-colors"
+              className="flex items-center gap-2 bg-[#f9d07a]/10 border border-[#f9d07a]/30 text-[#f9d07a] px-3 md:px-4 py-2 font-stretch text-[8px] md:text-[9px] tracking-widest hover:bg-[#f9d07a]/20 transition-colors"
             >
-              <Plus size={13} /> ADD
+              <Plus size={12} /> <span className="hidden sm:inline">ADD</span>
             </button>
             <button onClick={onClose} className="text-[#d1c5b3] hover:text-white transition-colors p-1">
               <X size={20} />
@@ -720,19 +720,18 @@ function SettingsTab({ user }) {
       <div className="bg-[#1f1f1f] p-8">
         <h3 className="font-stretch text-[10px] tracking-widest text-[#f9d07a] mb-4">DATABASE SETUP</h3>
         <p className="text-[#d1c5b3] opacity-50 text-xs leading-relaxed mb-4">
-          Run this SQL in your Supabase SQL Editor to enable all features (auto-status, briefing, schedule, roadmap):
+          Run this SQL in your Supabase SQL Editor to enable all features (auto-status, config, proofing):
         </p>
         <pre className="bg-[#0e0e0e] border border-[rgba(78,70,56,0.3)] p-4 text-[10px] text-[#f9d07a] overflow-x-auto leading-relaxed font-mono whitespace-pre-wrap">
 {`ALTER TABLE public.tournaments
-  ADD COLUMN IF NOT EXISTS registration_open_date
-    timestamp with time zone,
-  ADD COLUMN IF NOT EXISTS is_completed
-    boolean DEFAULT false,
+  ADD COLUMN IF NOT EXISTS registration_config jsonb DEFAULT '{"screenshots": []}',
   ADD COLUMN IF NOT EXISTS briefing text,
-  ADD COLUMN IF NOT EXISTS schedule
-    jsonb DEFAULT '[]',
-  ADD COLUMN IF NOT EXISTS roadmap
-    jsonb DEFAULT '[]';
+  ADD COLUMN IF NOT EXISTS schedule jsonb DEFAULT '[]',
+  ADD COLUMN IF NOT EXISTS roadmap jsonb DEFAULT '[]';
+
+ALTER TABLE public.registrations 
+  ADD COLUMN IF NOT EXISTS screenshot_urls text[] DEFAULT '{}',
+  ADD COLUMN IF NOT EXISTS real_name TEXT;
 
 -- Allows public realtime stats to fetch total users securely
 create or replace function public.get_total_users()
@@ -754,22 +753,6 @@ $$;`}
           Only admins should be able to INSERT/UPDATE/DELETE tournaments and UPDATE registrations.
         </p>
       </div>
-
-      {/* Registration Overhaul SQL */}
-      <div className="bg-[#1f1f1f] p-8 border border-[#dbb462]/30">
-        <h3 className="font-stretch text-[10px] tracking-widest text-[#f9d07a] mb-4">REGISTRATION OVERHAUL (REQUIRED SQL)</h3>
-        <p className="text-[#d1c5b3] opacity-50 text-xs leading-relaxed mb-4">
-          Run this SQL to add the Real Name field and ensure Character ID uniqueness checks:
-        </p>
-        <pre className="bg-[#0e0e0e] border border-[rgba(78,70,56,0.3)] p-4 text-[10px] text-[#f9d07a] font-mono whitespace-pre-wrap">
-{`-- Add real_name column to registrations
-ALTER TABLE public.registrations 
-  ADD COLUMN IF NOT EXISTS real_name TEXT;
-
--- Recommended: Add index to player_ids for faster uniqueness checks
--- CREATE INDEX IF NOT EXISTS idx_registrations_player_ids ON public.registrations USING GIN (player_ids);`}
-        </pre>
-      </div>
     </div>
   );
 }
@@ -790,17 +773,10 @@ function InfoRow({ label, children, mono }) {
 // ─────────────────────────────────────────────────────────────
 function TournamentModal({ isOpen, onClose, tournament, onSave }) {
   const emptyForm = {
-    title: '',
-    description: '',
-    briefing: '',
-    game: 'PUBG Mobile',
-    max_teams: 64,
-    prize_pool: '',
-    registration_open_date: '',
-    registration_deadline: '',
     start_date: '',
     poster_url: '',
     is_completed: false,
+    registration_config: { screenshots: [] },
   };
 
   const [form, setForm] = useState(emptyForm);
@@ -833,6 +809,7 @@ function TournamentModal({ isOpen, onClose, tournament, onSave }) {
           ? new Date(tournament.start_date).toISOString().slice(0, 10) : '',
         poster_url:               tournament.poster_url || '',
         is_completed:             tournament.is_completed || false,
+        registration_config:      tournament.registration_config || { screenshots: [] },
       });
       setScheduleRows(
         parseJSON(tournament.schedule).map((r) => ({ ...r, id: Math.random() }))
@@ -896,6 +873,7 @@ function TournamentModal({ isOpen, onClose, tournament, onSave }) {
     { id: 'content',  label: 'Briefing', icon: FileText },
     { id: 'schedule', label: 'Schedule', icon: ListOrdered },
     { id: 'roadmap',  label: 'Roadmap',  icon: Map },
+    { id: 'reg_config', label: 'Config', icon: Settings },
   ];
 
   const inputCls = 'w-full bg-[#131313] border border-[rgba(78,70,56,0.3)] p-2.5 text-sm text-[#e2e2e2] focus:outline-none focus:border-[#f9d07a] transition-colors font-mono placeholder:opacity-30';
@@ -1139,61 +1117,70 @@ function TournamentModal({ isOpen, onClose, tournament, onSave }) {
         </div>
       )}
 
-      {/* ── ROADMAP ── */}
-      {section === 'roadmap' && (
-        <div className="space-y-3">
-          <p className="font-stretch text-[9px] tracking-widest text-[#d1c5b3] opacity-40">
-            Define tournament phases. They will appear as a timeline on the Roadmap tab.
-          </p>
+      {/* ── REGISTRATION CONFIG ── */}
+      {section === 'reg_config' && (
+        <div className="space-y-6">
+          <div>
+            <h4 className={labelCls}>Screenshot Verification</h4>
+            <p className="text-[10px] text-[#d1c5b3] opacity-40 mb-4 leading-relaxed">
+              Require users to upload proof (e.g., Discord join, YouTube sub, In-game profile) during registration.
+            </p>
 
-          {roadmapRows.length === 0 && (
-            <div className="text-center py-8 bg-[#0e0e0e]">
-              <p className="font-stretch text-[9px] text-[#d1c5b3] opacity-30 tracking-widest">NO PHASES YET</p>
-            </div>
-          )}
-
-          <div className="space-y-3 max-h-64 overflow-y-auto no-scrollbar">
-            {roadmapRows.map((row) => (
-              <div key={row.id} className="bg-[#0e0e0e] border border-[rgba(78,70,56,0.2)] p-3 space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="font-stretch text-[8px] tracking-widest text-[#dbb462] opacity-60">PHASE</span>
-                  <button onClick={() => delRoad(row.id)} className="text-[#ffb4ab] hover:opacity-70">
-                    <X size={14} />
+            <div className="space-y-3">
+              {(form.registration_config?.screenshots || []).map((ss, idx) => (
+                <div key={idx} className="bg-[#0e0e0e] border border-[rgba(78,70,56,0.2)] p-4 flex gap-4 items-end">
+                  <div className="flex-1 space-y-1">
+                    <label className="font-stretch text-[8px] text-[#dbb462]/60 uppercase tracking-widest">Requirement Label</label>
+                    <input
+                      type="text"
+                      value={ss.label}
+                      onChange={(e) => {
+                        const newSS = [...form.registration_config.screenshots];
+                        newSS[idx].label = e.target.value;
+                        setForm(f => ({ ...f, registration_config: { ...f.registration_config, screenshots: newSS } }));
+                      }}
+                      placeholder="e.g. Subscribe to Zenith YT"
+                      className={inputCls}
+                    />
+                  </div>
+                  <div className="flex flex-col items-center gap-1">
+                    <label className="font-stretch text-[8px] text-[#dbb462]/60 uppercase tracking-widest">Required</label>
+                    <button
+                      onClick={() => {
+                        const newSS = [...form.registration_config.screenshots];
+                        newSS[idx].required = !newSS[idx].required;
+                        setForm(f => ({ ...f, registration_config: { ...f.registration_config, screenshots: newSS } }));
+                      }}
+                      className={ss.required ? 'text-[#dbb462]' : 'text-white/20'}
+                    >
+                      {ss.required ? <ToggleRight size={24} /> : <ToggleLeft size={24} />}
+                    </button>
+                  </div>
+                  <button
+                    onClick={() => {
+                      const newSS = form.registration_config.screenshots.filter((_, i) => i !== idx);
+                      setForm(f => ({ ...f, registration_config: { ...f.registration_config, screenshots: newSS } }));
+                    }}
+                    className="text-red-400 opacity-40 hover:opacity-100 p-2"
+                  >
+                    <Trash2 size={16} />
                   </button>
                 </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <input
-                    type="text"
-                    placeholder="Phase label (e.g. Phase 1)"
-                    value={row.phase}
-                    onChange={(e) => updRoad(row.id, 'phase', e.target.value)}
-                    className={inputCls}
-                  />
-                  <input
-                    type="text"
-                    placeholder="Title (e.g. Registration)"
-                    value={row.title}
-                    onChange={(e) => updRoad(row.id, 'title', e.target.value)}
-                    className={inputCls}
-                  />
-                </div>
-                <textarea
-                  placeholder="Brief description of this phase..."
-                  value={row.description}
-                  onChange={(e) => updRoad(row.id, 'description', e.target.value)}
-                  rows={2}
-                  className="w-full bg-[#131313] border border-[rgba(78,70,56,0.3)] p-2.5 text-sm text-[#e2e2e2] focus:outline-none focus:border-[#f9d07a] transition-colors resize-none"
-                />
-              </div>
-            ))}
-          </div>
+              ))}
 
-          <button
-            onClick={addRoadmapRow}
-            className="flex items-center gap-2 border border-dashed border-[rgba(78,70,56,0.4)] px-4 py-3 w-full font-stretch text-[9px] tracking-widest text-[#d1c5b3] opacity-50 hover:opacity-100 hover:bg-[#1f1f1f] transition-all"
-          >
-            <Plus size={14} /> ADD PHASE
-          </button>
+              {(form.registration_config?.screenshots || []).length < 4 && (
+                <button
+                  onClick={() => {
+                    const newSS = [...(form.registration_config?.screenshots || []), { label: '', required: true }];
+                    setForm(f => ({ ...f, registration_config: { ...f.registration_config, screenshots: newSS } }));
+                  }}
+                  className="w-full py-4 border border-dashed border-[#dbb462]/20 text-[#dbb462]/40 hover:text-[#dbb462] hover:bg-[#dbb462]/5 font-stretch text-[9px] tracking-[0.2em] transition-all uppercase"
+                >
+                  + Add Screenshot Requirement
+                </button>
+              )}
+            </div>
+          </div>
         </div>
       )}
 

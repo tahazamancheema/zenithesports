@@ -1,9 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Trophy, Users, Target, Zap, MessageCircle, Youtube } from 'lucide-react';
+import { Trophy, Users, Target, Zap, MessageCircle, Youtube, ChevronRight } from 'lucide-react';
 import { useTournaments } from '../hooks/useTournaments';
-import InteractiveBackground from '../components/ui/InteractiveBackground';
-import GeometryBackground from '../components/ui/GeometryBackground';
+import StaticBackground from '../components/ui/StaticBackground';
 
 const TEAM_MEMBERS = [
   {
@@ -50,6 +49,7 @@ const MILESTONES = [
 
 export default function AboutPage() {
   const { currentTournament } = useTournaments();
+  const scrollRef = React.useRef(null);
 
   // Dynamic Event 8 mapping
   let dynamicMilestones = [...MILESTONES];
@@ -67,145 +67,145 @@ export default function AboutPage() {
       event: 'Event 8: Coming Soon (April 2026)'
     });
   }
+
   return (
-    <div className="min-h-screen bg-[#131313] pt-20 animate-page-enter">
+    <div className="min-h-screen bg-[#0a0a0a] pt-20 animate-page-enter overflow-x-hidden">
 
       {/* ── HERO ── */}
-      <section className="relative py-28 px-6 md:px-12 overflow-hidden bg-[#1b1b1b]">
-        <div className="absolute inset-0 opacity-10"
-          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1542751371-adc38448a05e?w=1920&q=80&fm=webp')", backgroundSize: 'cover', backgroundPosition: 'center' }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#1b1b1b] via-[#1b1b1b]/50 to-transparent" />
-        <InteractiveBackground />
-        <div className="relative z-10 max-w-4xl">
-          <span className="font-stretch text-[#f9d07a] text-[10px] tracking-[0.4em] block mb-4">
-            WHO WE ARE
-          </span>
-          <h1 className="font-agency text-7xl md:text-9xl font-black italic tracking-tighter leading-none mb-6 text-[#e2e2e2]">
-            ABOUT<br /><span className="zenith-gradient-text">ZENITH ESPORTS</span>
+      <section className="relative py-48 px-6 lg:px-16 bg-[#0e0e0e] border-b border-white/5 overflow-hidden">
+        <StaticBackground variant="mesh" />
+        
+        {/* Logo Backdrop */}
+        <div className="absolute inset-0 flex items-center justify-center opacity-[0.02] pointer-events-none">
+           <img src="/logo.png" alt="" className="w-full max-w-4xl h-auto object-contain" />
+        </div>
+
+        <div className="relative z-10 container mx-auto max-w-7xl text-center md:text-left">
+          <div className="flex items-center justify-center md:justify-start gap-4 mb-8">
+            <div className="w-12 h-[2px] bg-[#dbb462]" />
+            <span className="font-teko text-[#dbb462] text-[20px] tracking-[0.2em] font-medium uppercase">OUR JOURNEY</span>
+          </div>
+          
+          <h1 className="font-bebas text-8xl md:text-[140px] tracking-tight mb-8 select-none leading-[0.8] uppercase">
+            BEYOND THE<br />
+            <span className="zenith-gradient-text pr-2">COMPETITION</span>
           </h1>
-          <p className="text-[#d1c5b3] text-xl opacity-70 max-w-2xl leading-relaxed">
-            We are Pakistan's premier PUBG Mobile esports organization — built from the ground up for Pakistani players, by Pakistani players. Our mission is simple: give every talented team a fair shot at championship glory.
+          
+          <p className="font-body text-[#d1c5b3] text-xl md:text-2xl opacity-40 max-w-2xl leading-relaxed mx-auto md:mx-0">
+            Zenith Esports is Pakistan's premier platform for competitive PUBG Mobile. We build the environment where every squad has a fair chance to build their legacy.
           </p>
         </div>
       </section>
 
-
-      {/* ── OUR STORY ── */}
-      <section className="py-24 px-6 md:px-12 bg-[#131313]">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center max-w-6xl mx-auto">
+      {/* ── OUR MISSION ── */}
+      <section className="py-40 px-6 lg:px-16 container mx-auto max-w-7xl relative">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#dbb462]/5 blur-[160px] rounded-full pointer-events-none" />
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-32 items-center">
           <div>
-            <span className="font-stretch text-[#f9d07a] text-[10px] tracking-[0.4em] block mb-4">OUR STORY</span>
-            <h2 className="font-agency text-5xl font-black italic tracking-tighter mb-6">
-              BORN FROM PAKISTAN'S COMPETITIVE SPIRIT
+            <span className="font-teko text-[18px] font-medium tracking-[0.2em] text-[#dbb462] block mb-6 uppercase">Mission Briefing</span>
+            <h2 className="font-bebas text-7xl md:text-9xl tracking-tight mb-8 leading-[0.85] uppercase">
+              FAIR PLAY.<br />
+              <span className="zenith-gradient-text pr-2">PURE SKILL.</span>
             </h2>
-            <p className="text-[#d1c5b3] opacity-60 leading-relaxed text-base mb-6">
-              <strong className="font-bold text-[#e2e2e2]">Zenith Esports</strong> was founded with one goal — to create a structured, professional esports ecosystem for Pakistan's rapidly growing PUBG Mobile community. Before <strong className="font-bold text-[#e2e2e2]">Zenith Esports</strong>, talented teams had no reliable platform to compete, get recognized, or win real prize money.
-            </p>
-            <p className="text-[#d1c5b3] opacity-60 leading-relaxed text-base mb-6">
-              We changed that. Today, <strong className="font-bold text-[#e2e2e2]">Zenith Esports</strong> hosts regular open tournaments, verifies every registered team, streams matches live on YouTube, and distributes prizes fairly across Pakistan — from Karachi to Islamabad, Lahore to Peshawar.
-            </p>
-            <p className="text-[#d1c5b3] opacity-60 leading-relaxed text-base">
-              <strong className="font-bold text-[#e2e2e2]">Zenith Esports</strong> is a project of <span className="text-[#f9d07a] font-bold">Beyond Zenith</span> — a Pakistan-based esports management organization committed to professionalizing competitive gaming in South Asia.
-            </p>
+            <div className="space-y-8 font-body text-[#d1c5b3] opacity-40 text-xl leading-relaxed">
+              <p>
+                We believe the future of Pakistani esports depends on a reliable foundation. Competitive gaming requires more than just high skill—it requires an arena built on trust and transparency.
+              </p>
+              <p>
+                Founded in 2021, we have consistently focused on technical quality. We don't just host matches; we provide a professional ecosystem where hard work meets opportunity.
+              </p>
+              <div className="pt-8 border-t border-white/5">
+                 <p className="font-bebas text-3xl tracking-tight text-white uppercase mb-1">PART OF BEYOND ZENITH</p>
+                 <p className="font-teko text-[16px] tracking-widest text-[#dbb462] uppercase font-bold">Performance & Operations Unit</p>
+              </div>
+            </div>
           </div>
-          <div className="relative">
-            <img
-              src="/image-2.jpeg"
-              alt="PUBG Mobile Pakistan esports"
-              loading="lazy"
-              decoding="async"
-              className="w-full h-96 object-cover opacity-60 grayscale hover:grayscale-0 transition-all duration-700"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#131313] via-transparent to-transparent" />
-            <div className="absolute bottom-6 left-6">
-              <p className="font-stretch text-[8px] text-[#f9d07a]">BEYOND ZENITH</p>
-              <h4 className="font-agency text-2xl font-black italic tracking-tighter">PAKISTAN ESPORTS</h4>
+
+          <div className="relative group overflow-hidden border border-white/5 bg-[#111]">
+             <div className="absolute inset-0 bg-[#dbb462]/[0.02] opacity-0 group-hover:opacity-100 transition-opacity" />
+             <div className="relative aspect-square flex items-center justify-center p-20">
+                <img 
+                  src="/logo.png" 
+                  alt="Zenith" 
+                  className="w-full h-full object-contain grayscale opacity-20 filter transition-all duration-[2s] group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105"
+                />
+             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── THE CHRONICLE (HORIZONTAL TIMELINE) ── */}
+      <section className="py-40 bg-[#0e0e0e] border-y border-white/5 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-20 pointer-events-none">
+          <div className="absolute top-1/2 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#dbb462]/30 to-transparent" />
+        </div>
+
+        <div className="container mx-auto max-w-7xl relative z-10 px-6 lg:px-16 mb-24">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+            <div>
+              <span className="font-teko text-[18px] font-medium tracking-[0.2em] text-[#dbb462] block mb-4 uppercase">Operational History</span>
+              <h2 className="font-bebas text-7xl md:text-9xl tracking-tight uppercase leading-none zenith-gradient-text pr-2">THE CHRONICLE</h2>
+            </div>
+            <div className="flex items-center gap-4 text-[#dbb462]/40 font-teko text-sm tracking-[0.3em] uppercase">
+              <span>Shift to reveal legacy</span>
+              <div className="w-12 h-px bg-[#dbb462]/20" />
             </div>
           </div>
         </div>
-      </section>
 
-      {/* ── VALUES ── */}
-      <section className="py-24 px-6 md:px-12 bg-[#1b1b1b]">
-        <div className="max-w-6xl mx-auto">
-          <div className="mb-12">
-            <span className="font-stretch text-[#f9d07a] text-[10px] tracking-[0.4em] block mb-3">WHAT DRIVES US</span>
-            <h2 className="font-agency text-5xl font-black italic tracking-tighter">OUR CORE VALUES</h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-px bg-[rgba(78,70,56,0.1)]">
-            {VALUES.map(({ icon: Icon, title, desc }) => (
-              <div key={title} className="bg-[#1b1b1b] p-8 hover:bg-[#2a2a2a] transition-colors group">
-                <div className="w-12 h-12 bg-[#0e0e0e] flex items-center justify-center mb-6 group-hover:bg-[#dbb462] transition-colors">
-                  <Icon size={20} className="text-[#dbb462] group-hover:text-[#402d00] transition-colors" />
+        <div 
+          ref={scrollRef}
+          className="flex gap-8 overflow-x-auto pb-20 px-[max(1.5rem,calc((100vw-80rem)/2))] no-scrollbar snap-x snap-mandatory cursor-grab active:cursor-grabbing"
+        >
+          {dynamicMilestones.map((m, i) => (
+            <div 
+              key={i} 
+              className="min-w-[320px] md:min-w-[400px] snap-center group"
+            >
+              <div className="bg-[#111] border border-white/5 p-12 h-full hover:border-[#dbb462]/40 transition-all duration-500 relative overflow-hidden">
+                {/* Background Scanline Animation */}
+                <div className="absolute inset-0 bg-gradient-to-b from-[#dbb462]/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="absolute top-0 left-0 w-full h-1 bg-[#dbb462] scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-left" />
+                
+                <div className="relative z-10">
+                  <span className="font-bebas text-6xl text-[#dbb462] block mb-8 opacity-40 group-hover:opacity-100 transition-opacity">
+                    {m.year}
+                  </span>
+                  <div className="w-12 h-[1px] bg-[#dbb462]/20 mb-6" />
+                  <p className="font-body text-xl text-[#d1c5b3] opacity-50 group-hover:opacity-100 leading-relaxed transition-all duration-500 italic">
+                    "{m.event}"
+                  </p>
                 </div>
-                <h3 className="font-agency text-xl font-bold italic tracking-tight mb-3">{title}</h3>
-                <p className="text-[#d1c5b3] opacity-50 text-sm leading-relaxed">{desc}</p>
+
+                {/* Tactical Corner Accents */}
+                <div className="absolute bottom-4 right-4 w-2 h-2 border-r border-b border-[#dbb462]/20 group-hover:border-[#dbb462]/60 transition-colors" />
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
+          {/* Spacer for end scroll */}
+          <div className="min-w-[200px] h-1" />
         </div>
       </section>
 
-      {/* ── MILESTONES ── */}
-      <section className="relative py-32 overflow-hidden bg-[#131313]">
-        {/* Dynamic Evolving Geometry Background */}
-        <GeometryBackground />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#131313] via-transparent to-[#131313] z-10 pointer-events-none" />
-        
-        <div className="relative z-20 max-w-7xl mx-auto px-6 md:px-12">
-          <div className="mb-20 text-center">
-            <span className="font-stretch text-[#f9d07a] text-[10px] tracking-[0.4em] block mb-4 animate-pulse">THE LEGACY</span>
-            <h2 className="font-agency text-5xl md:text-7xl font-black italic tracking-tighter text-[#e2e2e2]">OUR JOURNEY</h2>
+      {/* ── CALL TO ACTION ── */}
+      <section className="py-48 px-6 lg:px-16 text-center bg-[#0a0a0a] relative overflow-hidden">
+        <div className="container mx-auto max-w-3xl relative z-10">
+          <h2 className="font-bebas text-7xl md:text-[140px] tracking-tight mb-10 leading-[0.8] uppercase">
+            BUILD YOUR<br />
+            <span className="zenith-gradient-text pr-2">LEGACY</span>
+          </h2>
+          <p className="font-body text-[#d1c5b3] text-xl opacity-40 mb-16 leading-relaxed">
+            Every professional squad started somewhere. Join our circuit today and take your first step toward world-class competition.
+          </p>
+          <div className="flex flex-wrap gap-6 justify-center">
+            <Link
+              to="/auth"
+              className="btn-obsidian-primary font-bebas text-3xl px-16 py-6 tracking-widest uppercase"
+            >
+              ACCESS THE CIRCUIT
+            </Link>
           </div>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 group">
-            {dynamicMilestones.map(({ year, event }, i) => (
-              <div 
-                key={i} 
-                className="relative bg-[rgba(31,31,31,0.6)] backdrop-blur-md p-8 border border-[rgba(219,180,98,0.1)] hover:border-[#dbb462] hover:bg-[#1f1f1f] transition-all duration-500 hover:-translate-y-2 overflow-hidden cursor-pointer shadow-lg"
-              >
-                {/* Background Accent */}
-                <div className="absolute -top-10 -right-10 w-32 h-32 bg-[#dbb462] opacity-5 blur-3xl group-hover:opacity-20 transition-opacity" />
-                
-                <div className="absolute top-4 right-4 opacity-5">
-                  <span className="font-agency text-7xl font-black italic">{year.substring(2)}</span>
-                </div>
-                
-                <span className="inline-block px-3 py-1 bg-[#131313] border border-[#dbb462]/30 font-stretch text-[9px] text-[#dbb462] tracking-[0.2em] mb-6 shadow-[0_0_10px_rgba(219,180,98,0.1)]">
-                  {year}
-                </span>
-                
-                <p className="text-[#d1c5b3] text-sm leading-relaxed relative z-10 font-body opacity-80 group-hover:opacity-100 transition-opacity">
-                  {event}
-                </p>
-                
-                <div className="absolute bottom-0 left-0 w-0 h-1 bg-gradient-to-r from-[#dbb462] to-transparent transition-all duration-500 group-hover:w-full" />
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── CTA ── */}
-      <section className="py-20 px-6 md:px-12 bg-[#1b1b1b] text-center">
-        <h2 className="font-agency text-5xl font-black italic tracking-tighter mb-4">READY TO COMPETE?</h2>
-        <p className="text-[#d1c5b3] opacity-60 mb-10 max-w-md mx-auto">
-          Join thousands of Pakistani PUBG Mobile players competing for glory and prize money on <strong className="font-bold text-[#e2e2e2]">Zenith Esports</strong>.
-        </p>
-        <div className="flex flex-wrap gap-4 justify-center">
-          <Link
-            to="/auth"
-            className="zenith-gradient text-[#402d00] font-stretch text-xs px-10 py-5 tracking-widest hover:brightness-110 transition-all"
-          >
-            JOIN NOW
-          </Link>
-          <Link
-            to="/contact"
-            className="border border-[rgba(78,70,56,0.5)] text-[#e2e2e2] font-stretch text-xs px-10 py-5 tracking-widest hover:bg-[#2a2a2a] transition-all"
-          >
-            CONTACT US
-          </Link>
         </div>
       </section>
 

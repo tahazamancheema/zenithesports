@@ -160,12 +160,12 @@ function FAQItem({ q, a }) {
         onClick={() => setOpen((v) => !v)}
         className="w-full flex justify-between items-center px-6 py-5 text-left group"
       >
-        <span className="font-agency text-lg font-bold tracking-tight group-hover:text-[#f9d07a] transition-colors pr-8">
+        <span className="font-bebas text-2xl tracking-tight group-hover:text-[#dbb462] transition-colors pr-8">
           {q}
         </span>
         {open
-          ? <ChevronUp size={18} className="text-[#f9d07a] flex-shrink-0" />
-          : <ChevronDown size={18} className="text-[#d1c5b3] opacity-30 flex-shrink-0 group-hover:opacity-70 transition-opacity" />
+          ? <ChevronUp size={20} className="text-[#dbb462] flex-shrink-0" />
+          : <ChevronDown size={20} className="text-[#d1c5b3] opacity-30 flex-shrink-0 group-hover:opacity-70 transition-opacity" />
         }
       </button>
       {open && (
@@ -193,8 +193,8 @@ function TopicDrawer({ topic, onClose }) {
               <Icon size={16} className="text-[#dbb462]" />
             </div>
             <div>
-              <h2 className="font-agency text-2xl font-bold leading-none">{title}</h2>
-              <p className="font-stretch text-[8px] tracking-widest text-[#d1c5b3] opacity-40 mt-0.5">
+              <h2 className="font-bebas text-3xl text-white leading-none">{title}</h2>
+              <p className="font-teko text-[14px] tracking-widest text-[#dbb462] opacity-40 mt-0.5 uppercase">
                 SUPPORT TOPIC
               </p>
             </div>
@@ -211,19 +211,19 @@ function TopicDrawer({ topic, onClose }) {
         <div className="overflow-y-auto flex-1 no-scrollbar">
 
           {/* Detailed sub-topics */}
-          <div className="divide-y divide-[rgba(78,70,56,0.1)]">
+          <div className="divide-y divide-white/5">
             {details.map(({ heading, body }) => (
-              <div key={heading} className="px-8 py-6 hover:bg-[#1a1a1a] transition-colors">
-                <h3 className="font-agency text-lg font-bold text-[#f9d07a] mb-2">{heading}</h3>
-                <p className="text-[#d1c5b3] opacity-70 text-sm leading-relaxed">{body}</p>
+              <div key={heading} className="px-8 py-6 hover:bg-[#111] transition-colors">
+                <h3 className="font-bebas text-2xl text-[#dbb462] mb-2 uppercase">{heading}</h3>
+                <p className="font-body text-[#d1c5b3] opacity-40 text-lg leading-relaxed">{body}</p>
               </div>
             ))}
           </div>
 
           {/* Related FAQs */}
           {relatedFAQs.length > 0 && (
-            <div className="border-t border-[rgba(78,70,56,0.2)] bg-[#1b1b1b]">
-              <p className="font-stretch text-[8px] tracking-widest text-[#d1c5b3] opacity-40 px-8 pt-5 pb-2">
+            <div className="border-t border-white/5 bg-[#0a0a0a]">
+              <p className="font-teko text-[14px] tracking-widest text-[#dbb462] px-8 pt-5 pb-2 uppercase opacity-40">
                 RELATED QUESTIONS
               </p>
               <div>
@@ -236,17 +236,17 @@ function TopicDrawer({ topic, onClose }) {
         </div>
 
         {/* Footer CTA */}
-        <div className="border-t border-[rgba(78,70,56,0.2)] px-8 py-5 flex items-center justify-between gap-4 flex-shrink-0 bg-[#0e0e0e]">
-          <p className="text-[#d1c5b3] opacity-40 text-xs">Still stuck? Chat with us directly.</p>
+        <div className="border-t border-white/5 px-8 py-5 flex items-center justify-between gap-4 flex-shrink-0 bg-[#0a0a0a]">
+          <p className="text-[#d1c5b3] opacity-40 text-sm font-body">Still stuck? Reach out on WhatsApp.</p>
           <a
             href={`https://wa.me/923390715753?text=${encodeURIComponent(wa)}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="zenith-gradient text-[#402d00] font-stretch text-[10px] px-6 py-3 tracking-widest hover:brightness-110 transition-all flex items-center gap-2 whitespace-nowrap flex-shrink-0"
+            className="btn-obsidian-primary px-6 py-3 font-bebas text-xl tracking-widest flex items-center gap-2 whitespace-nowrap flex-shrink-0 uppercase"
           >
-            <MessageCircle size={13} />
+            <MessageCircle size={16} />
             WHATSAPP SUPPORT
-            <ExternalLink size={11} className="opacity-60" />
+            <ExternalLink size={14} className="opacity-60" />
           </a>
         </div>
       </div>
@@ -267,29 +267,29 @@ export default function SupportPage() {
       )}
 
       {/* Hero */}
-      <section className="py-24 px-6 md:px-12 bg-[#1b1b1b]">
-        <span className="font-stretch text-[#f9d07a] text-[10px] tracking-[0.4em] block mb-4">HELP CENTER</span>
-        <h1 className="font-agency text-7xl md:text-8xl font-black italic tracking-tighter leading-tight pb-2 pr-4 mb-6">
-          HELP &amp; <span className="zenith-gradient-text pr-4">SUPPORT</span>
+      <section className="py-24 px-6 md:px-12 bg-[#111] border-b border-white/5">
+        <span className="font-teko text-[#dbb462] text-[20px] tracking-[0.2em] block mb-4 uppercase">HELP CENTER</span>
+        <h1 className="font-bebas text-7xl md:text-9xl tracking-tight leading-none mb-6 text-white uppercase">
+          HELP &amp; <span className="text-[#dbb462]">SUPPORT</span>
         </h1>
-        <p className="text-[#d1c5b3] opacity-60 max-w-xl text-base leading-relaxed">
+        <p className="text-[#d1c5b3] opacity-40 max-w-xl text-lg leading-relaxed font-body">
           Find answers to frequently asked questions, or reach us directly on WhatsApp for immediate assistance.
         </p>
       </section>
 
       {/* Quick contact strip */}
-      <div className="bg-[#0e0e0e] px-6 md:px-12 py-6 flex flex-col md:flex-row items-center justify-between gap-4 border-b border-[rgba(78,70,56,0.15)]">
+      <div className="bg-[#0a0a0a] px-6 md:px-12 py-8 flex flex-col md:flex-row items-center justify-between gap-4 border-b border-white/5">
         <div>
-          <span className="font-stretch text-[9px] text-[#f9d07a] tracking-widest">NEED DIRECT HELP?</span>
-          <p className="font-agency text-2xl font-bold mt-1">WhatsApp: +92 339 0715753</p>
+          <span className="font-teko text-[16px] text-[#dbb462] tracking-widest">NEED DIRECT HELP?</span>
+          <p className="font-bebas text-3xl text-white mt-1 uppercase">WhatsApp: +92 339 0715753</p>
         </div>
         <a
           href="https://wa.me/923390715753"
           target="_blank"
           rel="noopener noreferrer"
-          className="zenith-gradient text-[#402d00] font-stretch text-[10px] px-8 py-4 tracking-widest hover:brightness-110 transition-all flex items-center gap-2 whitespace-nowrap"
+          className="btn-obsidian-primary px-8 py-4 font-bebas text-2xl tracking-widest flex items-center gap-2 whitespace-nowrap uppercase"
         >
-          <MessageCircle size={14} />
+          <MessageCircle size={18} />
           CHAT WITH US
         </a>
       </div>
@@ -298,8 +298,8 @@ export default function SupportPage() {
       <section className="py-16 px-6 md:px-12">
         <div className="max-w-5xl mx-auto">
           <div className="mb-10">
-            <span className="font-stretch text-[#f9d07a] text-[10px] tracking-[0.4em] block mb-3">BROWSE BY TOPIC</span>
-            <h2 className="font-agency text-4xl font-black italic tracking-tighter">SUPPORT TOPICS</h2>
+            <span className="font-teko text-[#dbb462] text-[20px] tracking-[0.2em] block mb-3 uppercase">BROWSE BY TOPIC</span>
+            <h2 className="font-bebas text-4xl text-white tracking-tight uppercase leading-tight">SUPPORT TOPICS</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -312,48 +312,47 @@ export default function SupportPage() {
                   className="group text-left bg-[#1b1b1b] border border-[rgba(78,70,56,0.2)] hover:border-[#dbb462]/50 hover:bg-[#1f1f1f] transition-all duration-200 p-6 flex flex-col gap-4"
                 >
                   <div className="flex items-start justify-between">
-                    <div className="w-10 h-10 bg-[#dbb462]/10 border border-[#dbb462]/20 flex items-center justify-center flex-shrink-0 group-hover:bg-[#dbb462]/20 transition-colors">
-                      <Icon size={18} className="text-[#dbb462]" />
+                    <div className="w-12 h-12 bg-[#dbb462]/10 border border-[#dbb462]/20 flex items-center justify-center flex-shrink-0 group-hover:bg-[#dbb462]/20 transition-colors">
+                      <Icon size={20} className="text-[#dbb462]" />
                     </div>
-                    <span className="font-stretch text-[8px] tracking-widest text-[#dbb462] opacity-0 group-hover:opacity-60 transition-opacity">
+                    <span className="font-teko text-[14px] tracking-widest text-[#dbb462] opacity-0 group-hover:opacity-60 transition-opacity uppercase font-medium">
                       {topic.details.length} TOPICS →
                     </span>
                   </div>
                   <div>
-                    <h3 className="font-agency text-xl font-bold mb-1 group-hover:text-[#f9d07a] transition-colors">
+                    <h3 className="font-bebas text-3xl text-white mb-1 group-hover:text-[#dbb462] transition-colors uppercase">
                       {topic.title}
                     </h3>
-                    <p className="text-[#d1c5b3] opacity-50 text-xs leading-relaxed">{topic.tagline}</p>
+                    <p className="font-body text-[#d1c5b3] opacity-40 text-sm leading-relaxed">{topic.tagline}</p>
                   </div>
-                  <div className="mt-auto pt-2 border-t border-[rgba(78,70,56,0.15)] flex items-center justify-between">
-                    <span className="font-stretch text-[8px] tracking-widest text-[#d1c5b3] opacity-30">
-                      CLICK TO EXPAND
+                  <div className="mt-auto pt-4 border-t border-white/5 flex items-center justify-between">
+                    <span className="font-teko text-[14px] tracking-widest text-[#dbb462] opacity-20 uppercase">
+                      DETAILS
                     </span>
-                    <ChevronDown size={14} className="text-[#d1c5b3] opacity-30 group-hover:text-[#f9d07a] group-hover:opacity-100 transition-all" />
+                    <ChevronDown size={18} className="text-[#dbb462] opacity-20 group-hover:opacity-100 transition-all" />
                   </div>
                 </button>
               );
             })}
           </div>
 
-          <div className="mt-8 text-center">
-            <p className="text-[#d1c5b3] opacity-40 text-sm">
-              Can't find your answer?{' '}
-              <a href="https://wa.me/923390715753" target="_blank" rel="noopener noreferrer" className="text-[#f9d07a] hover:underline">
-                Contact us on WhatsApp
-              </a>{' '}
-              for direct support.
+          <div className="mt-12 text-center">
+            <p className="font-body text-[#d1c5b3] opacity-40 text-base">
+              Still have questions?{' '}
+              <a href="https://wa.me/923390715753" target="_blank" rel="noopener noreferrer" className="text-[#dbb462] hover:underline font-medium">
+                Contact WhatsApp Support
+              </a>
             </p>
           </div>
         </div>
       </section>
 
       {/* FAQ */}
-      <section className="py-20 px-6 md:px-12 bg-[#1b1b1b]">
+      <section className="py-24 px-6 md:px-12 bg-[#0a0a0a]">
         <div className="max-w-3xl mx-auto">
           <div className="mb-12">
-            <span className="font-stretch text-[#f9d07a] text-[10px] tracking-[0.4em] block mb-3">COMMON QUESTIONS</span>
-            <h2 className="font-agency text-4xl font-black italic tracking-tighter">FREQUENTLY ASKED</h2>
+            <span className="font-teko text-[#dbb462] text-[20px] tracking-[0.2em] block mb-3 uppercase">COMMON QUESTIONS</span>
+            <h2 className="font-bebas text-5xl text-white tracking-tight uppercase">FREQUENTLY ASKED</h2>
           </div>
           <div className="bg-[#131313] border border-[rgba(78,70,56,0.15)]">
             {FAQS.map((item, i) => (

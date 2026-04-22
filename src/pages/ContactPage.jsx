@@ -64,11 +64,11 @@ export default function ContactPage() {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#1b1b1b] to-transparent" />
         <div className="relative z-10">
-          <span className="font-stretch text-[#f9d07a] text-[10px] tracking-[0.4em] block mb-4">GET IN TOUCH</span>
-          <h1 className="font-agency text-7xl md:text-8xl font-black italic tracking-tighter leading-none mb-6">
-            CONTACT <span className="zenith-gradient-text">COMMAND</span>
+          <span className="font-teko text-[#dbb462] text-[20px] tracking-[0.2em] block mb-4 uppercase">GET IN TOUCH</span>
+          <h1 className="font-bebas text-7xl md:text-9xl tracking-tight leading-none mb-6 uppercase text-white">
+            CONTACT <span className="text-[#dbb462]">US</span>
           </h1>
-          <p className="text-[#d1c5b3] opacity-60 max-w-xl text-base leading-relaxed">
+          <p className="font-body text-[#d1c5b3] opacity-40 max-w-xl text-lg leading-relaxed">
             Questions about registration? Tournament disputes? Business partnerships? We're here — reach us directly on WhatsApp for the fastest response.
           </p>
         </div>
@@ -81,21 +81,21 @@ export default function ContactPage() {
           {/* Contact info cards */}
           <div className="lg:col-span-4 space-y-4">
             {CONTACT_INFO.map(({ icon: Icon, label, value, sub, href, cta }) => (
-              <div key={label} className="bg-[#1f1f1f] p-8 border-l-4 border-[#dbb462]">
+              <div key={label} className="bg-[#111] p-8 border-l-4 border-[#dbb462]">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-8 h-8 bg-[#2a2a2a] flex items-center justify-center">
-                    <Icon size={16} className="text-[#f9d07a]" />
+                    <Icon size={16} className="text-[#dbb462]" />
                   </div>
-                  <span className="font-stretch text-[9px] tracking-widest text-[#f9d07a]">{label}</span>
+                  <span className="font-teko text-[16px] tracking-widest text-[#dbb462] uppercase">{label}</span>
                 </div>
-                <p className="font-agency text-xl font-bold mb-1">{value}</p>
-                <p className="text-[#d1c5b3] opacity-50 text-xs mb-4">{sub}</p>
+                <p className="font-bebas text-3xl text-white mb-1">{value}</p>
+                <p className="font-body text-[#d1c5b3] opacity-40 text-sm mb-4">{sub}</p>
                 {href && cta && (
                   <a
                     href={href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="font-stretch text-[9px] tracking-widest text-[#dbb462] hover:opacity-70 transition-opacity flex items-center gap-2"
+                    className="font-teko text-[14px] tracking-widest text-[#dbb462] hover:opacity-70 transition-opacity flex items-center gap-2 uppercase"
                   >
                     {cta} →
                   </a>
@@ -106,10 +106,10 @@ export default function ContactPage() {
 
           {/* Contact form */}
           <div className="lg:col-span-8">
-            <div className="bg-[#1f1f1f] p-10">
-              <h2 className="font-agency text-3xl font-bold italic tracking-tight mb-2">SEND A MESSAGE</h2>
-              <p className="font-stretch text-[9px] tracking-widest text-[#d1c5b3] opacity-40 mb-10">
-                YOUR MESSAGE WILL BE SENT VIA WHATSAPP
+            <div className="bg-[#111] p-10 border border-white/5">
+              <h2 className="font-bebas text-4xl text-white mb-2 uppercase">SEND A MESSAGE</h2>
+              <p className="font-teko text-[16px] tracking-widest text-[#d1c5b3] opacity-40 mb-10 uppercase">
+                Your message will be sent directly via WhatsApp
               </p>
 
               <form onSubmit={handleSubmit} className="space-y-8">
@@ -142,8 +142,8 @@ export default function ContactPage() {
                 />
 
                 <div className="space-y-1">
-                  <label className="font-stretch text-[9px] tracking-widest text-[#d1c5b3] uppercase block">
-                    Message <span className="text-[#f9d07a]">*</span>
+                  <label className="font-teko text-[16px] tracking-widest text-[#dbb462] uppercase block opacity-60">
+                    Message <span className="text-[#dbb462]">*</span>
                   </label>
                   <textarea
                     value={form.message}
@@ -151,13 +151,17 @@ export default function ContactPage() {
                     placeholder="Describe your issue or query in detail..."
                     rows={6}
                     required
-                    className="w-full bg-[#131313] border-b border-[rgba(78,70,56,0.3)] pt-3 pb-2 text-sm text-[#e2e2e2] placeholder:text-[#4e4638] focus:outline-none focus:border-b-[#f9d07a] transition-colors resize-none"
+                    className="w-full bg-[#0a0a0a] border-b border-white/10 pt-3 pb-2 text-lg text-[#f2f2f2] placeholder:text-white/10 focus:outline-none focus:border-b-[#dbb462] transition-colors resize-none font-body"
                   />
                 </div>
 
-                <GradientButton type="submit" size="lg" disabled={sending} icon={Send}>
-                  {sending ? 'OPENING WHATSAPP...' : 'SEND VIA WHATSAPP'}
-                </GradientButton>
+                <button 
+                  type="submit" 
+                  disabled={sending}
+                  className="btn-obsidian-primary w-full py-5 font-bebas text-3xl tracking-widest uppercase"
+                >
+                  {sending ? 'PROCESSING...' : 'SEND VIA WHATSAPP'}
+                </button>
               </form>
             </div>
           </div>

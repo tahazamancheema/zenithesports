@@ -50,6 +50,3 @@ export async function assignGroupsToSupabase(approvedTeams, updateFn, groupSize 
 
   return { groupsCreated: groups.length, teamsAssigned };
 }
-
-// Backward-compat alias (safe to remove after full migration)
-export { assignGroupsToSupabase as assignGroupsToFirestore };

@@ -36,39 +36,39 @@ export default function LiveStatus() {
   return (
     <section className="bg-[#1b1b1b] py-20 px-6 md:px-12" id="live">
       {/* Section Header */}
-      <div className="flex justify-between items-end mb-12 border-b border-[rgba(78,70,56,0.15)] pb-8">
+      <div className="flex justify-between items-end mb-12 border-b border-[rgba(219,180,98,0.1)] pb-8">
         <div>
-          <span className="font-stretch text-[#f9d07a] text-[10px] tracking-[0.4em] block mb-2">
-            BROADCAST CENTER
+          <span className="font-teko text-[#dbb462] text-[20px] tracking-[0.2em] font-medium block mb-2 uppercase">
+            LIVE BROADCAST 
           </span>
-          <h2 className="font-agency text-6xl md:text-7xl font-bold tracking-tighter leading-tight pb-2 pr-4 italic">
-            {isLive ? 'LIVE NOW' : 'LATEST UPLOAD'}
+          <h2 className="font-bebas text-7xl md:text-9xl tracking-tight leading-none pr-4 flex flex-wrap gap-x-6">
+            <span className="zenith-gradient-text pr-2">{isLive ? 'LIVE' : 'LATEST'}</span>
+            <span className="zenith-gradient-text pr-2">DROPS</span>
           </h2>
         </div>
         <div className="hidden md:flex items-center gap-4">
           {isLive ? (
-            <span className="flex items-center gap-2 font-stretch text-[10px] tracking-widest text-red-400">
-              <span className="w-2 h-2 bg-red-500 rounded-full live-dot" />
-              24/7 STREAMING
+            <span className="flex items-center gap-2 font-teko text-[16px] tracking-[0.2em] text-red-500 uppercase">
+              <span className="w-2 h-2 bg-red-600 rounded-full animate-pulse" />
+              BROADCAST ACTIVE
             </span>
           ) : (
-            <span className="flex items-center gap-2 font-stretch text-[10px] tracking-widest text-[#d1c5b3] opacity-40">
-              <Clock size={12} />
-              LATEST CONTENT
+            <span className="flex items-center gap-2 font-teko text-[16px] tracking-[0.2em] text-[#d1c5b3] opacity-40 uppercase">
+              <Clock size={14} />
+              RECENT UPLOADS
             </span>
           )}
-          {/* Refresh countdown — only visible when API is active */}
           {apiAvailable && countdown && (
-            <span className="flex items-center gap-1.5 font-stretch text-[8px] tracking-widest text-[#d1c5b3] opacity-30 border border-[rgba(78,70,56,0.2)] px-2 py-1">
-              <RefreshCw size={9} />
-              NEXT CHECK {countdown}
+            <span className="flex items-center gap-1.5 font-teko text-[14px] tracking-[0.1em] text-[#dbb462] border border-[#dbb462]/20 px-3 py-1.5 bg-[#dbb462]/5">
+              <RefreshCw size={12} className="animate-spin-slow" />
+              REFRESH IN {countdown}
             </span>
           )}
         </div>
       </div>
 
       {/* Content */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
         {/* Main Video */}
         <div className="lg:col-span-8">
           {loading ? (
@@ -76,51 +76,48 @@ export default function LiveStatus() {
           ) : error || !apiAvailable ? (
             <NoAPIPlaceholder />
           ) : videoId ? (
-            <div className="relative">
+            <div className="relative group/vid">
               {/* Status badge */}
-              <div className="absolute top-4 left-4 z-10 flex gap-3">
+              <div className="absolute top-6 left-6 z-10 flex gap-3">
                 {isLive ? (
-                  <span className="bg-red-600 px-3 py-1 font-stretch text-[10px] tracking-widest flex items-center gap-2 text-white">
-                    <span className="w-1.5 h-1.5 bg-white rounded-full live-dot" />
+                  <span className="bg-red-700 px-4 py-1.5 font-teko text-[14px] tracking-[0.2em] flex items-center gap-2 text-white shadow-xl">
+                    <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
                     LIVE
                   </span>
                 ) : (
-                  <span className="bg-[#1f1f1f]/90 px-3 py-1 font-stretch text-[10px] tracking-widest text-[#f9d07a] flex items-center gap-2">
-                    <Play size={10} />
-                    LATEST UPLOAD
-                  </span>
-                )}
-                {isLive && viewerCount && (
-                  <span className="bg-[#2a2a2a]/80 backdrop-blur-md px-3 py-1 font-stretch text-[10px] tracking-widest text-[#d1c5b3]">
-                    {Number(viewerCount).toLocaleString('en-PK')} WATCHING
+                  <span className="bg-[#131313] px-4 py-1.5 font-teko text-[14px] tracking-[0.2em] text-[#dbb462] flex items-center gap-2 border border-[#dbb462]/20 shadow-xl">
+                    <Play size={12} fill="currentColor" />
+                    LATEST VIDEO
                   </span>
                 )}
               </div>
 
-              {/* YouTube Embed */}
-              <div className="yt-embed-container">
+              {/* YouTube Embed Container */}
+              <div className="relative aspect-video w-full bg-[#0e0e0e] border border-white/5 overflow-hidden shadow-2xl group-hover/vid:border-[#dbb462]/20 transition-all duration-500">
                 <iframe
                   src={`https://www.youtube.com/embed/${videoId}?autoplay=0&rel=0&modestbranding=1`}
                   title={title}
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
-                  className="w-full"
+                  className="absolute inset-0 w-full h-full"
                 />
               </div>
 
               {/* Video Title */}
               {title && (
-                <div className="mt-4 px-2">
-                  <h3 className="font-agency text-2xl font-bold tracking-tight">{title}</h3>
-                  <div className="flex items-center gap-2 mt-2">
-                    <img
-                      src="/logo.png"
-                      alt="Zenith"
-                      className="w-6 h-6 object-contain"
-                      onError={(e) => { e.target.style.display = 'none'; }}
-                    />
-                    <span className="font-stretch text-[9px] tracking-widest text-[#d1c5b3] opacity-60">
-                      @ZENITHESPORTS.PAKISTAN
+                <div className="mt-6">
+                  <h3 className="font-bebas text-4xl tracking-tight uppercase mb-3 text-[#f2f2f2]">{title}</h3>
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-[#1f1f1f] border border-[#dbb462]/10 p-1 flex items-center justify-center">
+                      <img
+                        src="/logo.png"
+                        alt="Zenith"
+                        className="w-full h-full object-contain"
+                        onError={(e) => { e.target.style.display = 'none'; }}
+                      />
+                    </div>
+                    <span className="font-teko text-[16px] tracking-[0.2em] text-[#dbb462] uppercase">
+                      OFFICIAL CHANNEL &bull; ZENITH ESPORTS
                     </span>
                   </div>
                 </div>
@@ -134,51 +131,32 @@ export default function LiveStatus() {
         {/* Side info panel */}
         <div className="lg:col-span-4 space-y-6">
           {/* Channel info card */}
-          <div className="bg-[#0e0e0e] p-8 border-l-4 border-[#dbb462]">
-            <span className="font-stretch text-[9px] tracking-widest text-[#f9d07a] block mb-4">
-              CHANNEL INFO
+          <div className="bg-[#131313] p-10 border-t-2 border-[#dbb462] relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-[#dbb462]/5 blur-3xl pointer-events-none" />
+            <span className="font-teko text-[20px] tracking-[0.2em] text-[#dbb462] block mb-8 uppercase opacity-80">
+              Broadcast Spec
             </span>
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <span className="font-stretch text-[9px] text-[#c6c6c6] tracking-widest">CHANNEL</span>
-                <span className="font-agency text-sm md:text-lg text-[#f9d07a] font-bold">@ZENITHESPORTS.PAKISTAN</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="font-stretch text-[9px] text-[#c6c6c6] tracking-widest">PLATFORM</span>
-                <span className="font-agency text-lg text-[#f9d07a] font-bold">PUBG MOBILE</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="font-stretch text-[9px] text-[#c6c6c6] tracking-widest">STATUS</span>
-                <span className={`flex items-center gap-2 font-agency text-lg font-bold ${isLive ? 'text-green-400' : 'text-[#d1c5b3]'}`}>
-                  {isLive ? (
-                    <>
-                      <Wifi size={14} />
-                      LIVE
-                    </>
-                  ) : (
-                    <>
-                      <WifiOff size={14} />
-                      OFFLINE
-                    </>
-                  )}
-                </span>
-              </div>
+            <div className="space-y-6">
+              <SpecRow label="COORDINATES" value="@ZENITHESPORTS.PAKISTAN" />
+              <SpecRow label="GAME" value="PUBG MOBILE" />
+              <SpecRow label="STATUS" value={isLive ? 'CONNECTED' : 'STANDBY'} active={isLive} />
             </div>
           </div>
 
           {/* Subscribe CTA */}
-          <div className="bg-[#1f1f1f] p-8">
-            <h4 className="font-stretch text-[10px] tracking-widest text-[#f9d07a] mb-3">
-              STAY CONNECTED
+          <div className="bg-[#1a1a1a] p-10 border border-white/5 group relative overflow-hidden">
+            <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-[#dbb462]/5 blur-2xl group-hover:bg-[#dbb462]/10 transition-colors" />
+            <h4 className="font-teko text-[20px] tracking-[0.2em] text-[#dbb462] mb-4 uppercase">
+              JOIN THE SQUAD
             </h4>
-            <p className="text-[#d1c5b3] text-sm opacity-60 mb-6 leading-relaxed">
-              Subscribe for live tournaments, highlight reels, and PUBG Mobile competitive content from Pakistan's top teams.
+            <p className="font-body text-[#d1c5b3] text-sm opacity-50 mb-8 leading-relaxed">
+              Never miss a drop. Subscribe for major Pakistani tournament broadcasts, tactical highlights, and squad spotlights.
             </p>
             <a
               href="https://youtube.com/@zenithesports.pakistan"
               target="_blank"
               rel="noopener noreferrer"
-              className="block w-full text-center zenith-gradient text-[#402d00] font-stretch text-[10px] py-4 tracking-widest hover:brightness-110 active:scale-95 transition-all"
+              className="block w-full text-center zenith-gradient text-[#402d00] font-bebas text-2xl py-4 tracking-widest hover:brightness-110 active:scale-95 transition-all shadow-[0_0_20px_rgba(219,180,98,0.1)] group-hover:shadow-[0_0_30px_rgba(219,180,98,0.2)]"
             >
               SUBSCRIBE ON YOUTUBE
             </a>
@@ -192,10 +170,10 @@ export default function LiveStatus() {
 function LoadingSkeleton() {
   return (
     <div className="space-y-4">
-      <div className="yt-embed-container bg-[#1f1f1f] animate-pulse" style={{ paddingBottom: '56.25%' }}>
+      <div className="yt-embed-container bg-[#1f1f1f] animate-pulse relative" style={{ paddingBottom: '56.25%' }}>
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="font-stretch text-[10px] tracking-widest text-[#4e4638]">
-            LOADING BROADCAST...
+          <div className="font-teko text-[18px] tracking-[0.2em] text-[#dbb462]/40 uppercase">
+            Loading Broadcast...
           </div>
         </div>
       </div>
@@ -205,26 +183,37 @@ function LoadingSkeleton() {
 
 function NoAPIPlaceholder() {
   return (
-    <div className="yt-embed-container bg-[#0e0e0e] border border-[rgba(78,70,56,0.3)]" style={{ aspectRatio: '16/9', position: 'relative', paddingBottom: '56.25%' }}>
+    <div className="yt-embed-container bg-[#0e0e0e] border border-[rgba(78,70,56,0.3)] relative" style={{ paddingBottom: '56.25%' }}>
       <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
         <div className="w-16 h-16 bg-[#1f1f1f] flex items-center justify-center">
           <Play size={24} className="text-[#dbb462]" />
         </div>
-        <div className="text-center">
-          <p className="font-agency text-2xl font-bold text-[#d1c5b3]">BROADCAST CENTER</p>
-          <p className="font-stretch text-[9px] tracking-widest text-[#d1c5b3] opacity-40 mt-2">
-            CONFIGURE YOUTUBE API KEY TO ENABLE LIVE STATUS
+        <div className="text-center px-6">
+          <p className="font-bebas text-4xl text-[#d1c5b3] uppercase">BROADCAST CENTER</p>
+          <p className="font-teko text-[14px] tracking-[0.2em] text-[#dbb462]/40 mt-2 uppercase">
+            Video Fetch Pending
           </p>
         </div>
         <a
           href="https://youtube.com/@zenithesports.pakistan"
           target="_blank"
           rel="noopener noreferrer"
-          className="zenith-gradient text-[#402d00] font-stretch text-[10px] px-6 py-3 tracking-widest hover:brightness-110 transition-all"
+          className="btn-obsidian-primary font-bebas text-2xl px-8 py-3 tracking-widest uppercase"
         >
-          WATCH ON YOUTUBE
+          YouTube Channel
         </a>
       </div>
+    </div>
+  );
+}
+
+function SpecRow({ label, value, active }) {
+  return (
+    <div className="flex justify-between items-center transition-all group/row">
+      <span className="font-teko text-[16px] tracking-[0.1em] text-[#d1c5b3] opacity-40 uppercase group-hover/row:opacity-100 group-hover/row:text-[#dbb462] transition-colors">{label}</span>
+      <span className={`font-teko text-[22px] font-medium tracking-[0.1em] ${active ? 'text-emerald-400' : 'text-[#f2f2f2]'} group-hover/row:scale-105 transition-transform uppercase`}>
+        {value}
+      </span>
     </div>
   );
 }

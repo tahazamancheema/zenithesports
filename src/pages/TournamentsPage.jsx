@@ -56,90 +56,87 @@ export default function TournamentsPage() {
     <div className="min-h-screen bg-[#131313] pt-20 animate-page-enter">
 
       {/* Hero */}
-      <section className="relative py-24 px-6 md:px-12 bg-[#1b1b1b] overflow-hidden">
+      <section className="relative py-32 px-6 md:px-12 bg-[#0e0e0e] overflow-hidden border-b border-white/5">
         <div
-          className="absolute inset-0 opacity-10"
+          className="absolute inset-0 opacity-10 grayscale hover:grayscale-0 transition-all duration-[3s]"
           style={{
             backgroundImage: "url('https://images.unsplash.com/photo-1542751371-adc38448a05e?w=1920&q=80&fm=webp')",
             backgroundSize: 'cover',
             backgroundPosition: 'center',
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#1b1b1b] to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0e0e0e] via-[#0e0e0e]/40 to-transparent" />
         <div className="relative z-10">
-          <span className="font-stretch text-[#f9d07a] text-[10px] tracking-[0.4em] block mb-4">
-            COMPETITIVE CIRCUIT
+          <span className="font-teko text-[#dbb462] text-[18px] tracking-[0.1em] block mb-4 uppercase">
+            GLOBAL CIRCUIT &bull; ARCHIVE
           </span>
-          <h1 className="font-agency text-6xl md:text-8xl font-black italic tracking-tighter leading-tight pb-2 pr-4 mb-6">
-            TOURNAMENTS
+          <h1 className="font-bebas text-8xl md:text-[140px] tracking-tight leading-none mb-8 uppercase zenith-gradient-text pr-2">
+             TOURNAMENTS
           </h1>
-          <p className="text-[#d1c5b3] opacity-60 max-w-lg text-base leading-relaxed">
-            Pakistan ke top PUBG Mobile tournaments. Register your team and compete for glory and prize money.
+          <p className="font-body text-[#d1c5b3] opacity-40 max-w-lg text-lg leading-relaxed">
+            The proving ground for Pakistani talent. Register your squad, climb the ranks, and forge your legacy.
           </p>
         </div>
       </section>
 
       {/* Filter tabs */}
-      <div className="px-6 md:px-12 py-8 bg-[#131313] border-b border-[rgba(78,70,56,0.15)]">
-        <div className="flex gap-1 flex-wrap items-center">
-          {FILTERS.map(({ label, value }) => (
-            <button
-              key={value}
-              onClick={() => setFilter(value)}
-              className={`
-                font-stretch text-[10px] tracking-widest px-6 py-3 transition-all duration-200
-                ${filter === value
-                  ? 'bg-[#f9d07a] text-[#402d00]'
-                  : 'text-[#d1c5b3] opacity-50 hover:opacity-100 hover:bg-[#1f1f1f]'
-                }
-              `}
-            >
-              {label}
-            </button>
-          ))}
-          <span className="ml-auto font-stretch text-[9px] tracking-widest text-[#d1c5b3] opacity-30 self-center">
-            {filtered.length} TOURNAMENT{filtered.length !== 1 ? 'S' : ''}
-          </span>
+      <div className="px-6 md:px-12 py-12 bg-[#131313] border-b border-white/5">
+        <div className="flex flex-col md:flex-row md:items-center gap-8">
+          <div className="flex gap-2 p-1 bg-black/40 border border-white/5 rounded-sm">
+            {FILTERS.map(({ label, value }) => (
+              <button
+                key={value}
+                onClick={() => setFilter(value)}
+                className={`
+                  font-teko text-[16px] tracking-widest px-8 py-2 transition-all duration-300
+                  ${filter === value
+                    ? 'bg-[#dbb462] text-[#402d00]'
+                    : 'text-[#d1c5b3] opacity-40 hover:opacity-100 hover:bg-white/5'
+                  }
+                `}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          <div className="ml-auto flex items-center gap-4">
+             <div className="w-12 h-px bg-white/10" />
+             <span className="font-teko text-[18px] tracking-[0.1em] text-[#dbb462] opacity-80 uppercase">
+                {filtered.length} ACTIVE INTEL
+             </span>
+          </div>
         </div>
       </div>
 
-      {/* List */}
-      <section className="px-6 md:px-12 py-12">
+      {/* Grid */}
+      <section className="px-6 md:px-12 py-20 pb-40">
         {loading ? (
-          /* Skeleton loaders */
-          <div className="flex flex-col gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-[#1f1f1f] h-52 animate-pulse" />
+              <div key={i} className="bg-[#1a1a1a] aspect-[3/4] animate-pulse border border-white/5" />
             ))}
           </div>
         ) : error ? (
-          /* Error state */
-          <div className="flex flex-col items-center justify-center py-32 text-center">
-            <AlertTriangle className="text-[#ffb4ab] mb-4" size={40} />
-            <p className="font-agency text-3xl font-bold italic tracking-tighter text-[#d1c5b3] mb-2">
-              FAILED TO LOAD
-            </p>
-            <p className="font-stretch text-[9px] tracking-widest text-[#d1c5b3] opacity-40 mb-8">
-              {error}
-            </p>
+          <div className="flex flex-col items-center justify-center py-40 text-center">
+            <AlertTriangle className="text-red-500 mb-6" size={48} />
+            <p className="font-bebas text-5xl text-white mb-4">FAILED TO SYNC</p>
+            <p className="font-body text-[#d1c5b3] opacity-40 mb-12 max-w-sm">{error}</p>
             <button
               onClick={refetch}
-              className="flex items-center gap-2 border border-[rgba(78,70,56,0.3)] px-6 py-3 font-stretch text-[10px] tracking-widest text-[#d1c5b3] hover:bg-[#2a2a2a] transition-colors"
+              className="btn-obsidian-ghost px-12 py-4"
             >
-              <RefreshCw size={12} /> RETRY
+              <RefreshCw size={18} className="mr-3" /> RETRY CONNECTION
             </button>
           </div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-32">
-            <p className="font-agency text-4xl font-bold italic tracking-tighter text-[#d1c5b3] opacity-20 mb-4">
-              NO TOURNAMENTS
-            </p>
-            <p className="font-stretch text-[9px] tracking-widest text-[#d1c5b3] opacity-20">
-              {filter === 'all' ? 'CHECK BACK SOON' : `NO ${filter.toUpperCase()} TOURNAMENTS`}
+          <div className="text-center py-40 flex flex-col items-center">
+            <p className="font-bebas text-6xl text-white opacity-10 mb-2">NO RECORDS FOUND</p>
+            <p className="font-teko text-[18px] tracking-[0.2em] text-[#dbb462] opacity-40">
+              {filter === 'all' ? 'STAY TUNED FOR UPDATES' : `NO ${filter.toUpperCase()} EVENTS`}
             </p>
           </div>
         ) : (
-          <div className="flex flex-col gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
             {filtered.map((t) => (
               <TournamentCard
                 key={t.id}

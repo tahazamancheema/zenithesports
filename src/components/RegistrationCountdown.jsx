@@ -13,11 +13,11 @@ export default function RegistrationCountdown({ openDate, deadlineDate, compact 
   if (compact) {
     const timeStr = days > 0 ? `${days}D ${hours}H` : `${hours}H ${mins}M`;
     return (
-      <div className="bg-[#181818] border border-[rgba(78,70,56,0.2)] p-4 rounded-sm">
-        <p className="font-stretch text-[7px] tracking-widest text-[#d1c5b3] opacity-50 mb-1 uppercase">
+      <div className="bg-[#111] border border-white/5 p-4">
+        <p className="font-teko text-[14px] tracking-widest text-[#dbb462] mb-1 uppercase">
           {label}
         </p>
-        <p className={`font-agency text-2xl font-bold italic tracking-wider ${colorClass}`}>
+        <p className={`font-bebas text-3xl tracking-tight ${colorClass}`}>
           {timeStr}
         </p>
       </div>
@@ -27,8 +27,8 @@ export default function RegistrationCountdown({ openDate, deadlineDate, compact 
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2">
-        <Zap size={13} className="text-[#dbb462]" />
-        <span className="font-stretch text-[8px] tracking-widest text-[#d1c5b3]" style={{ opacity: 0.5 }}>
+        <Zap size={14} className="text-[#dbb462]" />
+        <span className="font-teko text-[16px] tracking-widest text-[#dbb462] uppercase">
           {label}
         </span>
       </div>
@@ -44,11 +44,11 @@ export default function RegistrationCountdown({ openDate, deadlineDate, compact 
 
 function CountdownUnit({ value, label }) {
   return (
-    <div className="flex flex-col items-center bg-[#0e0e0e] border border-[rgba(78,70,56,0.25)] px-4 py-3 min-w-[60px]">
-      <span className="font-agency text-3xl font-bold text-[#f9d07a] leading-none tabular-nums">
+    <div className="flex flex-col items-center bg-[#0e0e0e] border border-white/5 px-4 py-3 min-w-[70px]">
+      <span className="font-bebas text-4xl text-[#dbb462] leading-none tabular-nums">
         {String(value).padStart(2, '0')}
       </span>
-      <span className="font-stretch text-[7px] tracking-widest text-[#d1c5b3] mt-1" style={{ opacity: 0.4 }}>
+      <span className="font-teko text-[14px] tracking-widest text-[#d1c5b3] opacity-40 mt-1">
         {label}
       </span>
     </div>
