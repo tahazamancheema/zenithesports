@@ -25,6 +25,30 @@ const STATUS_CONFIG = {
     textClass: 'text-yellow-500',
     bgClass: 'bg-yellow-500/10',
   },
+  active: {
+    label: 'Matches Start',
+    dotClass: 'bg-emerald-400',
+    textClass: 'text-emerald-400',
+    bgClass: 'bg-emerald-500/10',
+  },
+  upcoming: {
+    label: 'Registrations Open',
+    dotClass: 'bg-[#f9d07a]',
+    textClass: 'text-[#f9d07a]',
+    bgClass: 'bg-[#f9d07a]/10',
+  },
+  completed: {
+    label: 'Tournament Completed',
+    dotClass: 'bg-[#9a8f7f]',
+    textClass: 'text-[#9a8f7f]',
+    bgClass: 'bg-[#9a8f7f]/10',
+  },
+  closed: {
+    label: 'Registrations Closed',
+    dotClass: 'bg-red-400',
+    textClass: 'text-red-400',
+    bgClass: 'bg-red-400/10',
+  },
 };
 
 /**

@@ -8,12 +8,12 @@ import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './hooks/useAuth';
 
 // Lazy-load all pages for code splitting
+import TournamentsPage from './pages/TournamentsPage';
+import TournamentDetailsPage from './pages/TournamentDetailsPage';
 const LandingPage     = lazy(() => import('./pages/LandingPage'));
 const AuthPage        = lazy(() => import('./pages/AuthPage'));
 const ProfilePage     = lazy(() => import('./pages/ProfilePage'));
 const AdminDashboard  = lazy(() => import('./pages/AdminDashboard'));
-const TournamentsPage = lazy(() => import('./pages/TournamentsPage'));
-const TournamentDetailsPage = lazy(() => import('./pages/TournamentDetailsPage'));
 const AboutPage       = lazy(() => import('./pages/AboutPage'));
 const ContactPage     = lazy(() => import('./pages/ContactPage'));
 const SupportPage     = lazy(() => import('./pages/SupportPage'));

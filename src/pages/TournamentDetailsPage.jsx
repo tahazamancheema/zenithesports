@@ -47,6 +47,13 @@ export default function TournamentDetailsPage() {
       }
     }
     loadData();
+
+    // Safety timeout to prevent stuck loading
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 5000);
+
+    return () => clearTimeout(timer);
   }, [id]);
 
   const { phase } = useTournamentCountdown(tournament?.registration_open_date, tournament?.registration_deadline);
@@ -75,7 +82,9 @@ export default function TournamentDetailsPage() {
   }
 
   // Apply computed status
-  const t = { ...tournament, status: computeTournamentStatus(tournament) };
+  let currentStatus = computeTournamentStatus(tournament);
+  if (currentStatus === 'active' && phase === 'closed') currentStatus = 'closed';
+  const t = { ...tournament, status: currentStatus };
   const { title, description, briefing, game, max_teams, prize_pool, status, start_date, registration_deadline, registration_open_date, poster_url } = t;
 
   // Parse schedule / roadmap (may come back as array from JSONB or string)

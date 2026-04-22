@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import TournamentCard from '../components/TournamentCard';
 import { useTournaments } from '../hooks/useTournaments';
 import { supabase } from '../supabase/config';
@@ -15,12 +15,12 @@ const FILTERS = [
 export default function TournamentsPage() {
   const { user } = useAuth();
   const { tournaments, loading, error, refetch } = useTournaments();
-  const [regCounts, setRegCounts] = React.useState({});
-  const [userRegs, setUserRegs] = React.useState([]);
+  const [regCounts, setRegCounts] = useState({});
+  const [userRegs, setUserRegs] = useState([]);
   const [filter, setFilter] = useState('all');
 
   // Fetch registration counts and user's own registrations
-  React.useEffect(() => {
+  useEffect(() => {
     // 1. All counts for display
     supabase
       .from('registrations')

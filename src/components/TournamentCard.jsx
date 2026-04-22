@@ -16,12 +16,13 @@ export default function TournamentCard({ tournament, registrationCount = 0, isUs
   const isOpen = status === 'active' && phase === 'closing' && (!max_teams || registrationCount < max_teams);
 
   const statusConfig = {
-    active:    { label: 'OPEN',      dot: 'bg-emerald-400', text: 'text-emerald-400', border: 'border-emerald-500/30' },
-    upcoming:  { label: 'SOON',      dot: 'bg-[#f9d07a]',   text: 'text-[#f9d07a]',   border: 'border-[#f9d07a]/30' },
-    completed: { label: 'FINISHED',  dot: 'bg-[#9a8f7f]',   text: 'text-[#9a8f7f]',   border: 'border-[#9a8f7f]/30' },
+    active:    { label: 'Matches Start',      dot: 'bg-emerald-400', text: 'text-emerald-400', border: 'border-emerald-500/30' },
+    upcoming:  { label: 'Registrations Open', dot: 'bg-[#f9d07a]',   text: 'text-[#f9d07a]',   border: 'border-[#f9d07a]/30' },
+    completed: { label: 'Tournament Completed', dot: 'bg-[#9a8f7f]',   text: 'text-[#9a8f7f]',   border: 'border-[#9a8f7f]/30' },
+    closed:    { label: 'Registrations Closed',  dot: 'bg-red-400',      text: 'text-red-400',      border: 'border-red-500/30' },
   };
   
-  const currentStatus = (status === 'active' && phase === 'closed') ? 'completed' : status;
+  const currentStatus = status === 'completed' ? 'completed' : (phase === 'closed' ? 'closed' : status);
   const pill = statusConfig[currentStatus] || statusConfig.upcoming;
 
   const fmtDate = (d, opts) => d ? new Date(d).toLocaleDateString('en-PK', opts) : null;
@@ -133,8 +134,8 @@ export default function TournamentCard({ tournament, registrationCount = 0, isUs
             <div className="w-full bg-[#dbb462]/5 border border-[#dbb462]/20 p-3 flex items-center justify-between gap-3 group/wa">
                <div className="flex items-center gap-2 min-w-0">
                  <MessageCircle size={14} className="text-[#dbb462] flex-shrink-0" />
-                 <p className="font-teko text-[14px] tracking-widest text-[#d1c5b3] uppercase truncate leading-none">
-                    Support: <span className="text-[#dbb462]">WhatsApp Unit</span>
+                 <p className="font-teko text-[14px] tracking-widest text-[#d1c5b3] uppercase leading-relaxed">
+                    Registrations Closed, the verified teams will receive response from the management on whatsapp soon.
                  </p>
                </div>
                <a href="https://wa.me/923390715753" target="_blank" rel="noreferrer" className="text-[12px] font-bold text-[#dbb462] hover:underline whitespace-nowrap leading-none">

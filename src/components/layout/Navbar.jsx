@@ -109,7 +109,6 @@ export default function Navbar() {
             {user ? (
               <div className="flex items-center gap-6 group/user">
                 <div className="text-right">
-                  <p className="font-teko text-[12px] tracking-widest text-[#dbb462] opacity-40 uppercase mb-0.5">OPERATIONAL</p>
                   <p className="font-bebas text-2xl text-white tracking-widest uppercase truncate max-w-[250px] transition-colors">
                     {displayName}
                   </p>
@@ -122,7 +121,6 @@ export default function Navbar() {
                   >
                     <LogOut size={18} />
                   </button>
-                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 border-2 border-[#0e0e0e] rounded-full" />
                 </div>
               </div>
             ) : (
