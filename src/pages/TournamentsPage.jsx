@@ -68,13 +68,13 @@ export default function TournamentsPage() {
         <div className="absolute inset-0 bg-gradient-to-t from-[#0e0e0e] via-[#0e0e0e]/40 to-transparent" />
         <div className="relative z-10">
           <span className="font-teko text-[#dbb462] text-[18px] tracking-[0.1em] block mb-4 uppercase">
-            GLOBAL CIRCUIT &bull; ARCHIVE
+            GLOBAL CIRCUIT &bull; TOURNAMENTS
           </span>
-          <h1 className="font-bebas text-8xl md:text-[140px] tracking-tight leading-none mb-8 uppercase zenith-gradient-text pr-2">
+          <h1 className="font-bebas text-6xl md:text-[140px] tracking-tight leading-none mb-8 uppercase zenith-gradient-text pr-2">
              TOURNAMENTS
           </h1>
           <p className="font-body text-[#d1c5b3] opacity-40 max-w-lg text-lg leading-relaxed">
-            The proving ground for Pakistani talent. Register your squad, climb the ranks, and forge your legacy.
+            Browse and join our tournaments. Register your team and compete for the top spots.
           </p>
         </div>
       </section>
@@ -88,7 +88,7 @@ export default function TournamentsPage() {
                 key={value}
                 onClick={() => setFilter(value)}
                 className={`
-                  font-teko text-[16px] tracking-widest px-8 py-2 transition-all duration-300
+                  flex-1 md:flex-none font-teko text-[14px] md:text-[16px] tracking-widest px-4 md:px-8 py-2 transition-all duration-300
                   ${filter === value
                     ? 'bg-[#dbb462] text-[#402d00]'
                     : 'text-[#d1c5b3] opacity-40 hover:opacity-100 hover:bg-white/5'
@@ -102,7 +102,7 @@ export default function TournamentsPage() {
           <div className="ml-auto flex items-center gap-4">
              <div className="w-12 h-px bg-white/10" />
              <span className="font-teko text-[18px] tracking-[0.1em] text-[#dbb462] opacity-80 uppercase">
-                {filtered.length} ACTIVE INTEL
+                {filtered.length} ACTIVE TOURNAMENTS
              </span>
           </div>
         </div>

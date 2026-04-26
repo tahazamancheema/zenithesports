@@ -129,7 +129,7 @@ export default function AdminDashboard() {
         <main className="flex-1 p-8 lg:p-12 overflow-auto">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
             <div>
-              <h1 className="font-agency text-4xl md:text-6xl font-black italic tracking-tighter">
+              <h1 className="font-agency text-5xl md:text-6xl font-black italic tracking-tighter uppercase">
                 ZENITH OPS
               </h1>
               <p className="font-stretch text-[9px] tracking-widest text-[#d1c5b3] opacity-50 mt-2">
@@ -309,20 +309,22 @@ function TournamentsTab({ tournaments, registrations, onEdit, onDelete, onViewRe
               className="bg-[#1b1b1b] border border-[rgba(78,70,56,0.2)] hover:border-[rgba(78,70,56,0.4)] transition-colors"
             >
               {/* Header Row */}
-              <div className="flex items-center justify-between p-6 border-b border-[rgba(78,70,56,0.1)]">
-                <div className="flex items-center gap-6">
-                  <StatusBadge status={t.status} />
+              <div className="flex flex-col md:flex-row md:items-center justify-between p-5 md:p-6 border-b border-[rgba(78,70,56,0.1)] gap-4">
+                <div className="flex flex-row items-center gap-4 md:gap-6">
+                  <div className="shrink-0">
+                    <StatusBadge status={t.status} />
+                  </div>
                   <div>
-                    <p className="font-agency text-xl md:text-2xl font-bold">{t.title}</p>
-                    <p className="font-stretch text-[8px] md:text-[9px] text-[#d1c5b3] opacity-40 tracking-widest mt-0.5">
-                      {t.game || 'PUBG MOBILE'} &bull; {regCount}/{t.max_teams || 64} SQUADS
+                    <p className="font-agency text-xl md:text-2xl font-bold leading-tight">{t.title}</p>
+                    <p className="font-stretch text-[9px] md:text-[10px] text-[#d1c5b3] opacity-40 tracking-widest mt-1">
+                      {t.game || 'PUBG MOBILE'} &bull; {regCount}/{t.max_teams || 64} TEAMS
                       {pendingCount > 0 && (
                         <span className="text-[#f9d07a] ml-2">• {pendingCount} PENDING</span>
                       )}
                     </p>
                   </div>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 justify-end">
                   <button
                     onClick={() => onEdit(t)}
                     title="Edit Tournament"
@@ -371,9 +373,9 @@ function ActionBtn({ icon: Icon, label, badge, onClick }) {
   return (
     <button
       onClick={onClick}
-      className="flex items-center justify-center gap-2 px-3 md:px-6 py-3 font-stretch text-[8px] md:text-[9px] tracking-widest text-[#d1c5b3] opacity-50 hover:opacity-100 hover:bg-[#2a2a2a] transition-all flex-1 min-w-[30%]"
+      className="flex items-center justify-center gap-2 px-3 md:px-6 py-4 font-stretch text-[10px] md:text-[11px] tracking-widest text-[#d1c5b3] opacity-60 hover:opacity-100 hover:bg-[#2a2a2a] transition-all flex-1 min-w-[33.33%]"
     >
-      <Icon size={12} className="md:w-3.5 md:h-3.5" />
+      <Icon size={14} className="md:w-4 md:h-4" />
       {label}
       {badge && (
         <span className="bg-[#f9d07a] text-[#402d00] font-bold text-[8px] px-1.5 py-0.5 rounded-full">
@@ -792,6 +794,30 @@ function TournamentModal({ isOpen, onClose, tournament, onSave }) {
     try { return JSON.parse(val); } catch { return []; }
   };
 
+  /** Converts UTC string from DB to PKT string for datetime-local input */
+  const toPKT = (dateStr) => {
+    if (!dateStr) return '';
+    const d = new Date(dateStr);
+    try {
+      return new Intl.DateTimeFormat('sv-SE', {
+        timeZone: 'Asia/Karachi',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      }).format(d).replace(' ', 'T');
+    } catch (e) {
+      return '';
+    }
+  };
+
+  /** Appends PKT offset to input value for saving to DB */
+  const fromPKT = (val) => {
+    if (!val) return null;
+    return `${val}:00+05:00`;
+  };
+
   React.useEffect(() => {
     if (tournament) {
       setForm({
@@ -799,12 +825,10 @@ function TournamentModal({ isOpen, onClose, tournament, onSave }) {
         description:              tournament.description || '',
         briefing:                 tournament.briefing || '',
         game:                     tournament.game || 'PUBG Mobile',
-        max_teams:                tournament.max_teams || 64,
+        max_teams:                tournament.max_teams === null ? '' : tournament.max_teams,
         prize_pool:               tournament.prize_pool || '',
-        registration_open_date:   tournament.registration_open_date
-          ? new Date(tournament.registration_open_date).toISOString().slice(0, 16) : '',
-        registration_deadline:    tournament.registration_deadline
-          ? new Date(tournament.registration_deadline).toISOString().slice(0, 16) : '',
+        registration_open_date:   toPKT(tournament.registration_open_date),
+        registration_deadline:    toPKT(tournament.registration_deadline),
         start_date:               tournament.start_date
           ? new Date(tournament.start_date).toISOString().slice(0, 10) : '',
         poster_url:               tournament.poster_url || '',
@@ -856,6 +880,8 @@ function TournamentModal({ isOpen, onClose, tournament, onSave }) {
       const finalData = {
         ...form,
         max_teams: parsedMaxTeams,
+        registration_open_date: fromPKT(form.registration_open_date),
+        registration_deadline:  fromPKT(form.registration_deadline),
         schedule: scheduleRows.map(({ date, time, event }) => ({ date, time, event })),
         roadmap:  roadmapRows.map(({ phase, title, description }) => ({ phase, title, description })),
       };

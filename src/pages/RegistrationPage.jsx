@@ -56,19 +56,19 @@ export default function RegistrationPage() {
   useEffect(() => {
     if (aLoading || tLoading) return;
     if (!user) {
-      toast.error('You must be securely authenticated to access tactical registrations.');
+      toast.error('You must be signed in to access tournament registrations.');
       navigate('/auth');
       return;
     }
     if (!tournament) {
-      toast.error('Tournament parameters corrupted or vanished.');
+      toast.error('Tournament not found.');
       navigate('/tournaments');
       return;
     }
 
     // Guard: Opening phase check
     if (phase === 'opening') {
-      toast.error('REGISTRATION PENDING. Signal has not been initialized.');
+      toast.error('REGISTRATION PENDING. Registration is not open yet.');
       navigate(`/tournaments/${tournamentId}`);
     }
     
@@ -80,7 +80,7 @@ export default function RegistrationPage() {
     
     setSaving(true);
     try {
-      toast.loading('Synchronizing to secure vaults...', { id: 'reg' });
+      toast.loading('Saving your registration details...', { id: 'reg' });
       
       // Upload Team Logo
       const logoUrl = await uploadFile('ze-logos', file, `logo_${user.id}_${Date.now()}`);
@@ -134,7 +134,7 @@ export default function RegistrationPage() {
   };
 
   if (tLoading || aLoading) {
-    return <div className="min-h-screen bg-[#131313] flex items-center justify-center text-[#d1c5b3] font-stretch tracking-widest text-[10px]">VERIFYING COMMAND CREDENTIALS...</div>;
+    return <div className="min-h-screen bg-[#131313] flex items-center justify-center text-[#d1c5b3] font-stretch tracking-widest text-[10px]">VERIFYING ACCOUNT...</div>;
   }
   if (!tournament) return null;
 
@@ -153,7 +153,7 @@ export default function RegistrationPage() {
             </div>
 
             <p className="font-body text-[#d1c5b3] text-lg leading-relaxed opacity-60 mb-12">
-              Registrations for this tournament have been officially terminated. If you have any issues or require tactical assistance, contact our support unit.
+              Registrations for this tournament have closed. If you have any issues or require assistance, contact our support team.
             </p>
 
             <a 
@@ -164,7 +164,7 @@ export default function RegistrationPage() {
             >
               <div className="flex items-center gap-3">
                 <div className="w-2 h-2 rounded-full bg-[#dbb462] animate-pulse" />
-                <span className="font-teko text-[14px] tracking-[0.2em] text-[#d1c5b3] opacity-60 uppercase">Support Unit</span>
+                <span className="font-teko text-[14px] tracking-[0.2em] text-[#d1c5b3] opacity-60 uppercase">Support Team</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="font-bebas text-2xl text-white uppercase tracking-wider">WhatsApp Support</span>
@@ -177,7 +177,7 @@ export default function RegistrationPage() {
             onClick={() => navigate(`/tournaments/${tournamentId}`)}
             className="font-teko text-[18px] tracking-[0.2em] text-[#dbb462] uppercase hover:underline"
           >
-            Return to Intel Briefing
+            Return to Tournament Details
           </button>
         </div>
       </div>
@@ -193,7 +193,7 @@ export default function RegistrationPage() {
         </button>
 
         <div className="border-b border-white/5 pb-6 mb-10">
-          <span className="font-teko text-[18px] tracking-[0.2em] text-[#dbb462] block mb-2 uppercase">Squad Registration</span>
+          <span className="font-teko text-[18px] tracking-[0.2em] text-[#dbb462] block mb-2 uppercase">Team Registration</span>
           <h1 className="font-bebas text-5xl md:text-7xl tracking-tight text-[#f2f2f2] uppercase">
             {tournament.title}
           </h1>
@@ -254,7 +254,7 @@ export default function RegistrationPage() {
           <div className="bg-[#111] border border-white/5 p-8">
             <h2 className="font-bebas text-3xl text-white mb-6">CONTACT DETAILS</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <GhostInput label="Team Name *" value={form.team_name} onChange={e => setForm(f => ({ ...f, team_name: e.target.value }))} required placeholder="Enter full squad name" />
+              <GhostInput label="Team Name *" value={form.team_name} onChange={e => setForm(f => ({ ...f, team_name: e.target.value }))} required placeholder="Enter full team name" />
               <GhostInput label="Point of Contact *" value={form.real_name} onChange={e => setForm(f => ({ ...f, real_name: e.target.value }))} required placeholder="Full name of Captain/Manager" />
               <div className="md:col-span-2">
                 <GhostInput label="WhatsApp Contact Number *" value={form.whatsapp_number} onChange={e => setForm(f => ({ ...f, whatsapp_number: e.target.value }))} required placeholder="+92 3XX XXXXXXX" />
@@ -262,9 +262,9 @@ export default function RegistrationPage() {
             </div>
           </div>
 
-          {/* Squad Roster Section */}
+          {/* Team Roster Section */}
           <div className="bg-[#111] border border-white/5 p-8">
-            <h2 className="font-bebas text-3xl text-white mb-2">SQUAD ROSTER</h2>
+            <h2 className="font-bebas text-3xl text-white mb-2">TEAM ROSTER</h2>
             <p className="font-teko text-[16px] tracking-widest text-[#d1c5b3] opacity-40 uppercase mb-8">
               Minimum 4 players required. Character IDs must be exactly 10-14 digits.
             </p>
@@ -344,7 +344,7 @@ export default function RegistrationPage() {
               disabled={submitting}
               className="btn-obsidian-primary w-full md:w-auto px-20 py-5 font-bebas text-3xl tracking-widest uppercase"
             >
-              {submitting ? 'PROCESSING...' : 'REGISTER SQUAD'}
+              {submitting ? 'PROCESSING...' : 'REGISTER TEAM'}
             </button>
           </div>
         </form>

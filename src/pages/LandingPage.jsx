@@ -117,13 +117,13 @@ export default function LandingPage() {
                     {currentTournament.title}
                   </h2>
                   <p className="font-body text-[#d1c5b3] text-xl opacity-50 leading-relaxed max-w-2xl">
-                    {currentTournament.description || "The next evolution of competitive PUBG Mobile. Secure your squad's slot and prepare for deployment in the current circuit."}
+                    {currentTournament.description || "The next evolution of competitive PUBG Mobile. Secure your team's slot and prepare for the current circuit."}
                   </p>
                 </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
                    <MetricBox label="PRIZE DISTRIBUTION" value={prizeFormatted || 'TBA'} gold />
-                   <MetricBox label="No. of Teams" value={`${maxTeams} SQUADS`} />
+                   <MetricBox label="No. of Teams" value={`${maxTeams} TEAMS`} />
                    <MetricBox label="START DATE" value={currentTournament.start_date ? new Date(currentTournament.start_date).toLocaleDateString('en-PK', { day: 'numeric', month: 'short' }) : 'TBA'} />
                    <MetricBox label="DEADLINE" value={currentTournament.registration_deadline ? new Date(currentTournament.registration_deadline).toLocaleDateString('en-PK', { day: 'numeric', month: 'short' }) : 'TBA'} />
                 </div>
@@ -131,7 +131,7 @@ export default function LandingPage() {
                 {/* Progress Bar */}
                 <div className="space-y-4">
                   <div className="flex justify-between font-teko text-[16px] tracking-widest text-[#dbb462] uppercase">
-                    <span>{approvedCount} Squads Verified</span>
+                    <span>{approvedCount} Teams Verified</span>
                     <span>{Math.round(fillPct)}% Capacity</span>
                   </div>
                   <div className="h-1.5 bg-white/5 relative overflow-hidden">
@@ -160,11 +160,11 @@ export default function LandingPage() {
                           to={user ? `/register/${currentTournament.id}` : "/auth"}
                           className="btn-obsidian-primary w-full py-5 text-2xl tracking-[0.2em]"
                         >
-                          REGISTER SQUAD
+                          REGISTER TEAM
                         </Link>
                       ) : (
                         <div className="w-full text-center bg-white/5 text-[#d1c5b3]/30 font-bebas text-2xl py-5 tracking-widest uppercase">
-                          {isUserRegistered ? 'DASHBOARD UPDATED' : 'DEPLOYMENT CLOSED'}
+                          {isUserRegistered ? 'ALREADY REGISTERED' : 'REGISTRATION CLOSED'}
                         </div>
                       )}
                       
@@ -194,7 +194,7 @@ export default function LandingPage() {
                 <span className="zenith-gradient-text pr-2">TOURNAMENT QUALITY</span>
               </h2>
               <p className="font-body text-[#d1c5b3] opacity-40 leading-relaxed text-xl mb-12 max-w-xl">
-                We focus on technical excellence and competitive fairness. Every tournament is run with strict protocols to ensure the best experience for every squad.
+                We focus on technical excellence and competitive fairness. Every tournament is run with strict rules to ensure the best experience for every team.
               </p>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-10">

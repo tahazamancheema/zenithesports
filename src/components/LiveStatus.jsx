@@ -43,7 +43,7 @@ export default function LiveStatus() {
           </span>
           <h2 className="font-bebas text-7xl md:text-9xl tracking-tight leading-none pr-4 flex flex-wrap gap-x-6">
             <span className="zenith-gradient-text pr-2">{isLive ? 'LIVE' : 'LATEST'}</span>
-            <span className="zenith-gradient-text pr-2">DROPS</span>
+            <span className="zenith-gradient-text pr-2">CONTENT</span>
           </h2>
         </div>
         <div className="hidden md:flex items-center gap-4">
@@ -131,26 +131,29 @@ export default function LiveStatus() {
         {/* Side info panel */}
         <div className="lg:col-span-4 space-y-6">
           {/* Channel info card */}
-          <div className="bg-[#131313] p-10 border-t-2 border-[#dbb462] relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-24 h-24 bg-[#dbb462]/5 blur-3xl pointer-events-none" />
-            <span className="font-teko text-[20px] tracking-[0.2em] text-[#dbb462] block mb-8 uppercase opacity-80">
-              Broadcast Spec
-            </span>
-            <div className="space-y-6">
-              <SpecRow label="COORDINATES" value="@ZENITHESPORTS.PAKISTAN" />
-              <SpecRow label="GAME" value="PUBG MOBILE" />
-              <SpecRow label="STATUS" value={isLive ? 'CONNECTED' : 'STANDBY'} active={isLive} />
+          <div className="bg-[#131313] p-10 border border-white/5 border-t-2 border-[#dbb462] relative overflow-hidden shadow-2xl">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-[#dbb462]/5 blur-3xl pointer-events-none" />
+            <div className="flex items-center gap-3 mb-10">
+              <div className="w-1.5 h-1.5 bg-[#dbb462] rounded-full" />
+              <span className="font-teko text-[18px] tracking-[0.2em] text-[#dbb462] uppercase font-bold">
+                Broadcast Information
+              </span>
+            </div>
+            <div className="space-y-8">
+              <SpecRow label="CHANNEL HANDLE" value="@zenithesports.pakistan" />
+              <SpecRow label="CURRENT GAME" value="PUBG MOBILE" />
+              <SpecRow label="CONNECTION" value={isLive ? 'CONNECTED' : 'STANDBY'} active={isLive} />
             </div>
           </div>
 
           {/* Subscribe CTA */}
           <div className="bg-[#1a1a1a] p-10 border border-white/5 group relative overflow-hidden">
             <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-[#dbb462]/5 blur-2xl group-hover:bg-[#dbb462]/10 transition-colors" />
-            <h4 className="font-teko text-[20px] tracking-[0.2em] text-[#dbb462] mb-4 uppercase">
-              JOIN THE SQUAD
+            <h4 className="font-teko text-[22px] tracking-[0.2em] text-[#dbb462] mb-4 uppercase font-bold">
+              JOIN THE COMMUNITY
             </h4>
-            <p className="font-body text-[#d1c5b3] text-sm opacity-50 mb-8 leading-relaxed">
-              Never miss a drop. Subscribe for major Pakistani tournament broadcasts, tactical highlights, and squad spotlights.
+            <p className="font-body text-[#d1c5b3] text-base opacity-40 mb-8 leading-relaxed">
+              Never miss a moment. Subscribe for major Pakistani tournament broadcasts, highlights, and team spotlights.
             </p>
             <a
               href="https://youtube.com/@zenithesports.pakistan"
@@ -209,9 +212,11 @@ function NoAPIPlaceholder() {
 
 function SpecRow({ label, value, active }) {
   return (
-    <div className="flex justify-between items-center transition-all group/row">
-      <span className="font-teko text-[16px] tracking-[0.1em] text-[#d1c5b3] opacity-40 uppercase group-hover/row:opacity-100 group-hover/row:text-[#dbb462] transition-colors">{label}</span>
-      <span className={`font-teko text-[22px] font-medium tracking-[0.1em] ${active ? 'text-emerald-400' : 'text-[#f2f2f2]'} group-hover/row:scale-105 transition-transform uppercase`}>
+    <div className="flex flex-col gap-1 transition-all group/row border-l border-white/5 pl-4 hover:border-[#dbb462]/40">
+      <span className="font-teko text-[14px] tracking-[0.2em] text-[#dbb462]/40 uppercase font-medium group-hover/row:text-[#dbb462]/80 transition-colors">
+        {label}
+      </span>
+      <span className={`font-bebas text-2xl tracking-[0.05em] ${active ? 'text-emerald-400' : 'text-white'} transition-all truncate`}>
         {value}
       </span>
     </div>

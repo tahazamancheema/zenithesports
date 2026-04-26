@@ -85,7 +85,7 @@ export default function AuthPage() {
         <div className="w-full md:w-1/2 p-12 bg-gradient-to-br from-[#161616] to-[#0a0a0a] flex flex-col justify-between border-b md:border-b-0 md:border-r border-white/5 relative group">
           <div className="absolute inset-0 bg-[#dbb462]/[0.02] opacity-0 group-hover:opacity-100 transition-opacity" />
           
-          <Link to="/" className="relative z-10 flex items-center gap-3">
+          <Link to="/" className="relative z-10 hidden md:flex items-center gap-3">
             <img src="/logo.png" alt="Zenith" className="h-10 w-auto" />
             <div className="font-bebas text-3xl tracking-tight uppercase leading-none">
               <span className="text-white">ZENITH</span>

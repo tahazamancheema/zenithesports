@@ -9,10 +9,10 @@ import RegistrationCountdown from '../components/RegistrationCountdown';
 import { useTournamentCountdown } from '../hooks/useTournamentCountdown';
 
 const TABS = [
-  { id: 'overview',  label: 'BRIEFING',  icon: BookOpen },
-  { id: 'schedule',  label: 'TIMELINE',  icon: ListOrdered },
+  { id: 'overview',  label: 'OVERVIEW',  icon: BookOpen },
+  { id: 'schedule',  label: 'SCHEDULE',  icon: ListOrdered },
   { id: 'roadmap',   label: 'ROADMAP',   icon: Map },
-  { id: 'teams',     label: 'SQUADS',    icon: Users },
+  { id: 'teams',     label: 'TEAMS',    icon: Users },
 ];
 
 export default function TournamentDetailsPage() {
@@ -111,9 +111,11 @@ export default function TournamentDetailsPage() {
   });
 
   const statusConfig = {
-    active:    { label: 'REGISTRATIONS OPEN', cls: 'text-emerald-400 border-emerald-500/40' },
-    upcoming:  { label: 'UPCOMING',           cls: 'text-[#f9d07a] border-[#f9d07a]/30' },
-    completed: { label: 'COMPLETED',          cls: 'text-[#9a8f7f] border-[rgba(78,70,56,0.3)]' },
+    active:      { label: 'REGISTRATIONS OPEN', cls: 'text-emerald-400 border-emerald-500/40' },
+    in_progress: { label: 'IN PROGRESS',        cls: 'text-[#dbb462] border-[#dbb462]/40' },
+    upcoming:    { label: 'UPCOMING',           cls: 'text-[#f9d07a] border-[#f9d07a]/30' },
+    closed:      { label: 'REGISTRATIONS CLOSED', cls: 'text-red-400 border-red-500/30' },
+    completed:   { label: 'COMPLETED',          cls: 'text-[#9a8f7f] border-[rgba(78,70,56,0.3)]' },
   };
   const sPill = statusConfig[status] || statusConfig.upcoming;
 
@@ -121,7 +123,7 @@ export default function TournamentDetailsPage() {
     <div className="min-h-screen bg-[#0a0a0a] pt-20 md:pt-24 pb-20">
 
       {/* ── Hero Banner ── */}
-      <div className="w-full h-80 md:h-[500px] lg:h-[600px] relative border-b border-white/5 overflow-hidden">
+      <div className="w-full h-96 md:h-[500px] lg:h-[600px] relative border-b border-white/5 overflow-hidden">
         {poster_url ? (
           <img src={poster_url} alt="Poster" className="w-full h-full object-cover grayscale-[0.2] hover:grayscale-0 transition-all duration-[3s]" />
         ) : (
@@ -134,9 +136,9 @@ export default function TournamentDetailsPage() {
         <div className="absolute bottom-0 left-0 w-full p-8 lg:p-20 max-w-7xl mx-auto z-10">
           <Link
             to="/tournaments"
-            className="inline-flex items-center text-[#d1c5b3] opacity-60 hover:opacity-100 hover:text-[#dbb462] transition-all mb-8 font-teko text-[18px] tracking-widest uppercase"
+            className="inline-flex items-center text-[#d1c5b3] opacity-60 hover:opacity-100 hover:text-[#dbb462] transition-all mb-4 md:mb-8 font-teko text-[14px] md:text-[18px] tracking-widest uppercase"
           >
-            <ChevronLeft size={18} className="mr-2" />
+            <ChevronLeft size={16} className="mr-2" />
             Back to Directory
           </Link>
           <div className="flex flex-wrap gap-4 items-center mb-6">
@@ -147,7 +149,7 @@ export default function TournamentDetailsPage() {
               {sPill.label}
             </span>
           </div>
-          <h1 className="font-bebas text-7xl md:text-9xl lg:text-[140px] uppercase leading-[0.8] tracking-tight mb-4 zenith-gradient-text pr-2">
+          <h1 className="font-bebas text-5xl md:text-9xl lg:text-[140px] uppercase leading-[0.9] md:leading-[0.8] tracking-tight mb-4 zenith-gradient-text pr-2">
             {title}
           </h1>
         </div>
@@ -182,7 +184,7 @@ export default function TournamentDetailsPage() {
       {/* ── Tab Content ── */}
       <div id="details-content" className="max-w-7xl mx-auto px-6 lg:px-20 py-16 scroll-mt-40 grid grid-cols-1 lg:grid-cols-3 gap-16">
 
-        {/* Left: Main Intel */}
+        {/* Left: Main Details */}
         <div className="lg:col-span-2 order-2 lg:order-1 space-y-20">
 
           {/* OVERVIEW */}
@@ -282,7 +284,7 @@ export default function TournamentDetailsPage() {
             <section className="animate-in fade-in slide-in-from-bottom-4 duration-700">
                <div className="flex items-center gap-4 mb-12">
                   <div className="w-10 h-[2px] bg-[#dbb462]" />
-                  <h2 className="font-bebas text-5xl text-[#dbb462]">VERIFIED SQUADS</h2>
+                  <h2 className="font-bebas text-5xl text-[#dbb462]">REGISTERED TEAMS</h2>
                 </div>
               {registrations.length === 0 ? (
                 <p className="font-teko text-[20px] text-white/20 tracking-widest uppercase">
@@ -322,7 +324,7 @@ export default function TournamentDetailsPage() {
           )}
         </div>
 
-        {/* Right: Briefing Panel */}
+        {/* Right: Details Panel */}
         <div className="lg:col-span-1 order-1 lg:order-2 space-y-8">
           <div className="bg-[#111] border border-white/5 p-10 space-y-12 sticky top-40 relative overflow-hidden">
              <div className="absolute top-0 right-0 w-32 h-32 bg-[#dbb462]/5 blur-3xl pointer-events-none" />
@@ -368,7 +370,7 @@ export default function TournamentDetailsPage() {
                 </SpecRow>
 
                 <SpecRow icon={Users} label="No. of Teams">
-                  {max_teams ? `${approvedCount} / ${max_teams} VERIFIED` : `${approvedCount} SQUADS`}
+                  {max_teams ? `${approvedCount} / ${max_teams} VERIFIED` : `${approvedCount} / UNLIMITED`}
                 </SpecRow>
 
                 {start_date && (
@@ -411,7 +413,7 @@ export default function TournamentDetailsPage() {
                 to={`/register/${id}`}
                 className="btn-obsidian-primary w-full py-5 text-2xl tracking-widest"
               >
-                REGISTER SQUAD →
+                REGISTER TEAM →
               </Link>
             )}
 

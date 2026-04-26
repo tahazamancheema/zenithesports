@@ -16,13 +16,14 @@ export default function TournamentCard({ tournament, registrationCount = 0, isUs
   const isOpen = status === 'active' && phase === 'closing' && (!max_teams || registrationCount < max_teams);
 
   const statusConfig = {
-    active:    { label: 'Matches Start',      dot: 'bg-emerald-400', text: 'text-emerald-400', border: 'border-emerald-500/30' },
-    upcoming:  { label: 'Registrations Open', dot: 'bg-[#f9d07a]',   text: 'text-[#f9d07a]',   border: 'border-[#f9d07a]/30' },
-    completed: { label: 'Tournament Completed', dot: 'bg-[#9a8f7f]',   text: 'text-[#9a8f7f]',   border: 'border-[#9a8f7f]/30' },
-    closed:    { label: 'Registrations Closed',  dot: 'bg-red-400',      text: 'text-red-400',      border: 'border-red-500/30' },
+    active:      { label: 'Registrations Open',   dot: 'bg-emerald-400', text: 'text-emerald-400', border: 'border-emerald-500/30' },
+    in_progress: { label: 'Tournament In Progress', dot: 'bg-[#dbb462]',   text: 'text-[#dbb462]',   border: 'border-[#dbb462]/30' },
+    upcoming:    { label: 'Upcoming Tournament',  dot: 'bg-[#f9d07a]',   text: 'text-[#f9d07a]',   border: 'border-[#f9d07a]/30' },
+    completed:   { label: 'Tournament Completed', dot: 'bg-[#9a8f7f]',   text: 'text-[#9a8f7f]',   border: 'border-[#9a8f7f]/30' },
+    closed:      { label: 'Registrations Closed', dot: 'bg-red-400',     text: 'text-red-400',     border: 'border-red-500/30' },
   };
   
-  const currentStatus = status === 'completed' ? 'completed' : (phase === 'closed' ? 'closed' : status);
+  const currentStatus = (status === 'completed' || status === 'in_progress') ? status : (phase === 'closed' ? 'closed' : status);
   const pill = statusConfig[currentStatus] || statusConfig.upcoming;
 
   const fmtDate = (d, opts) => d ? new Date(d).toLocaleDateString('en-PK', opts) : null;
@@ -89,7 +90,7 @@ export default function TournamentCard({ tournament, registrationCount = 0, isUs
                <span className="font-teko text-[14px] text-[#d1c5b3] opacity-40 uppercase tracking-widest mb-1">Squads Joined</span>
                <div className="flex items-center gap-2">
                   <span className="font-bebas text-2xl text-white">{registrationCount}</span>
-                  <span className="font-bebas text-xl text-white/30">/ {max_teams || '∞'}</span>
+                  <span className="font-teko text-lg text-white/30 tracking-widest uppercase">/ {max_teams || 'Unlimited'}</span>
                </div>
             </div>
             <div className="w-12 h-12 rounded-full border border-white/5 flex items-center justify-center group-hover:border-[#dbb462]/30 transition-colors">
