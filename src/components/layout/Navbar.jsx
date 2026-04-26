@@ -151,7 +151,7 @@ export default function Navbar() {
                 key={label}
                 to={to}
                 onClick={() => setMobileOpen(false)}
-                className={`font-agency text-3xl font-black italic tracking-tighter uppercase ${isActive(to) ? 'text-[#dbb462]' : 'text-[#d1c5b3] opacity-40'}`}
+                className={`font-bebas text-4xl tracking-widest uppercase ${isActive(to) ? 'text-[#dbb462]' : 'text-[#d1c5b3] opacity-40'}`}
               >
                 {label}
               </Link>
@@ -160,9 +160,9 @@ export default function Navbar() {
               <Link
                 to="/admin"
                 onClick={() => setMobileOpen(false)}
-                className="font-agency text-xl font-bold tracking-[0.2em] text-[#dbb462] py-4 border-t border-white/5 flex items-center gap-3 uppercase"
+                className="font-teko text-2xl tracking-[0.2em] text-[#dbb462] py-4 border-t border-white/5 flex items-center gap-3 uppercase"
               >
-                <ShieldCheck size={20} /> ADMIN PANEL
+                <ShieldCheck size={24} /> ADMIN DASHBOARD
               </Link>
             )}
             <div className="pt-8 border-t border-white/5">
@@ -170,14 +170,14 @@ export default function Navbar() {
                 <Link
                   to="/auth"
                   onClick={() => setMobileOpen(false)}
-                  className="block w-full text-center zenith-gradient text-[#402d00] font-agency font-bold text-xl py-6 tracking-[0.2em]"
+                  className="block w-full text-center zenith-gradient text-[#402d00] font-bebas text-2xl py-6 tracking-[0.2em] uppercase"
                 >
                   LOGIN / REGISTER
                 </Link>
               ) : (
                 <button
                   onClick={handleSignOut}
-                  className="w-full text-center border border-[#ffb4ab]/30 text-[#ffb4ab] font-agency font-bold text-xl py-6 tracking-[0.2em] uppercase"
+                  className="w-full text-center border border-[#ffb4ab]/30 text-[#ffb4ab] font-bebas text-2xl py-6 tracking-[0.2em] uppercase"
                 >
                   SIGN OUT
                 </button>

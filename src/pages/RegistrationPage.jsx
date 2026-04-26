@@ -87,6 +87,7 @@ export default function RegistrationPage() {
 
   const handleRegisterSub = async (e) => {
     e.preventDefault();
+    if (saving || submitting) return;
     if (!file) {
       setFieldErrors(prev => ({ ...prev, team_logo: 'Logo is required' }));
       return toast.error('Team logo is required for identification.', { id: 'reg' });
@@ -466,10 +467,10 @@ export default function RegistrationPage() {
           <div className="flex justify-end pt-6">
             <button 
               type="submit" 
-              disabled={submitting}
-              className="btn-obsidian-primary w-full md:w-auto px-20 py-5 font-bebas text-3xl tracking-widest uppercase"
+              disabled={submitting || saving}
+              className="btn-obsidian-primary w-full md:w-auto px-20 py-5 font-bebas text-3xl tracking-widest uppercase disabled:opacity-50 disabled:cursor-wait"
             >
-              {submitting ? 'PROCESSING...' : 'REGISTER TEAM'}
+              {(submitting || saving) ? 'PROCESSING...' : 'REGISTER TEAM'}
             </button>
           </div>
         </form>

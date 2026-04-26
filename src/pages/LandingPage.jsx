@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronRight, Shield, Star, Trophy, Users, Clock, Calendar, Zap } from 'lucide-react';
+import { ChevronRight, Zap } from 'lucide-react';
 import LiveStatus from '../components/LiveStatus';
 import StatStrip from '../components/StatStrip';
 import StaticBackground from '../components/ui/StaticBackground';
@@ -10,6 +10,7 @@ import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../supabase/config';
 
 import RegistrationCountdown from '../components/RegistrationCountdown';
+import heroBg from '../assets/images/hero-bg.png';
 
 export default function LandingPage() {
   const { currentTournament } = useTournaments();
@@ -39,8 +40,9 @@ export default function LandingPage() {
     }
   }, [currentTournament?.id, user?.id]);
 
-  const maxTeams = currentTournament?.max_teams || 64;
-  const fillPct = Math.min((approvedCount / maxTeams) * 100, 100);
+  const maxTeams = currentTournament?.max_teams;
+  const isUnlimited = !maxTeams || maxTeams === 0;
+  const fillPct = isUnlimited ? 100 : Math.min((approvedCount / maxTeams) * 100, 100);
   const isOpen = currentTournament?.status === 'active';
 
   const prizeFormatted = currentTournament?.prize_pool
@@ -51,40 +53,52 @@ export default function LandingPage() {
     <div className="animate-page-enter bg-[#131313] overflow-x-hidden">
       
       {/* ── HERO SECTION ── */}
-      <section className="relative min-h-screen flex items-center pt-20">
+      <section className="relative min-h-screen flex items-center pt-20 overflow-hidden">
+        {/* Background Image with Layering */}
+        <div className="absolute inset-0 z-0">
+          <img 
+            src={heroBg} 
+            className="w-full h-full object-cover opacity-20 scale-105"
+            alt=""
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#131313]/40 via-[#131313] to-[#131313]" />
+          <div className="absolute inset-0 scanline opacity-10 pointer-events-none" />
+        </div>
+
         <StaticBackground variant="mesh" />
         
         {/* Ambient Hero Glow */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#dbb462]/5 blur-[120px] rounded-full pointer-events-none" />
 
-        <div className="relative z-10 w-full px-6 lg:px-16 container mx-auto">
-          <div className="max-w-5xl">
-            <div className="flex items-center gap-3 mb-8">
-              <div className="w-12 h-[2px] bg-[#dbb462]" />
-              <span className="font-teko text-[#dbb462] text-[18px] tracking-[0.2em] font-medium uppercase">
-                ZENITH ESPORTS &bull; COMPETITIVE ECOSYSTEM
+        <div className="relative z-10 w-full px-6 lg:px-16 container mx-auto text-center">
+          <div className="max-w-4xl mx-auto">
+            <div className="flex items-center justify-center gap-3 mb-8">
+              <div className="w-12 h-[2px] bg-[#dbb462] shadow-[0_0_10px_#dbb462]" />
+              <span className="font-teko text-[#dbb462] text-[18px] tracking-[0.3em] font-medium uppercase">
+                ZENITH ESPORTS &bull; PAKISTAN'S COMPETITIVE ECOSYSTEM
               </span>
+              <div className="w-12 h-[2px] bg-[#dbb462] shadow-[0_0_10px_#dbb462]" />
             </div>
 
-            <h1 className="hero-text-huge mb-10 select-none leading-[0.85] uppercase tracking-tight">
-              PAKISTAN'S PREMIER<br />
-              <span className="zenith-gradient-text pr-2">TOURNAMENT CIRCUIT</span>
+            <h1 className="hero-text-huge mb-10 select-none leading-[0.85] uppercase tracking-tight drop-shadow-2xl">
+              LEVEL UP YOUR<br />
+              <span className="zenith-gradient-text pr-2">COMPETITIVE GAME</span>
             </h1>
 
-            <p className="font-body text-[#d1c5b3] text-lg md:text-xl max-w-2xl mb-12 leading-relaxed opacity-60">
-              Technical, reliable, and high-quality tournaments for serious PUBG Mobile squads. We provide the infrastructure for you to compete at the highest level.
+            <p className="font-body text-[#d1c5b3] text-xl md:text-2xl max-w-2xl mx-auto mb-12 leading-relaxed opacity-80">
+              Join the most technical and reliable tournament circuit in Pakistan. We provide the infrastructure for professional PUBG Mobile squads to shine.
             </p>
 
-            <div className="flex flex-wrap gap-5">
+            <div className="flex flex-wrap justify-center gap-6">
               <Link 
                 to={user ? "/profile" : "/auth"} 
-                className="btn-obsidian-primary font-bebas text-2xl px-12 py-5 tracking-widest inline-flex items-center gap-4 uppercase"
+                className="btn-obsidian-primary font-bebas text-2xl px-14 py-6 tracking-[0.2em] inline-flex items-center gap-4 uppercase"
               >
-                {user ? 'MY DASHBOARD' : 'JOIN THE CIRCUIT'} <ChevronRight size={24} />
+                {user ? 'MY DASHBOARD' : 'JOIN THE CIRCUIT'} <ChevronRight size={28} />
               </Link>
               <Link 
                 to="/tournaments" 
-                className="btn-obsidian-ghost font-bebas text-2xl px-12 py-5 tracking-widest uppercase"
+                className="btn-obsidian-ghost font-bebas text-2xl px-14 py-6 tracking-widest uppercase"
               >
                 BROWSE EVENTS
               </Link>
@@ -104,10 +118,33 @@ export default function LandingPage() {
         <section className="relative py-32 px-6 lg:px-16 border-t border-white/5 bg-[#0e0e0e]">
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#dbb462]/30 to-transparent" />
           
-          <div className="container mx-auto max-w-7xl">
+          <div className="container mx-auto max-w-7xl relative z-10">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
               
-              {/* Left: Info */}
+              {/* Left Side: Interactive Poster */}
+              <div className="lg:col-span-5">
+                <div className="relative group cursor-pointer perspective-1000">
+                  <div className="relative z-10 transition-all duration-700 ease-out transform-gpu group-hover:rotate-y-12 group-hover:-rotate-x-6 group-hover:scale-105 border border-white/10 bg-[#111] overflow-hidden shadow-2xl">
+                    <div className="aspect-[4/5] relative">
+                      {currentTournament.poster_url ? (
+                        <img 
+                          src={currentTournament.poster_url} 
+                          alt={currentTournament.title} 
+                          className="w-full h-full object-cover transition-transform duration-[2s] group-hover:scale-110"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-[#111] flex items-center justify-center">
+                          <img src="/logo.png" className="w-1/2 opacity-20" alt="" />
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#0e0e0e] via-transparent to-transparent opacity-60" />
+                    </div>
+                  </div>
+                  <div className="absolute -inset-4 bg-[#dbb462]/10 blur-[60px] rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-1000 -z-10" />
+                </div>
+              </div>
+
+              {/* Right Side: Content */}
               <div className="lg:col-span-7">
                 <div className="mb-12">
                   <span className="inline-block font-teko text-[16px] text-[#dbb462] mb-6 px-4 py-1.5 border border-[#dbb462]/20 bg-[#dbb462]/5 tracking-widest uppercase">
@@ -123,16 +160,15 @@ export default function LandingPage() {
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
                    <MetricBox label="PRIZE DISTRIBUTION" value={prizeFormatted || 'TBA'} gold />
-                   <MetricBox label="No. of Teams" value={`${maxTeams} TEAMS`} />
+                   <MetricBox label="No. of Teams" value={isUnlimited ? 'UNLIMITED' : `${maxTeams} TEAMS`} />
                    <MetricBox label="START DATE" value={currentTournament.start_date ? new Date(currentTournament.start_date).toLocaleDateString('en-PK', { day: 'numeric', month: 'short' }) : 'TBA'} />
                    <MetricBox label="DEADLINE" value={currentTournament.registration_deadline ? new Date(currentTournament.registration_deadline).toLocaleDateString('en-PK', { day: 'numeric', month: 'short' }) : 'TBA'} />
                 </div>
 
-                {/* Progress Bar */}
-                <div className="space-y-4">
+                <div className="space-y-4 mb-12">
                   <div className="flex justify-between font-teko text-[16px] tracking-widest text-[#dbb462] uppercase">
                     <span>{approvedCount} Teams Verified</span>
-                    <span>{Math.round(fillPct)}% Capacity</span>
+                    <span>{isUnlimited ? 'OPEN ACCESS' : `${Math.round(fillPct)}% Capacity`}</span>
                   </div>
                   <div className="h-1.5 bg-white/5 relative overflow-hidden">
                     <div 
@@ -141,20 +177,19 @@ export default function LandingPage() {
                     />
                   </div>
                 </div>
-              </div>
 
-              {/* Right: Action Card */}
-              <div className="lg:col-span-5">
                 <div className="bg-[#111] p-10 border border-white/5 relative overflow-hidden group hover:border-[#dbb462]/30 transition-all duration-500">
                   <div className="absolute top-0 right-0 w-32 h-32 bg-[#dbb462]/5 blur-3xl rounded-full pointer-events-none" />
                   
-                  <div className="relative z-10 space-y-10 text-center md:text-left">
-                    <RegistrationCountdown 
-                      openDate={currentTournament.registration_open_date}
-                      deadlineDate={currentTournament.registration_deadline}
-                    />
+                  <div className="relative z-10 flex flex-col md:flex-row items-center gap-10">
+                    <div className="flex-1 text-center md:text-left">
+                      <RegistrationCountdown 
+                        openDate={currentTournament.registration_open_date}
+                        deadlineDate={currentTournament.registration_deadline}
+                      />
+                    </div>
 
-                    <div className="pt-10 border-t border-white/5 space-y-4">
+                    <div className="w-full md:w-auto space-y-4 shrink-0 min-w-[280px]">
                       {isOpen && !isUserRegistered ? (
                         <Link
                           to={user ? `/register/${currentTournament.id}` : "/auth"}

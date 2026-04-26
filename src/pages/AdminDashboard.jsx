@@ -86,7 +86,7 @@ export default function AdminDashboard() {
         {/* ── Sidebar ── */}
         <aside className="hidden md:flex flex-col w-64 bg-[#131313] border-r border-[rgba(78,70,56,0.15)] min-h-[calc(100vh-5rem)] shrink-0">
           <div className="p-8">
-            <h2 className="font-agency text-xl font-bold text-[#f9d07a] tracking-tight">COMMAND CENTER</h2>
+            <h2 className="font-bebas text-2xl font-bold text-[#dbb462] tracking-widest">ZENITH DASHBOARD</h2>
             <p className="font-stretch text-[8px] tracking-widest text-[#d1c5b3] opacity-40 mt-1">ADMIN OVERVIEW</p>
           </div>
 
@@ -130,7 +130,7 @@ export default function AdminDashboard() {
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
             <div>
               <h1 className="font-agency text-5xl md:text-6xl font-black italic tracking-tighter uppercase">
-                ZENITH OPS
+                ZENITH ADMIN
               </h1>
               <p className="font-stretch text-[9px] tracking-widest text-[#d1c5b3] opacity-50 mt-2">
                 REAL-TIME MANAGEMENT & GRID LOGISTICS

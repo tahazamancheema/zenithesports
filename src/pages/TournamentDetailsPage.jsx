@@ -390,7 +390,7 @@ export default function TournamentDetailsPage() {
               <div className="pt-4">
                 <div className="flex justify-between mb-4">
                   <span className="font-teko text-[14px] tracking-widest text-[#d1c5b3] opacity-60 uppercase">
-                    {max_teams ? 'CAPACITY STATUS' : 'OPEN DEPLOYMENT'}
+                    {max_teams ? 'CAPACITY STATUS' : 'REGISTRATION STATUS'}
                   </span>
                   {max_teams && (
                     <span className="font-bebas text-xl text-[#dbb462]">
