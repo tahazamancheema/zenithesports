@@ -6,6 +6,7 @@ import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './hooks/useAuth';
+import ScrollToTop from './components/ScrollToTop';
 
 // Lazy-load all pages for code splitting
 import TournamentsPage from './pages/TournamentsPage';
@@ -151,6 +152,7 @@ export default function App() {
     <BrowserRouter>
       <AuthProvider>
         <ErrorBoundary>
+          <ScrollToTop />
           <Toaster position="top-right" toastOptions={TOAST_STYLE} />
           <AppLayout />
         </ErrorBoundary>
