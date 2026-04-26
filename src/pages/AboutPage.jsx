@@ -80,35 +80,35 @@ export default function AboutPage() {
            <img src="/logo.png" alt="" className="w-full max-w-4xl h-auto object-contain" />
         </div>
 
-        <div className="relative z-10 container mx-auto max-w-7xl text-center md:text-left">
-          <div className="flex items-center justify-center md:justify-start gap-4 mb-8">
+        <div className="relative z-10 container mx-auto max-w-7xl text-left">
+          <div className="flex items-center justify-start gap-4 mb-8">
             <div className="w-12 h-[2px] bg-[#dbb462]" />
-            <span className="font-teko text-[#dbb462] text-[20px] tracking-[0.2em] font-medium uppercase">OUR JOURNEY</span>
+            <span className="font-teko text-[#dbb462] text-[18px] md:text-[20px] tracking-[0.2em] font-medium uppercase">OUR JOURNEY</span>
           </div>
           
-          <h1 className="font-bebas text-8xl md:text-[140px] tracking-tight mb-8 select-none leading-[0.8] uppercase">
+          <h1 className="font-bebas text-7xl md:text-[140px] tracking-tight mb-8 select-none leading-[0.9] md:leading-[0.8] uppercase">
             BEYOND THE<br />
             <span className="zenith-gradient-text pr-2">COMPETITION</span>
           </h1>
           
-          <p className="font-body text-[#d1c5b3] text-xl md:text-2xl opacity-40 max-w-2xl leading-relaxed mx-auto md:mx-0">
+          <p className="font-body text-[#d1c5b3] text-lg md:text-2xl opacity-40 max-w-2xl leading-relaxed">
             Zenith Esports is Pakistan's premier platform for competitive PUBG Mobile. We build the environment where every squad has a fair chance to build their legacy.
           </p>
         </div>
       </section>
 
       {/* ── OUR MISSION ── */}
-      <section className="py-40 px-6 lg:px-16 container mx-auto max-w-7xl relative">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#dbb462]/5 blur-[160px] rounded-full pointer-events-none" />
+      <section className="py-24 md:py-40 px-6 lg:px-16 container mx-auto max-w-7xl relative">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] md:w-[600px] h-[300px] md:h-[600px] bg-[#dbb462]/5 blur-[100px] md:blur-[160px] rounded-full pointer-events-none" />
         
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-32 items-center">
-          <div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 md:gap-32 items-center">
+          <div className="text-left">
             <span className="font-teko text-[18px] font-medium tracking-[0.2em] text-[#dbb462] block mb-6 uppercase">Mission Briefing</span>
-            <h2 className="font-bebas text-7xl md:text-9xl tracking-tight mb-8 leading-[0.85] uppercase">
+            <h2 className="font-bebas text-6xl md:text-9xl tracking-tight mb-8 leading-[0.9] md:leading-[0.85] uppercase">
               FAIR PLAY.<br />
               <span className="zenith-gradient-text pr-2">PURE SKILL.</span>
             </h2>
-            <div className="space-y-8 font-body text-[#d1c5b3] opacity-40 text-xl leading-relaxed">
+            <div className="space-y-6 md:space-y-8 font-body text-[#d1c5b3] opacity-40 text-lg md:text-xl leading-relaxed">
               <p>
                 We believe the future of Pakistani esports depends on a reliable foundation. Competitive gaming requires more than just high skill—it requires an arena built on trust and transparency.
               </p>
@@ -124,11 +124,11 @@ export default function AboutPage() {
 
           <div className="relative group overflow-hidden border border-white/5 bg-[#111]">
              <div className="absolute inset-0 bg-[#dbb462]/[0.02] opacity-0 group-hover:opacity-100 transition-opacity" />
-             <div className="relative aspect-square flex items-center justify-center p-20">
+             <div className="relative aspect-video md:aspect-square flex items-center justify-center p-12 md:p-20">
                 <img 
                   src="/logo.png" 
                   alt="Zenith" 
-                  className="w-full h-full object-contain grayscale opacity-20 filter transition-all duration-[2s] group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105"
+                  className="w-1/2 md:w-full h-auto md:h-full object-contain grayscale opacity-20 filter transition-all duration-[2s] group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105"
                 />
              </div>
           </div>
@@ -156,12 +156,11 @@ export default function AboutPage() {
 
         <div 
           ref={scrollRef}
-          className="flex gap-8 overflow-x-auto pb-20 px-[max(1.5rem,calc((100vw-80rem)/2))] no-scrollbar snap-x snap-mandatory cursor-grab active:cursor-grabbing"
+          className="flex gap-4 md:gap-8 overflow-x-auto pb-20 px-6 md:px-[max(1.5rem,calc((100vw-80rem)/2))] snap-x snap-mandatory cursor-grab active:cursor-grabbing touch-pan-x"
         >
-          {dynamicMilestones.map((m, i) => (
             <div 
               key={i} 
-              className="min-w-[320px] md:min-w-[400px] snap-center group"
+              className="min-w-[280px] sm:min-w-[320px] md:min-w-[400px] snap-center group"
             >
               <div className="bg-[#111] border border-white/5 p-12 h-full hover:border-[#dbb462]/40 transition-all duration-500 relative overflow-hidden">
                 {/* Background Scanline Animation */}

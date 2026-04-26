@@ -34,7 +34,7 @@ export default function TournamentCard({ tournament, registrationCount = 0, isUs
     <div className="group relative w-full bg-[#0e0e0e] border border-white/5 hover:border-[#dbb462]/40 transition-all duration-500 overflow-hidden flex flex-col h-full">
       
       {/* ── Banner/Poster Area ── */}
-      <div className="relative aspect-[16/9] overflow-hidden group/poster">
+      <Link to={`/tournaments/${id}`} className="relative aspect-[16/9] overflow-hidden group/poster block">
         {poster_url ? (
           <img 
             src={poster_url} 
@@ -55,13 +55,13 @@ export default function TournamentCard({ tournament, registrationCount = 0, isUs
         <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[#0e0e0e] to-transparent" />
         
         {/* Prize Badge */}
-        <div className="absolute top-4 right-4 bg-[#0e0e0e]/90 backdrop-blur-md border border-[#dbb462]/30 px-3 py-2 flex flex-col items-center min-w-[100px]">
+        <div className="absolute top-4 right-4 bg-[#0e0e0e]/90 backdrop-blur-md border border-[#dbb462]/30 px-3 py-2 flex flex-col items-center min-w-[100px] z-20">
           <span className="font-teko text-[14px] text-[#dbb462] tracking-widest leading-none uppercase">Prize Pool</span>
           <span className="font-bebas text-2xl text-white leading-none mt-1">{prizeFormatted || 'TBA'}</span>
         </div>
 
         {/* Status Badge */}
-        <div className="absolute top-4 left-4 flex gap-2">
+        <div className="absolute top-4 left-4 flex gap-2 z-20">
            <div className={`flex items-center gap-2 bg-[#0e0e0e]/90 backdrop-blur-md px-3 py-1.5 border ${pill.border}`}>
               <span className={`w-1.5 h-1.5 rounded-full ${pill.dot} ${status === 'active' && phase === 'closing' ? 'animate-pulse' : ''}`} />
               <span className={`font-teko text-[14px] tracking-widest uppercase ${pill.text}`}>
@@ -69,7 +69,7 @@ export default function TournamentCard({ tournament, registrationCount = 0, isUs
               </span>
             </div>
         </div>
-      </div>
+      </Link>
 
       {/* ── Info Content ── */}
       <div className="p-6 md:p-8 flex-1 flex flex-col justify-between relative">
@@ -93,9 +93,9 @@ export default function TournamentCard({ tournament, registrationCount = 0, isUs
                   <span className="font-teko text-lg text-white/30 tracking-widest uppercase">/ {max_teams || 'Unlimited'}</span>
                </div>
             </div>
-            <div className="w-12 h-12 rounded-full border border-white/5 flex items-center justify-center group-hover:border-[#dbb462]/30 transition-colors">
+            <Link to={`/tournaments/${id}`} className="w-12 h-12 rounded-full border border-white/5 flex items-center justify-center group-hover:border-[#dbb462]/30 transition-colors">
                <ChevronRight size={20} className="text-[#dbb462] group-hover:translate-x-1 transition-transform" />
-            </div>
+            </Link>
           </div>
 
           {/* Slots Progress */}
@@ -113,19 +113,19 @@ export default function TournamentCard({ tournament, registrationCount = 0, isUs
             {isOpen && !isUserRegistered ? (
               <Link 
                 to={`/register/${id}`} 
-                className="btn-obsidian-primary flex-1 py-4 font-bebas text-2xl tracking-widest uppercase"
+                className="btn-obsidian-primary flex-1 py-4 font-bebas text-lg md:text-2xl tracking-widest uppercase flex items-center justify-center text-center px-2"
               >
                 Register Squad
               </Link>
             ) : isUserRegistered ? (
-              <div className="flex-1 bg-[#dbb462]/5 border border-[#dbb462]/20 text-[#dbb462] font-teko text-[22px] py-3 tracking-widest uppercase text-center">
+              <div className="flex-1 bg-[#dbb462]/5 border border-[#dbb462]/20 text-[#dbb462] font-teko text-[22px] py-3 tracking-widest uppercase text-center flex items-center justify-center">
                 Squad Registered
               </div>
             ) : null}
 
             <Link 
               to={`/tournaments/${id}`} 
-              className="btn-obsidian-ghost flex-1 py-4 font-bebas text-xl tracking-widest uppercase"
+              className="btn-obsidian-ghost flex-1 py-4 font-bebas text-lg md:text-xl tracking-widest uppercase flex items-center justify-center text-center px-2"
             >
               View Details
             </Link>
