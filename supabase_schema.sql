@@ -142,6 +142,23 @@ create trigger on_auth_user_created
   for each row execute procedure public.handle_new_user();
 
 -- ─────────────────────────────────────────
+-- STORAGE SETUP
+-- ─────────────────────────────────────────
+
+-- Create buckets if they don't exist
+insert into storage.buckets (id, name, public)
+values ('ze-posters', 'ze-posters', true)
+on conflict (id) do nothing;
+
+insert into storage.buckets (id, name, public)
+values ('ze-logos', 'ze-logos', true)
+on conflict (id) do nothing;
+
+insert into storage.buckets (id, name, public)
+values ('ze-proofs', 'ze-proofs', true)
+on conflict (id) do nothing;
+
+-- ─────────────────────────────────────────
 -- STORAGE POLICIES
 -- ─────────────────────────────────────────
 
@@ -170,6 +187,16 @@ create policy "Users can update their own logos" on storage.objects for update u
 
 drop policy if exists "Admins can delete any logos" on storage.objects;
 create policy "Admins can delete any logos" on storage.objects for delete using (bucket_id = 'ze-logos' AND public.is_admin());
+
+-- Proofs (Registration Screenshots)
+drop policy if exists "Anyone can view proofs" on storage.objects;
+create policy "Anyone can view proofs" on storage.objects for select using (bucket_id = 'ze-proofs');
+
+drop policy if exists "Authenticated users can upload proofs" on storage.objects;
+create policy "Authenticated users can upload proofs" on storage.objects for insert with check (bucket_id = 'ze-proofs' AND auth.role() = 'authenticated');
+
+drop policy if exists "Admins can delete any proofs" on storage.objects;
+create policy "Admins can delete any proofs" on storage.objects for delete using (bucket_id = 'ze-proofs' AND public.is_admin());
 
 -- ─────────────────────────────────────────
 -- RPC FUNCTIONS

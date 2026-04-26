@@ -49,6 +49,17 @@ export default function RegistrationPage() {
   const [file, setFile] = useState(null);
   const [screenshotFiles, setScreenshotFiles] = useState([null, null, null, null]);
   const [saving, setSaving] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({});
+
+  const clearFieldError = (field) => {
+    if (fieldErrors[field]) {
+      setFieldErrors(prev => {
+        const next = { ...prev };
+        delete next[field];
+        return next;
+      });
+    }
+  };
 
   const tournament = tournaments.find(t => t.id === tournamentId);
   const { phase } = useTournamentCountdown(tournament?.registration_open_date, tournament?.registration_deadline);
@@ -76,9 +87,27 @@ export default function RegistrationPage() {
 
   const handleRegisterSub = async (e) => {
     e.preventDefault();
-    if (!file) return toast.error('Team logo is required for identification.', { id: 'reg' });
+    if (!file) {
+      setFieldErrors(prev => ({ ...prev, team_logo: 'Logo is required' }));
+      return toast.error('Team logo is required for identification.', { id: 'reg' });
+    }
+
+    // Validate WhatsApp
+    const waClean = form.whatsapp_number.trim().replace(/[^0-9]/g, '');
+    if (waClean.length !== 11) {
+      setFieldErrors(prev => ({ ...prev, whatsapp_number: 'Number must be exactly 11 digits' }));
+      return toast.error('WhatsApp number must be exactly 11 digits.', { id: 'reg' });
+    }
+
+    // Validate Player IDs (Basic check)
+    const p1Clean = form.player_1_id.trim();
+    if (p1Clean.length < 10) {
+      setFieldErrors(prev => ({ ...prev, player_1_id: 'ID too short' }));
+      return toast.error('Character IDs must be 10-14 digits.', { id: 'reg' });
+    }
     
     setSaving(true);
+    setFieldErrors({});
     try {
       toast.loading('Saving your registration details...', { id: 'reg' });
       
@@ -125,6 +154,9 @@ export default function RegistrationPage() {
         navigate('/tournaments');
       } else {
         toast.error(result.error || 'Registration failed', { id: 'reg' });
+        // Try to map error to field if possible
+        if (result.error.includes('Character ID')) setFieldErrors(prev => ({ ...prev, player_1_id: 'Invalid ID' }));
+        if (result.error.includes('WhatsApp')) setFieldErrors(prev => ({ ...prev, whatsapp_number: '11 digits required' }));
       }
     } catch (err) {
       toast.error(`Registration uplink failed: ${err.message}`, { id: 'reg' });
@@ -238,13 +270,18 @@ export default function RegistrationPage() {
                 )}
               </div>
               <div className="flex-1">
-                <label className="font-teko text-[16px] tracking-widest text-[#d1c5b3] uppercase block mb-3 opacity-60">Team Logo (JPEG/PNG)</label>
+                <label className="font-teko text-[16px] tracking-widest text-[#d1c5b3] uppercase block mb-3 opacity-60">
+                  Team Logo (JPEG/PNG) {fieldErrors.team_logo && <span className="text-red-400 ml-2 italic">— {fieldErrors.team_logo}</span>}
+                </label>
                 <input 
                   type="file" 
                   accept="image/*"
-                  onChange={(e) => setFile(e.target.files[0])}
+                  onChange={(e) => {
+                    setFile(e.target.files[0]);
+                    clearFieldError('team_logo');
+                  }}
                   required
-                  className="w-full text-[14px] text-[#d1c5b3] file:mr-4 file:py-2 file:px-6 file:border-0 file:bg-[#1f1f1f] file:text-[#dbb462] file:font-teko file:text-[16px] file:cursor-pointer hover:file:bg-[#2a2a2a] file:uppercase file:tracking-widest"
+                  className={`w-full text-[14px] text-[#d1c5b3] file:mr-4 file:py-2 file:px-6 file:border-0 file:bg-[#1f1f1f] file:text-[#dbb462] file:font-teko file:text-[16px] file:cursor-pointer hover:file:bg-[#2a2a2a] file:uppercase file:tracking-widest ${fieldErrors.team_logo ? 'outline outline-1 outline-red-400' : ''}`}
                 />
               </div>
             </div>
@@ -254,10 +291,40 @@ export default function RegistrationPage() {
           <div className="bg-[#111] border border-white/5 p-8">
             <h2 className="font-bebas text-3xl text-white mb-6">CONTACT DETAILS</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <GhostInput label="Team Name *" value={form.team_name} onChange={e => setForm(f => ({ ...f, team_name: e.target.value }))} required placeholder="Enter full team name" />
-              <GhostInput label="Point of Contact *" value={form.real_name} onChange={e => setForm(f => ({ ...f, real_name: e.target.value }))} required placeholder="Full name of Captain/Manager" />
+              <GhostInput 
+                label="Team Name *" 
+                value={form.team_name} 
+                onChange={e => {
+                  setForm(f => ({ ...f, team_name: e.target.value }));
+                  clearFieldError('team_name');
+                }} 
+                required 
+                placeholder="Enter full team name" 
+                error={fieldErrors.team_name}
+              />
+              <GhostInput 
+                label="Captain Real Name *" 
+                value={form.real_name} 
+                onChange={e => {
+                  setForm(f => ({ ...f, real_name: e.target.value }));
+                  clearFieldError('real_name');
+                }} 
+                required 
+                placeholder="Enter Captain's full name" 
+                error={fieldErrors.real_name}
+              />
               <div className="md:col-span-2">
-                <GhostInput label="WhatsApp Contact Number *" value={form.whatsapp_number} onChange={e => setForm(f => ({ ...f, whatsapp_number: e.target.value }))} required placeholder="+92 3XX XXXXXXX" />
+                <GhostInput 
+                  label="WhatsApp Contact Number *" 
+                  value={form.whatsapp_number} 
+                  onChange={e => {
+                    setForm(f => ({ ...f, whatsapp_number: e.target.value }));
+                    clearFieldError('whatsapp_number');
+                  }} 
+                  required 
+                  placeholder="03XX XXXXXXX (11 Digits)" 
+                  error={fieldErrors.whatsapp_number}
+                />
               </div>
             </div>
           </div>
@@ -269,12 +336,70 @@ export default function RegistrationPage() {
               Minimum 4 players required. Character IDs must be exactly 10-14 digits.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
-              <GhostInput label="Player 1 (Captain) *" value={form.player_1_id} onChange={e => setForm(f => ({ ...f, player_1_id: e.target.value }))} required placeholder="5XXXXXXXXX" />
-              <GhostInput label="Player 2 *" value={form.player_2_id} onChange={e => setForm(f => ({ ...f, player_2_id: e.target.value }))} required placeholder="5XXXXXXXXX" />
-              <GhostInput label="Player 3 *" value={form.player_3_id} onChange={e => setForm(f => ({ ...f, player_3_id: e.target.value }))} required placeholder="5XXXXXXXXX" />
-              <GhostInput label="Player 4 *" value={form.player_4_id} onChange={e => setForm(f => ({ ...f, player_4_id: e.target.value }))} required placeholder="5XXXXXXXXX" />
-              <GhostInput label="Player 5 (Sub)" value={form.player_5_id} onChange={e => setForm(f => ({ ...f, player_5_id: e.target.value }))} placeholder="Optional" />
-              <GhostInput label="Player 6 (Sub)" value={form.player_6_id} onChange={e => setForm(f => ({ ...f, player_6_id: e.target.value }))} placeholder="Optional" />
+              <GhostInput 
+                label="Player 1 (Captain) *" 
+                value={form.player_1_id} 
+                onChange={e => {
+                  setForm(f => ({ ...f, player_1_id: e.target.value }));
+                  clearFieldError('player_1_id');
+                }} 
+                required 
+                placeholder="5XXXXXXXXX" 
+                error={fieldErrors.player_1_id}
+              />
+              <GhostInput 
+                label="Player 2 *" 
+                value={form.player_2_id} 
+                onChange={e => {
+                  setForm(f => ({ ...f, player_2_id: e.target.value }));
+                  clearFieldError('player_2_id');
+                }} 
+                required 
+                placeholder="5XXXXXXXXX" 
+                error={fieldErrors.player_2_id}
+              />
+              <GhostInput 
+                label="Player 3 *" 
+                value={form.player_3_id} 
+                onChange={e => {
+                  setForm(f => ({ ...f, player_3_id: e.target.value }));
+                  clearFieldError('player_3_id');
+                }} 
+                required 
+                placeholder="5XXXXXXXXX" 
+                error={fieldErrors.player_3_id}
+              />
+              <GhostInput 
+                label="Player 4 *" 
+                value={form.player_4_id} 
+                onChange={e => {
+                  setForm(f => ({ ...f, player_4_id: e.target.value }));
+                  clearFieldError('player_4_id');
+                }} 
+                required 
+                placeholder="5XXXXXXXXX" 
+                error={fieldErrors.player_4_id}
+              />
+              <GhostInput 
+                label="Player 5 (Sub)" 
+                value={form.player_5_id} 
+                onChange={e => {
+                  setForm(f => ({ ...f, player_5_id: e.target.value }));
+                  clearFieldError('player_5_id');
+                }} 
+                placeholder="Optional" 
+                error={fieldErrors.player_5_id}
+              />
+              <GhostInput 
+                label="Player 6 (Sub)" 
+                value={form.player_6_id} 
+                onChange={e => {
+                  setForm(f => ({ ...f, player_6_id: e.target.value }));
+                  clearFieldError('player_6_id');
+                }} 
+                placeholder="Optional" 
+                error={fieldErrors.player_6_id}
+              />
             </div>
           </div>
 

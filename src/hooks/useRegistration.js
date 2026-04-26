@@ -90,6 +90,12 @@ export function useRegistration() {
           );
         }
 
+        // Guard 4 — WhatsApp Validation
+        const cleanWhatsApp = whatsapp.trim().replace(/[^0-9]/g, '');
+        if (cleanWhatsApp.length !== 11) {
+          throw new Error('واٹس ایپ نمبر 11 ہندسوں کا ہونا چاہیے۔\n(WhatsApp number must be exactly 11 digits.)');
+        }
+
         // All guards passed — submit
         const { data, error: insertErr } = await supabase
           .from('registrations')
