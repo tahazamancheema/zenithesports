@@ -158,6 +158,7 @@ export default function AboutPage() {
           ref={scrollRef}
           className="flex gap-4 md:gap-8 overflow-x-auto pb-20 px-6 md:px-[max(1.5rem,calc((100vw-80rem)/2))] snap-x snap-mandatory cursor-grab active:cursor-grabbing touch-pan-x"
         >
+          {dynamicMilestones.map((m, i) => (
             <div 
               key={i} 
               className="min-w-[280px] sm:min-w-[320px] md:min-w-[400px] snap-center group"

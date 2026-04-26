@@ -40,11 +40,15 @@ export async function uploadFile(bucket, file, path = null, retries = 3) {
       break;
     } catch (err) {
       console.error(`Attempt ${attempt} failed:`, err);
-      if (err.message === 'UPLINK_TIMEOUT' || attempt === retries) {
-        if (attempt === retries) {
+      if (attempt === retries) {
+        if (err.message === 'UPLINK_TIMEOUT') {
           throw new Error('Uplink failed after multiple attempts. This usually happens due to a slow or unstable internet connection. Please check your signal and try again.');
+        } else {
+          // It's a real Supabase error (e.g. Permission denied, File too large)
+          throw err;
         }
       }
+      // Small delay before retry
       await new Promise(r => setTimeout(r, 1000));
     }
   }
