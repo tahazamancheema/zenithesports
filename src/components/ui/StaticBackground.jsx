@@ -7,8 +7,8 @@ import React from 'react';
  */
 export default function StaticBackground({ variant = 'mesh' }) {
   return (
-    <div 
-      className={`absolute inset-0 pointer-events-none z-0 ${variant === 'grid' ? 'static-grid' : 'static-mesh'}`} 
+    <div
+      className={`absolute inset-0 pointer-events-none z-0 ${variant === 'grid' ? 'static-grid' : 'static-mesh'}`}
       aria-hidden="true"
     >
       {/* Subtle depth gradients */}

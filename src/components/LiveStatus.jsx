@@ -39,7 +39,7 @@ export default function LiveStatus() {
       <div className="flex justify-between items-end mb-12 border-b border-[rgba(219,180,98,0.1)] pb-8">
         <div>
           <span className="font-teko text-[#dbb462] text-[20px] tracking-[0.2em] font-medium block mb-2 uppercase">
-            LIVE BROADCAST 
+            LIVE BROADCAST
           </span>
           <h2 className="font-bebas text-7xl md:text-9xl tracking-tight leading-none pr-4 flex flex-wrap gap-x-6">
             <span className="zenith-gradient-text pr-2">{isLive ? 'LIVE' : 'LATEST'}</span>

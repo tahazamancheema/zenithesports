@@ -112,9 +112,9 @@ export default function Footer() {
       {/* Bottom bar */}
       <div className="border-t border-white/5 bg-[#0a0a0a] py-10">
         <div className="container mx-auto px-6 lg:px-12 flex flex-col md:flex-row justify-center items-center gap-4 text-center">
-            <span className="font-teko text-[16px] tracking-widest text-[#d1c5b3] opacity-40 uppercase">
-              © 2021 - {year} Zenith Esports Pakistan &nbsp;&bull;&nbsp; A Project By <span className="text-[#dbb462] opacity-100 font-bold">Beyond Zenith</span>
-            </span>
+          <span className="font-teko text-[16px] tracking-widest text-[#d1c5b3] opacity-40 uppercase">
+            © 2021 - {year} Zenith Esports Pakistan &nbsp;&bull;&nbsp; A Project By <span className="text-[#dbb462] opacity-100 font-bold">Beyond Zenith</span>
+          </span>
         </div>
       </div>
     </footer>

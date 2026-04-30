@@ -6,10 +6,10 @@ import { signOut } from '../../supabase/auth';
 import toast from 'react-hot-toast';
 
 const NAV_LINKS = [
-  { label: 'HOME',         to: '/' },
-  { label: 'TOURNAMENTS',  to: '/tournaments' },
-  { label: 'ABOUT US',    to: '/about' },
-  { label: 'MY PROFILE',   to: '/profile' },
+  { label: 'HOME', to: '/' },
+  { label: 'TOURNAMENTS', to: '/tournaments' },
+  { label: 'ABOUT US', to: '/about' },
+  { label: 'MY PROFILE', to: '/profile' },
 ];
 
 export default function Navbar() {
@@ -43,15 +43,14 @@ export default function Navbar() {
     'PLAYER';
 
   return (
-    <header 
-      className={`fixed top-0 w-full z-50 transition-all duration-500 border-b ${
-        scrolled 
-          ? 'h-20 bg-[#0e0e0e]/95 backdrop-blur-xl border-white/10 shadow-2xl' 
+    <header
+      className={`fixed top-0 w-full z-50 transition-all duration-500 border-b ${scrolled
+          ? 'h-20 bg-[#0e0e0e]/95 backdrop-blur-xl border-white/10 shadow-2xl'
           : 'h-24 bg-transparent border-white/5'
-      }`}
+        }`}
     >
       <div className="container mx-auto h-full px-6 lg:px-12 flex justify-between items-center">
-        
+
         {/* Brand Area */}
         <div className="flex items-center gap-10">
           <Link to="/" className="flex items-center gap-4 group">

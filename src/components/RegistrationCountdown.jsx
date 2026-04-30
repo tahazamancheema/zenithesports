@@ -33,10 +33,10 @@ export default function RegistrationCountdown({ openDate, deadlineDate, compact 
         </span>
       </div>
       <div className="flex gap-2 flex-wrap">
-        <CountdownUnit value={days}  label="DAYS" />
+        <CountdownUnit value={days} label="DAYS" />
         <CountdownUnit value={hours} label="HRS" />
-        <CountdownUnit value={mins}  label="MIN" />
-        <CountdownUnit value={secs}  label="SEC" />
+        <CountdownUnit value={mins} label="MIN" />
+        <CountdownUnit value={secs} label="SEC" />
       </div>
     </div>
   );

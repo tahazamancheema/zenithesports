@@ -59,7 +59,9 @@
 }
 
 /* ─── Base Styles ─── */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   border-radius: 0 !important;
 }
@@ -78,11 +80,25 @@ body {
 }
 
 /* ─── Typography Utilities ─── */
-.font-bebas { font-family: 'Bebas Neue', sans-serif; }
-.font-teko { font-family: 'Teko', sans-serif; }
-.font-rajdhani { font-family: 'Rajdhani', sans-serif; }
-.font-roboto { font-family: 'Roboto', sans-serif; }
-.font-michroma { font-family: 'Michroma', sans-serif; }
+.font-bebas {
+  font-family: 'Bebas Neue', sans-serif;
+}
+
+.font-teko {
+  font-family: 'Teko', sans-serif;
+}
+
+.font-rajdhani {
+  font-family: 'Rajdhani', sans-serif;
+}
+
+.font-roboto {
+  font-family: 'Roboto', sans-serif;
+}
+
+.font-michroma {
+  font-family: 'Michroma', sans-serif;
+}
 
 /* Clear & Professional Headlines */
 .headline-main {
@@ -110,7 +126,7 @@ body {
 
 /* ─── Background System ─── */
 .static-grid {
-  background-image: 
+  background-image:
     linear-gradient(rgba(78, 70, 56, 0.05) 1px, transparent 1px),
     linear-gradient(90deg, rgba(78, 70, 56, 0.05) 1px, transparent 1px);
   background-size: 40px 40px;
@@ -160,25 +176,40 @@ body {
 ::-webkit-scrollbar {
   width: 4px;
 }
+
 ::-webkit-scrollbar-track {
   background: #0e0e0e;
 }
+
 ::-webkit-scrollbar-thumb {
   background: #2a2a2a;
 }
 
 /* ─── Animations ─── */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .animate-page-enter {
   animation: fadeIn 0.4s ease-out forwards;
 }
 
-.no-scrollbar::-webkit-scrollbar { display: none; }
-.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
 
 /* ─── Obsidian Buttons ─── */
 .btn-obsidian-primary {
@@ -252,8 +283,13 @@ body {
 
 /* ─── Technical Animations ─── */
 @keyframes scanline {
-  0% { transform: translateY(-100%); }
-  100% { transform: translateY(100vh); }
+  0% {
+    transform: translateY(-100%);
+  }
+
+  100% {
+    transform: translateY(100vh);
+  }
 }
 
 .scanline {
@@ -267,8 +303,15 @@ body {
 }
 
 @keyframes techPulse {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 1; }
+
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+
+  50% {
+    opacity: 1;
+  }
 }
 
 .tech-pulse {
@@ -276,8 +319,15 @@ body {
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-15px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-15px);
+  }
 }
 
 .animate-float {
@@ -285,8 +335,15 @@ body {
 }
 
 @keyframes float-slow {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-30px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-30px);
+  }
 }
 
 .animate-float-slow {
@@ -294,8 +351,17 @@ body {
 }
 
 @keyframes pulse-slow {
-  0%, 100% { opacity: 0.3; transform: scale(1.05); }
-  50% { opacity: 0.5; transform: scale(1); }
+
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(1.05);
+  }
+
+  50% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
 }
 
 .animate-pulse-slow {
@@ -310,4 +376,3 @@ body {
   transform-style: preserve-3d;
   will-change: transform;
 }
-

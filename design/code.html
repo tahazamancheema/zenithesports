@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Zenith Esports | Engineered for Elite Competition</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&amp;family=Space+Grotesk:wght@600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-dim": "#16130e",
+                        "surface-container": "#221f1a",
+                        "surface-container-low": "#1e1b16",
+                        "on-primary-fixed": "#251a00",
+                        "tertiary": "#dee3ff",
+                        "on-surface": "#e9e1d9",
+                        "on-surface-variant": "#d0c5b4",
+                        "on-primary-container": "#685012",
+                        "outline-variant": "#4d4639",
+                        "surface-container-lowest": "#100e09",
+                        "on-background": "#e9e1d9",
+                        "background": "#16130e",
+                        "on-tertiary-fixed-variant": "#394570",
+                        "on-error": "#690005",
+                        "on-error-container": "#ffdad6",
+                        "secondary-fixed": "#56ffa8",
+                        "primary-fixed-dim": "#e4c27a",
+                        "primary-container": "#e6c47b",
+                        "outline": "#999080",
+                        "on-tertiary-container": "#45517d",
+                        "secondary-fixed-dim": "#00e38b",
+                        "error": "#ffb4ab",
+                        "background-deep": "#0A0A0A",
+                        "secondary-container": "#16ff9e",
+                        "inverse-surface": "#e9e1d9",
+                        "on-primary-fixed-variant": "#5a4304",
+                        "on-primary": "#3f2e00",
+                        "tertiary-fixed-dim": "#b8c4f7",
+                        "on-secondary": "#00391f",
+                        "secondary": "#f5fff4",
+                        "primary": "#ffe1a3",
+                        "surface-bright": "#3c3933",
+                        "surface-card": "#141414",
+                        "inverse-on-surface": "#33302a",
+                        "surface-container-high": "#2d2a24",
+                        "on-tertiary": "#222e58",
+                        "on-tertiary-fixed": "#0a1842",
+                        "on-secondary-fixed": "#002110",
+                        "tertiary-fixed": "#dce1ff",
+                        "text-medium": "#A0A0A0",
+                        "surface-variant": "#38342f",
+                        "tertiary-container": "#bac6f9",
+                        "surface": "#16130e",
+                        "primary-fixed": "#ffdf9c",
+                        "text-high": "#F5F5F5",
+                        "error-container": "#93000a",
+                        "on-secondary-container": "#007243",
+                        "on-secondary-fixed-variant": "#00522f",
+                        "surface-tint": "#e4c27a",
+                        "surface-container-highest": "#38342f",
+                        "accent-gold-muted": "#B39962",
+                        "inverse-primary": "#745b1d",
+                        "glow-gold": "rgba(230, 196, 123, 0.3)"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "stack-lg": "32px",
+                        "stack-sm": "8px",
+                        "container-max": "1280px",
+                        "section-padding": "120px",
+                        "gutter": "24px",
+                        "stack-md": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "label-sm": ["Space Grotesk"],
+                        "body-md": ["Inter"],
+                        "display-xl": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["48px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "headline-md": ["32px", { "lineHeight": "1.3", "fontWeight": "700" }],
+                        "label-sm": ["12px", { "lineHeight": "1.0", "letterSpacing": "0.1em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "display-xl": ["72px", { "lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "900" }],
+                        "body-lg": ["18px", { "lineHeight": "1.7", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glow-button {
+            box-shadow: 0 0 15px rgba(230, 196, 123, 0.3);
+            transition: all 0.3s ease;
+        }
+        .glow-button:hover {
+            box-shadow: 0 0 25px rgba(230, 196, 123, 0.6);
+            transform: translateY(-2px);
+        }
+        .card-border-glow {
+            border: 1px solid rgba(230, 196, 123, 0.1);
+            transition: all 0.3s ease;
+        }
+        .card-border-glow:hover {
+            border-color: rgba(230, 196, 123, 0.4);
+            box-shadow: inset 0 -10px 30px -10px rgba(230, 196, 123, 0.15);
+        }
+    </style>
+</head>
+<body class="bg-background-deep text-on-surface antialiased font-body-md">
+<!-- TopNavBar -->
+<nav class="bg-zinc-950/95 backdrop-blur-md text-amber-400 font-inter tracking-tighter uppercase font-bold text-sm shadow-[0_4px_20px_rgba(0,0,0,0.5)] border-b border-amber-400/10 sticky top-0 z-50">
+<div class="flex justify-between items-center w-full px-6 py-4 max-w-[1280px] mx-auto">
+<div class="text-2xl font-black italic tracking-tighter text-amber-400">
+                ZENITH
+            </div>
+<div class="hidden md:flex gap-8 items-center border-b border-white/5">
+<a class="text-amber-400 border-b-2 border-amber-400 pb-1 hover:bg-amber-400 hover:text-black hover:shadow-[0_0_20px_rgba(230,196,123,0.4)] scale-95 active:scale-90 transition-all duration-150" href="#">Tournaments</a>
+<a class="text-zinc-400 hover:text-zinc-100 transition-colors hover:bg-amber-400 hover:text-black hover:shadow-[0_0_20px_rgba(230,196,123,0.4)] scale-95 active:scale-90 duration-150" href="#">Schedule</a>
+<a class="text-zinc-400 hover:text-zinc-100 transition-colors hover:bg-amber-400 hover:text-black hover:shadow-[0_0_20px_rgba(230,196,123,0.4)] scale-95 active:scale-90 duration-150" href="#">Standings</a>
+<a class="text-zinc-400 hover:text-zinc-100 transition-colors hover:bg-amber-400 hover:text-black hover:shadow-[0_0_20px_rgba(230,196,123,0.4)] scale-95 active:scale-90 duration-150" href="#">Broadcast</a>
+<a class="text-zinc-400 hover:text-zinc-100 transition-colors hover:bg-amber-400 hover:text-black hover:shadow-[0_0_20px_rgba(230,196,123,0.4)] scale-95 active:scale-90 duration-150" href="#">News</a>
+</div>
+<div>
+<button class="bg-primary-container text-on-primary-container px-6 py-3 font-label-sm uppercase rounded-DEFAULT glow-button border border-transparent hover:border-primary-container transition-all">JOIN THE CIRCUIT</button>
+</div>
+</div>
+</nav>
+<!-- Hero Section -->
+<header class="relative min-h-[819px] flex items-center justify-center border-b border-outline-variant overflow-hidden">
+<!-- Background Image -->
+<div class="absolute inset-0 z-0 bg-surface-card opacity-40 mix-blend-luminosity">
+<img alt="A dynamic, high-energy esports arena setup captured from an immersive angle. Bright, glowing neon lights in deep blues and intense amber gold illuminate a massive stage. The scene is dramatic and cinematic, reflecting a high-stakes, competitive gaming environment with dark, professional technical equipment dominating the foreground." class="w-full h-full object-cover" data-alt="A dynamic, high-energy esports arena setup captured from an immersive angle. Bright, glowing neon lights in deep blues and intense amber gold illuminate a massive stage. The scene is dramatic and cinematic, reflecting a high-stakes, competitive gaming environment with dark, professional technical equipment dominating the foreground." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCpTHS68-PWs7YMFd4OJR1wSKg3APbTc5CqMcFuIgq73yQH979TeH_HIK4vD7GC-U2c6DMoQJsaX5-AWFnYpssIRHlesliahi20JFbMv59f0CkrV29dVGD056M147GZiEhjPUFf6TS9c_wHryciTguTFRqJx9EzOnHpiPLmo09m2HghOqnLBY7at5Fa6jFqO-edQlIFQPhg3giRGhLdFt2YP064cTmakWUabF-tGOGd5YB1UKaoZARNoQDJtgRnzwU6wNQrKZ6g51c"/>
+</div>
+<!-- Gradient Overlay -->
+<div class="absolute inset-0 bg-gradient-to-t from-background-deep via-background-deep/80 to-transparent z-10"></div>
+<div class="relative z-20 max-w-container-max mx-auto px-gutter text-center flex flex-col items-center gap-stack-lg pt-section-padding pb-16">
+<h1 class="font-display-xl text-display-xl text-primary-container uppercase max-w-4xl drop-shadow-[0_0_30px_rgba(230,196,123,0.2)]">
+                LEVEL UP YOUR COMPETITIVE GAME
+            </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">
+                The premier competitive infrastructure for elite esports athletes in Pakistan. Engineered for precision, fairness, and professional-grade broadcasts.
+            </p>
+<div class="flex gap-stack-md mt-8">
+<button class="bg-primary-container text-on-primary-container px-8 py-4 font-label-sm text-label-sm uppercase rounded-DEFAULT glow-button">
+                    REGISTER TEAM
+                </button>
+<button class="bg-transparent border border-primary-container text-primary-container px-8 py-4 font-label-sm text-label-sm uppercase rounded-DEFAULT hover:bg-primary-container/10 transition-colors">
+                    VIEW STANDINGS
+                </button>
+</div>
+</div>
+</header>
+<!-- Live Ticker -->
+<section class="bg-surface-card border-b border-surface-container-high py-4 overflow-hidden relative shadow-[0_4px_20px_rgba(0,0,0,0.5)]">
+<div class="max-w-container-max mx-auto px-gutter flex flex-col md:flex-row justify-between items-center gap-stack-md font-label-sm text-label-sm uppercase tracking-widest text-text-medium">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-secondary-fixed animate-pulse"></span>
+<span>SYSTEM STATUS: <span class="text-secondary-fixed">ONLINE</span></span>
+</div>
+<div class="hidden md:block w-px h-4 bg-outline-variant"></div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-container" style="font-variation-settings: 'FILL' 1;">groups</span>
+<span class="text-on-surface">50,000+ Active Players</span>
+</div>
+<div class="hidden md:block w-px h-4 bg-outline-variant"></div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-container" style="font-variation-settings: 'FILL' 1;">payments</span>
+<span class="text-on-surface">PKR 5M+ Distributed</span>
+</div>
+<div class="hidden md:block w-px h-4 bg-outline-variant"></div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-container" style="font-variation-settings: 'FILL' 1;">emoji_events</span>
+<span class="text-on-surface">100+ Tournaments Run</span>
+</div>
+</div>
+</section>
+<!-- Featured Broadcast -->
+<section class="py-section-padding bg-background-deep relative">
+<div class="max-w-container-max mx-auto px-gutter">
+<div class="flex flex-col mb-stack-lg border-l-4 border-primary-container pl-6">
+<h2 class="font-headline-lg text-headline-lg text-on-surface uppercase tracking-tight">LIVE CIRCUIT BROADCAST</h2>
+<p class="font-body-md text-body-md text-outline mt-2">Witness elite tactical execution.</p>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-stack-md bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden card-border-glow">
+<!-- Video Area -->
+<div class="col-span-1 lg:col-span-8 relative aspect-video bg-black flex items-center justify-center overflow-hidden">
+<img alt="A high-resolution screenshot from a competitive tactical shooter game being broadcasted. The scene shows an intense firefight from a first-person perspective, with detailed futuristic weaponry and complex industrial environments. The color palette is gritty and contrast-heavy, perfectly suited for a dark, professional esports tournament stream. The lighting features harsh neon accents against deep shadows." class="absolute inset-0 w-full h-full object-cover opacity-80 mix-blend-lighten" data-alt="A high-resolution screenshot from a competitive tactical shooter game being broadcasted. The scene shows an intense firefight from a first-person perspective, with detailed futuristic weaponry and complex industrial environments. The color palette is gritty and contrast-heavy, perfectly suited for a dark, professional esports tournament stream. The lighting features harsh neon accents against deep shadows." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAWnIopjZTPPOV8wVlU2QCUQYrmYHmKTJaWBFf_VDAl3PBdYJS9-nYpmfBL_y8QG5UMJiWtZ7-J4T2XboEk8i1c4YAyT2gkp1NGterWrywtTS-3I1zbKJq4Zg3j3s4YIlW3SsfKx33tCgZpXCIujMhD_33KyyljZxs7qpm57_eVPDWNW99CAgEws4_6IvfIoZakGDXS9xQQcbF2whb5Poxf2eQ0clhLwsZ7VjL-KSp_cLK2Q9ujvsHzQ4a1Sr09pgBtRR4nDU2AUV0"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+<!-- Play Button Overlay -->
+<button class="relative z-10 bg-primary-container/20 backdrop-blur-sm border border-primary-container text-primary-container w-20 h-20 rounded-full flex items-center justify-center glow-button hover:bg-primary-container/40">
+<span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+<!-- Top Status Indicators -->
+<div class="absolute top-4 left-4 flex gap-2">
+<span class="bg-error text-on-error font-label-sm text-label-sm px-3 py-1 rounded-DEFAULT uppercase flex items-center gap-1 shadow-[0_0_10px_rgba(255,180,171,0.5)]">
+<span class="w-1.5 h-1.5 rounded-full bg-on-error animate-pulse"></span> LIVE
+                        </span>
+<span class="bg-surface-card/80 backdrop-blur-md text-on-surface font-label-sm text-label-sm px-3 py-1 rounded-DEFAULT uppercase border border-outline-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">visibility</span> 12.4K
+                        </span>
+</div>
+</div>
+<!-- Broadcast Sidebar Control Panel -->
+<div class="col-span-1 lg:col-span-4 bg-surface-card p-6 flex flex-col justify-between border-l border-outline-variant">
+<div>
+<div class="flex justify-between items-start mb-6 border-b border-surface-variant pb-4">
+<div>
+<h3 class="font-headline-md text-headline-md text-primary-container uppercase text-xl mb-1">ZENITH INVITATIONAL</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">Grand Finals - Map 3</p>
+</div>
+<span class="material-symbols-outlined text-outline">cast</span>
+</div>
+<div class="space-y-4 font-label-sm text-label-sm uppercase">
+<div class="flex justify-between items-center p-3 bg-surface-container-low border border-outline-variant rounded-DEFAULT">
+<span class="text-text-medium">Stream Quality</span>
+<span class="text-on-surface flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-secondary-fixed"></span> 1080p60</span>
+</div>
+<div class="flex justify-between items-center p-3 bg-surface-container-low border border-outline-variant rounded-DEFAULT">
+<span class="text-text-medium">Current Matchup</span>
+<span class="text-primary-container">ELEVATE VS. VORTEX</span>
+</div>
+<div class="flex justify-between items-center p-3 bg-surface-container-low border border-outline-variant rounded-DEFAULT">
+<span class="text-text-medium">Casters</span>
+<span class="text-on-surface">AERO &amp; CYPHER</span>
+</div>
+</div>
+</div>
+<div class="mt-8 pt-6 border-t border-surface-variant">
+<button class="w-full bg-transparent border border-primary-container text-primary-container py-3 font-label-sm text-label-sm uppercase rounded-DEFAULT hover:bg-primary-container/10 transition-colors flex justify-center items-center gap-2">
+<span class="material-symbols-outlined text-sm">forum</span> JOIN LIVE CHAT
+                        </button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Footer -->
+<footer class="bg-zinc-950 font-inter text-xs tracking-widest uppercase border-t border-amber-400/10">
+<div class="flex flex-col md:flex-row justify-between items-center w-full px-8 py-12 max-w-[1280px] mx-auto gap-8 border-t border-zinc-900">
+<div class="text-xl font-black text-zinc-100">
+                ZENITH
+            </div>
+<div class="flex flex-wrap justify-center gap-6">
+<a class="text-amber-400 hover:text-amber-400 transition-colors opacity-80 hover:opacity-100" href="#">Privacy Policy</a>
+<a class="text-zinc-500 hover:text-zinc-300 hover:text-amber-400 transition-colors opacity-80 hover:opacity-100" href="#">Terms of Service</a>
+<a class="text-zinc-500 hover:text-zinc-300 hover:text-amber-400 transition-colors opacity-80 hover:opacity-100" href="#">Brand Kit</a>
+<a class="text-zinc-500 hover:text-zinc-300 hover:text-amber-400 transition-colors opacity-80 hover:opacity-100" href="#">Contact Support</a>
+<a class="text-zinc-500 hover:text-zinc-300 hover:text-amber-400 transition-colors opacity-80 hover:opacity-100" href="#">Sponsorships</a>
+</div>
+<div class="text-zinc-500">
+                © 2024 ZENITH ESPORTS. ENGINEERED FOR ELITE COMPETITION.
+            </div>
+</div>
+</footer>
+</body></html>

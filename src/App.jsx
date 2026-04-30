@@ -11,16 +11,16 @@ import ScrollToTop from './components/ScrollToTop';
 // Lazy-load all pages for code splitting
 import TournamentsPage from './pages/TournamentsPage';
 import TournamentDetailsPage from './pages/TournamentDetailsPage';
-const LandingPage     = lazy(() => import('./pages/LandingPage'));
-const AuthPage        = lazy(() => import('./pages/AuthPage'));
-const ProfilePage     = lazy(() => import('./pages/ProfilePage'));
-const AdminDashboard  = lazy(() => import('./pages/AdminDashboard'));
-const AboutPage       = lazy(() => import('./pages/AboutPage'));
-const ContactPage     = lazy(() => import('./pages/ContactPage'));
-const SupportPage     = lazy(() => import('./pages/SupportPage'));
-const TermsPage       = lazy(() => import('./pages/TermsPage'));
-const PrivacyPage     = lazy(() => import('./pages/PrivacyPage'));
-const NotFoundPage    = lazy(() => import('./pages/NotFoundPage'));
+const LandingPage = lazy(() => import('./pages/LandingPage'));
+const AuthPage = lazy(() => import('./pages/AuthPage'));
+const ProfilePage = lazy(() => import('./pages/ProfilePage'));
+const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
+const AboutPage = lazy(() => import('./pages/AboutPage'));
+const ContactPage = lazy(() => import('./pages/ContactPage'));
+const SupportPage = lazy(() => import('./pages/SupportPage'));
+const TermsPage = lazy(() => import('./pages/TermsPage'));
+const PrivacyPage = lazy(() => import('./pages/PrivacyPage'));
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 const RegistrationPage = lazy(() => import('./pages/RegistrationPage'));
 
 // Pages that don't show the main footer
@@ -41,7 +41,7 @@ class ErrorBoundary extends React.Component {
             <p className="font-body text-[#d1c5b3] opacity-60">
               The Zenith engine encountered an unexpected exception. Protocol requires a tactical reset.
             </p>
-            <button 
+            <button
               onClick={() => window.location.reload()}
               className="zenith-gradient text-[#402d00] font-agency font-bold text-lg px-12 py-4 tracking-widest hover:brightness-110 active:scale-95 transition-all"
             >
@@ -80,15 +80,15 @@ function AppLayout() {
         <Suspense fallback={<PageLoader />}>
           <Routes>
             {/* Main */}
-            <Route path="/"            element={<LandingPage />} />
-            <Route path="/auth"        element={<AuthPage />} />
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/auth" element={<AuthPage />} />
             <Route path="/tournaments" element={<TournamentsPage />} />
             <Route path="/tournaments/:id" element={<TournamentDetailsPage />} />
-            <Route path="/about"       element={<AboutPage />} />
-            <Route path="/contact"     element={<ContactPage />} />
-            <Route path="/support"     element={<SupportPage />} />
-            <Route path="/terms"       element={<TermsPage />} />
-            <Route path="/privacy"     element={<PrivacyPage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+            <Route path="/support" element={<SupportPage />} />
+            <Route path="/terms" element={<TermsPage />} />
+            <Route path="/privacy" element={<PrivacyPage />} />
 
             {/* Protected */}
             <Route
@@ -135,7 +135,7 @@ const TOAST_STYLE = {
     borderRadius: '0px',
   },
   success: { iconTheme: { primary: '#dbb462', secondary: '#402d00' } },
-  error:   { iconTheme: { primary: '#ffb4ab', secondary: '#690005' } },
+  error: { iconTheme: { primary: '#ffb4ab', secondary: '#690005' } },
 };
 
 export default function App() {

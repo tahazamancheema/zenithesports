@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronRight, Zap } from 'lucide-react';
+import { ChevronRight, Shield, Tv, GitBranch, Banknote, ArrowRight, Trophy, Calendar } from 'lucide-react';
 import LiveStatus from '../components/LiveStatus';
-import StatStrip from '../components/StatStrip';
-import StaticBackground from '../components/ui/StaticBackground';
 import { useTournaments } from '../hooks/useTournaments';
 import { usePlatformStats } from '../hooks/usePlatformStats';
 import { useAuth } from '../hooks/useAuth';
@@ -13,7 +11,7 @@ import RegistrationCountdown from '../components/RegistrationCountdown';
 import heroBg from '../assets/images/hero-bg.png';
 
 export default function LandingPage() {
-  const { currentTournament } = useTournaments();
+  const { currentTournament, activeTournaments } = useTournaments();
   const { user } = useAuth();
   const platformStats = usePlatformStats();
   const [approvedCount, setApprovedCount] = useState(0);
@@ -50,138 +48,294 @@ export default function LandingPage() {
     : null;
 
   return (
-    <div className="animate-page-enter bg-[#131313] overflow-x-hidden">
+    <div className="animate-page-enter bg-[#0a0a0a] overflow-x-hidden">
       
-      {/* ── HERO SECTION ── */}
-      <section className="relative min-h-screen flex items-center pt-20 overflow-hidden">
-        {/* Background Image with Layering */}
+      {/* ═══════════════════════════════════════════
+          HERO — Full Bleed Cinematic 
+          ═══════════════════════════════════════════ */}
+      <section className="relative min-h-screen flex items-end pb-20 lg:pb-32 pt-28 overflow-hidden">
+        {/* BG Layers */}
         <div className="absolute inset-0 z-0">
-          <img 
-            src={heroBg} 
-            className="w-full h-full object-cover opacity-20 scale-105"
-            alt=""
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#131313]/40 via-[#131313] to-[#131313]" />
-          <div className="absolute inset-0 scanline opacity-10 pointer-events-none" />
+          <img src={heroBg} className="w-full h-full object-cover opacity-25 scale-110" alt="" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/80 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/40 to-transparent" />
         </div>
 
-        <StaticBackground variant="mesh" />
-        
-        {/* Ambient Hero Glow */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#dbb462]/5 blur-[120px] rounded-full pointer-events-none" />
+        {/* Grid overlay */}
+        <div className="absolute inset-0 z-[1] opacity-[0.03]" style={{
+          backgroundImage: 'linear-gradient(rgba(219,180,98,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(219,180,98,0.5) 1px, transparent 1px)',
+          backgroundSize: '80px 80px'
+        }} />
 
-        <div className="relative z-10 w-full px-6 lg:px-16 container mx-auto text-center">
-          <div className="max-w-4xl mx-auto">
-            <div className="flex items-center justify-center gap-3 mb-8">
-              <div className="w-12 h-[2px] bg-[#dbb462] shadow-[0_0_10px_#dbb462]" />
-              <span className="font-teko text-[#dbb462] text-[18px] tracking-[0.3em] font-medium uppercase">
-                ZENITH ESPORTS &bull; PAKISTAN'S COMPETITIVE ECOSYSTEM
-              </span>
-              <div className="w-12 h-[2px] bg-[#dbb462] shadow-[0_0_10px_#dbb462]" />
+        {/* Scanline */}
+        <div className="absolute inset-0 scanline opacity-[0.06] pointer-events-none z-[2]" />
+
+        {/* Gold accent lines */}
+        <div className="absolute top-0 left-0 w-[1px] h-full bg-gradient-to-b from-transparent via-[#dbb462]/20 to-transparent z-[3]" style={{left: '8%'}} />
+        <div className="absolute top-0 left-0 w-[1px] h-full bg-gradient-to-b from-transparent via-[#dbb462]/10 to-transparent z-[3] hidden lg:block" style={{left: '50%'}} />
+
+        {/* Main Content */}
+        <div className="relative z-10 w-full px-6 lg:px-16 container mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-0 items-end">
+            
+            {/* Left Column — Text */}
+            <div className="lg:col-span-7 xl:col-span-6">
+              {/* Eyebrow Tag */}
+              <div className="flex items-center gap-4 mb-8">
+                <div className="w-3 h-3 bg-[#dbb462] animate-pulse" />
+                <span className="font-teko text-[#dbb462] text-[16px] tracking-[0.3em] font-medium uppercase">
+                  PAKISTAN'S COMPETITIVE ECOSYSTEM
+                </span>
+              </div>
+
+              {/* Headline */}
+              <h1 className="font-bebas text-[clamp(4rem,14vw,11rem)] leading-[0.82] mb-8 select-none uppercase tracking-tight">
+                <span className="text-[#f2f2f2] block">LEVEL UP</span>
+                <span className="text-[#f2f2f2] block">YOUR <span className="zenith-gradient-text">GAME</span></span>
+              </h1>
+
+              {/* Sub-copy */}
+              <p className="font-rajdhani text-[#d1c5b3] text-lg md:text-xl max-w-lg mb-10 leading-relaxed opacity-70 font-medium">
+                Join the most technical and reliable tournament circuit in Pakistan. We provide the infrastructure for professional PUBG Mobile squads to shine.
+              </p>
+
+              {/* CTAs */}
+              <div className="flex flex-wrap gap-4 mb-12 lg:mb-0">
+                <Link 
+                  to={user ? "/profile" : "/auth"} 
+                  className="btn-obsidian-primary font-bebas text-[22px] px-10 py-5 tracking-[0.15em] inline-flex items-center gap-3 uppercase"
+                >
+                  {user ? 'MY DASHBOARD' : 'JOIN THE CIRCUIT'} <ArrowRight size={22} strokeWidth={2.5} />
+                </Link>
+                <Link 
+                  to="/tournaments" 
+                  className="btn-obsidian-ghost font-bebas text-[22px] px-10 py-5 tracking-[0.15em] uppercase"
+                >
+                  BROWSE EVENTS
+                </Link>
+              </div>
             </div>
 
-            <h1 className="hero-text-huge mb-10 select-none leading-[0.85] uppercase tracking-tight drop-shadow-2xl">
-              LEVEL UP YOUR<br />
-              <span className="zenith-gradient-text pr-2">COMPETITIVE GAME</span>
-            </h1>
-
-            <p className="font-body text-[#d1c5b3] text-xl md:text-2xl max-w-2xl mx-auto mb-12 leading-relaxed opacity-80">
-              Join the most technical and reliable tournament circuit in Pakistan. We provide the infrastructure for professional PUBG Mobile squads to shine.
-            </p>
-
-            <div className="flex flex-wrap justify-center gap-6">
-              <Link 
-                to={user ? "/profile" : "/auth"} 
-                className="btn-obsidian-primary font-bebas text-2xl px-14 py-6 tracking-[0.2em] inline-flex items-center gap-4 uppercase"
-              >
-                {user ? 'MY DASHBOARD' : 'JOIN THE CIRCUIT'} <ChevronRight size={28} />
-              </Link>
-              <Link 
-                to="/tournaments" 
-                className="btn-obsidian-ghost font-bebas text-2xl px-14 py-6 tracking-widest uppercase"
-              >
-                BROWSE EVENTS
-              </Link>
+            {/* Right Column — Floating Stats Panel */}
+            <div className="lg:col-span-5 xl:col-span-6 flex justify-end">
+              <div className="w-full max-w-md space-y-[2px]">
+                <FloatingStat label="ACTIVE PLAYERS" value={platformStats.activePlayers} delay={0} />
+                <FloatingStat label="PRIZE POOLS DISTRIBUTED" value={platformStats.prizePools} delay={100} />
+                <FloatingStat label="TOURNAMENTS COMPLETED" value={platformStats.tournamentsRun} delay={200} />
+                <FloatingStat label="REGION" value="PAKISTAN" accent delay={300} />
+              </div>
             </div>
           </div>
         </div>
+
+        {/* Bottom edge line */}
+        <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#dbb462]/30 to-transparent z-10" />
       </section>
 
-      {/* ── STAT STRIP ── */}
-      <StatStrip />
-
-      {/* ── LIVE DATA ── */}
+      {/* ═══════════════════════════════════════════
+          LIVE BROADCAST
+          ═══════════════════════════════════════════ */}
       <LiveStatus />
 
-      {/* ── FEATURED TOURNAMENT ── */}
-      {currentTournament && (
-        <section className="relative py-32 px-6 lg:px-16 border-t border-white/5 bg-[#0e0e0e]">
-          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#dbb462]/30 to-transparent" />
-          
-          <div className="container mx-auto max-w-7xl relative z-10">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
-              
-              {/* Left Side: Interactive Poster */}
-              <div className="lg:col-span-5">
-                <div className="relative group cursor-pointer perspective-1000">
-                  <div className="relative z-10 transition-all duration-700 ease-out transform-gpu group-hover:rotate-y-12 group-hover:-rotate-x-6 group-hover:scale-105 border border-white/10 bg-[#111] overflow-hidden shadow-2xl">
-                    <div className="aspect-[4/5] relative">
-                      {currentTournament.poster_url ? (
-                        <img 
-                          src={currentTournament.poster_url} 
-                          alt={currentTournament.title} 
-                          className="w-full h-full object-cover transition-transform duration-[2s] group-hover:scale-110"
+      {/* ═══════════════════════════════════════════
+          OPEN REGISTRATIONS
+          ═══════════════════════════════════════════ */}
+      {activeTournaments.length > 0 && (
+        <section className="relative bg-[#0a0a0a] border-t border-white/[0.04] overflow-hidden">
+          <div className="container mx-auto max-w-7xl px-6 lg:px-16 py-24 lg:py-32 relative z-10">
+            {/* Section Header */}
+            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-14">
+              <div>
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-8 h-[2px] bg-[#dbb462]" />
+                  <span className="font-teko text-[16px] tracking-[0.25em] text-[#dbb462] uppercase font-medium">Now Accepting Teams</span>
+                </div>
+                <h2 className="font-bebas text-5xl md:text-7xl lg:text-8xl tracking-tight leading-[0.85] uppercase">
+                  <span className="text-[#f2f2f2]">OPEN </span>
+                  <span className="zenith-gradient-text">REGISTRATIONS</span>
+                </h2>
+              </div>
+              <Link
+                to="/tournaments"
+                className="btn-obsidian-ghost font-bebas text-[20px] px-8 py-4 tracking-[0.15em] uppercase shrink-0"
+              >
+                ALL TOURNAMENTS <ChevronRight size={20} className="ml-2" />
+              </Link>
+            </div>
+
+            {/* Tournament Cards Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[1px] bg-white/[0.04]">
+              {activeTournaments.map((t) => {
+                const prize = t.prize_pool ? `PKR ${Number(t.prize_pool).toLocaleString('en-PK')}` : 'TBA';
+                const deadline = t.registration_deadline
+                  ? new Date(t.registration_deadline).toLocaleDateString('en-PK', { day: 'numeric', month: 'short', year: 'numeric' })
+                  : 'TBA';
+
+                return (
+                  <div key={t.id} className="bg-[#0e0e0e] group hover:bg-[#111] transition-all duration-500 relative overflow-hidden flex flex-col">
+                    {/* Gold top edge on hover */}
+                    <div className="absolute top-0 left-0 w-full h-[2px] bg-[#dbb462] scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left z-10" />
+
+                    {/* Poster */}
+                    <Link to={`/tournaments/${t.id}`} className="relative aspect-[16/9] overflow-hidden block">
+                      {t.poster_url ? (
+                        <img
+                          src={t.poster_url}
+                          alt={t.title}
+                          className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
                         />
                       ) : (
-                        <div className="w-full h-full bg-[#111] flex items-center justify-center">
-                          <img src="/logo.png" className="w-1/2 opacity-20" alt="" />
+                        <div className="w-full h-full bg-[#131313] flex items-center justify-center">
+                          <Trophy className="text-[#dbb462] opacity-10" size={56} />
                         </div>
                       )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#0e0e0e] via-transparent to-transparent opacity-60" />
+                      <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[#0e0e0e] to-transparent" />
+                      {/* Live badge */}
+                      <div className="absolute top-4 left-4 flex items-center gap-2 bg-[#0e0e0e]/90 backdrop-blur-md px-3 py-1.5 border border-emerald-500/30 z-20">
+                        <span className="w-1.5 h-1.5 bg-emerald-400 animate-pulse" />
+                        <span className="font-teko text-[13px] tracking-[0.2em] text-emerald-400 uppercase">Registrations Open</span>
+                      </div>
+                    </Link>
+
+                    {/* Info */}
+                    <div className="p-6 lg:p-8 flex-1 flex flex-col">
+                      <h3 className="font-bebas text-3xl lg:text-4xl text-[#f2f2f2] group-hover:text-white transition-colors leading-tight mb-4 line-clamp-1 uppercase">
+                        {t.title}
+                      </h3>
+
+                      {/* Data strip */}
+                      <div className="grid grid-cols-2 gap-4 mb-6">
+                        <div>
+                          <span className="font-teko text-[12px] tracking-[0.2em] text-[#d1c5b3] opacity-40 uppercase block mb-1">Prize Pool</span>
+                          <span className="font-bebas text-xl text-[#dbb462] leading-none">{prize}</span>
+                        </div>
+                        <div>
+                          <span className="font-teko text-[12px] tracking-[0.2em] text-[#d1c5b3] opacity-40 uppercase block mb-1">Deadline</span>
+                          <span className="font-bebas text-xl text-[#f2f2f2] leading-none">{deadline}</span>
+                        </div>
+                      </div>
+
+                      {/* Slots info */}
+                      <div className="mb-6">
+                        <div className="flex justify-between font-teko text-[12px] tracking-[0.2em] uppercase mb-2">
+                          <span className="text-[#d1c5b3] opacity-40">Team Slots</span>
+                          <span className="text-[#dbb462]">{t.max_teams ? `${t.max_teams} TEAMS` : 'UNLIMITED'}</span>
+                        </div>
+                        <div className="h-[2px] bg-white/[0.06] relative overflow-hidden">
+                          <div className="absolute left-0 inset-y-0 zenith-gradient w-[30%]" />
+                        </div>
+                      </div>
+
+                      {/* CTA */}
+                      <div className="mt-auto flex gap-3">
+                        <Link
+                          to={user ? `/register/${t.id}` : '/auth'}
+                          className="btn-obsidian-primary flex-1 py-4 font-bebas text-[20px] tracking-[0.15em] uppercase"
+                        >
+                          REGISTER
+                        </Link>
+                        <Link
+                          to={`/tournaments/${t.id}`}
+                          className="btn-obsidian-ghost px-5 py-4 font-bebas text-[20px] tracking-widest uppercase"
+                        >
+                          <ChevronRight size={20} />
+                        </Link>
+                      </div>
                     </div>
                   </div>
-                  <div className="absolute -inset-4 bg-[#dbb462]/10 blur-[60px] rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-1000 -z-10" />
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ═══════════════════════════════════════════
+          FEATURED TOURNAMENT — Cinematic Showcase
+          ═══════════════════════════════════════════ */}
+      {currentTournament && (
+        <section className="relative bg-[#0e0e0e] overflow-hidden">
+          {/* Diagonal accent strip */}
+          <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-[#dbb462]/[0.03] blur-[100px] pointer-events-none" />
+          
+          <div className="container mx-auto max-w-7xl px-6 lg:px-16 py-24 lg:py-32 relative z-10">
+            {/* Section header */}
+            <div className="flex items-center gap-4 mb-4">
+              <div className="w-8 h-[2px] bg-[#dbb462]" />
+              <span className="font-teko text-[16px] tracking-[0.25em] text-[#dbb462] uppercase font-medium">Ongoing Tournament</span>
+            </div>
+            <h2 className="font-bebas text-6xl md:text-8xl lg:text-[9rem] tracking-tight leading-[0.82] uppercase zenith-gradient-text mb-16 lg:mb-20">
+              {currentTournament.title}
+            </h2>
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16">
+              
+              {/* Poster Column */}
+              <div className="lg:col-span-5 relative">
+                <div className="relative group">
+                  <div className="aspect-[4/5] relative overflow-hidden bg-[#111] border border-white/[0.06]">
+                    {currentTournament.poster_url ? (
+                      <img 
+                        src={currentTournament.poster_url} 
+                        alt={currentTournament.title} 
+                        className="w-full h-full object-cover transition-transform duration-[3s] group-hover:scale-110"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-[#111] flex items-center justify-center">
+                        <img src="/logo.png" className="w-1/2 opacity-20" alt="" />
+                      </div>
+                    )}
+                    {/* Bottom gradient overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0e0e0e] via-transparent to-transparent opacity-80" />
+                    
+                    {/* Corner accents */}
+                    <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-[#dbb462]/40" />
+                    <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-[#dbb462]/40" />
+                  </div>
+
+                  {/* Glow on hover */}
+                  <div className="absolute -inset-4 bg-[#dbb462]/[0.06] blur-[60px] rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-1000 -z-10" />
                 </div>
               </div>
 
-              {/* Right Side: Content */}
-              <div className="lg:col-span-7">
-                <div className="mb-12">
-                  <span className="inline-block font-teko text-[16px] text-[#dbb462] mb-6 px-4 py-1.5 border border-[#dbb462]/20 bg-[#dbb462]/5 tracking-widest uppercase">
-                    Ongoing Tournament
-                  </span>
-                  <h2 className="font-bebas text-7xl md:text-9xl mb-8 leading-[0.8] uppercase tracking-tight zenith-gradient-text pr-2">
-                    {currentTournament.title}
-                  </h2>
-                  <p className="font-body text-[#d1c5b3] text-xl opacity-50 leading-relaxed max-w-2xl">
-                    {currentTournament.description || "The next evolution of competitive PUBG Mobile. Secure your team's slot and prepare for the current circuit."}
-                  </p>
+              {/* Info Column */}
+              <div className="lg:col-span-7 flex flex-col justify-between">
+                {/* Description */}
+                <p className="font-rajdhani text-[#d1c5b3] text-lg opacity-50 leading-relaxed max-w-2xl mb-10 font-medium">
+                  {currentTournament.description || "The next evolution of competitive PUBG Mobile. Secure your team's slot and prepare for the current circuit."}
+                </p>
+
+                {/* Metric Bar */}
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-[1px] bg-white/[0.04] mb-10">
+                  <MetricBox label="PRIZE DISTRIBUTION" value={prizeFormatted || 'TBA'} gold />
+                  <MetricBox label="TEAM SLOTS" value={isUnlimited ? 'UNLIMITED' : `${maxTeams} TEAMS`} />
+                  <MetricBox label="START DATE" value={currentTournament.start_date ? new Date(currentTournament.start_date).toLocaleDateString('en-PK', { day: 'numeric', month: 'short' }) : 'TBA'} />
+                  <MetricBox label="DEADLINE" value={currentTournament.registration_deadline ? new Date(currentTournament.registration_deadline).toLocaleDateString('en-PK', { day: 'numeric', month: 'short' }) : 'TBA'} />
                 </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
-                   <MetricBox label="PRIZE DISTRIBUTION" value={prizeFormatted || 'TBA'} gold />
-                   <MetricBox label="No. of Teams" value={isUnlimited ? 'UNLIMITED' : `${maxTeams} TEAMS`} />
-                   <MetricBox label="START DATE" value={currentTournament.start_date ? new Date(currentTournament.start_date).toLocaleDateString('en-PK', { day: 'numeric', month: 'short' }) : 'TBA'} />
-                   <MetricBox label="DEADLINE" value={currentTournament.registration_deadline ? new Date(currentTournament.registration_deadline).toLocaleDateString('en-PK', { day: 'numeric', month: 'short' }) : 'TBA'} />
-                </div>
-
-                <div className="space-y-4 mb-12">
-                  <div className="flex justify-between font-teko text-[16px] tracking-widest text-[#dbb462] uppercase">
-                    <span>{approvedCount} Teams Verified</span>
-                    <span>{isUnlimited ? 'OPEN ACCESS' : `${Math.round(fillPct)}% Capacity`}</span>
+                {/* Capacity Bar */}
+                <div className="mb-10">
+                  <div className="flex justify-between font-teko text-[14px] tracking-[0.2em] uppercase mb-3">
+                    <span className="text-[#dbb462]">{approvedCount} Teams Verified</span>
+                    <span className="text-[#d1c5b3] opacity-40">{isUnlimited ? 'OPEN ACCESS' : `${Math.round(fillPct)}% Capacity`}</span>
                   </div>
-                  <div className="h-1.5 bg-white/5 relative overflow-hidden">
+                  <div className="h-[3px] bg-white/[0.06] relative overflow-hidden">
                     <div 
-                      className="absolute left-0 inset-y-0 zenith-gradient transition-all duration-1000"
+                      className="absolute left-0 inset-y-0 zenith-gradient transition-all duration-1000 ease-out"
                       style={{ width: `${fillPct}%` }}
+                    />
+                    <div 
+                      className="absolute inset-y-0 w-[2px] bg-white/60 transition-all duration-1000"
+                      style={{ left: `${fillPct}%` }}
                     />
                   </div>
                 </div>
 
-                <div className="bg-[#111] p-10 border border-white/5 relative overflow-hidden group hover:border-[#dbb462]/30 transition-all duration-500">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-[#dbb462]/5 blur-3xl rounded-full pointer-events-none" />
+                {/* Registration Card */}
+                <div className="bg-[#111] border border-white/[0.06] p-8 relative overflow-hidden group hover:border-[#dbb462]/20 transition-all duration-500">
+                  <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-[#dbb462] via-[#dbb462]/40 to-transparent" />
                   
-                  <div className="relative z-10 flex flex-col md:flex-row items-center gap-10">
+                  <div className="relative z-10 flex flex-col md:flex-row items-center gap-8">
                     <div className="flex-1 text-center md:text-left">
                       <RegistrationCountdown 
                         openDate={currentTournament.registration_open_date}
@@ -189,25 +343,25 @@ export default function LandingPage() {
                       />
                     </div>
 
-                    <div className="w-full md:w-auto space-y-4 shrink-0 min-w-[280px]">
+                    <div className="w-full md:w-auto space-y-3 shrink-0 min-w-[260px]">
                       {isOpen && !isUserRegistered ? (
                         <Link
                           to={user ? `/register/${currentTournament.id}` : "/auth"}
-                          className="btn-obsidian-primary w-full py-5 text-2xl tracking-[0.2em]"
+                          className="btn-obsidian-primary w-full py-5 font-bebas text-[22px] tracking-[0.2em]"
                         >
                           REGISTER TEAM
                         </Link>
                       ) : (
-                        <div className="w-full text-center bg-white/5 text-[#d1c5b3]/30 font-bebas text-2xl py-5 tracking-widest uppercase">
+                        <div className="w-full text-center bg-white/[0.04] text-[#d1c5b3]/30 font-bebas text-[22px] py-5 tracking-widest uppercase">
                           {isUserRegistered ? 'ALREADY REGISTERED' : 'REGISTRATION CLOSED'}
                         </div>
                       )}
                       
                       <Link
                         to={`/tournaments/${currentTournament.id}`}
-                        className="btn-obsidian-ghost w-full py-5 text-2xl tracking-widest uppercase"
+                        className="btn-obsidian-ghost w-full py-5 font-bebas text-[22px] tracking-widest uppercase"
                       >
-                        VIEW DETAILS <ChevronRight size={22} className="ml-2" />
+                        VIEW DETAILS <ChevronRight size={20} className="ml-2" />
                       </Link>
                     </div>
                   </div>
@@ -218,44 +372,88 @@ export default function LandingPage() {
         </section>
       )}
 
-      {/* ── CORE FEATURES ── */}
-      <section className="py-40 px-6 lg:px-16 bg-[#131313] relative overflow-hidden">
-        <div className="container mx-auto max-w-7xl relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
+      {/* ═══════════════════════════════════════════
+          WHY COMPETE — Feature Pillars
+          ═══════════════════════════════════════════ */}
+      <section className="relative bg-[#0a0a0a] overflow-hidden">
+        {/* Background texture */}
+        <div className="absolute inset-0 opacity-[0.02]" style={{
+          backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(219,180,98,1) 1px, transparent 0)',
+          backgroundSize: '32px 32px'
+        }} />
+
+        <div className="container mx-auto max-w-7xl px-6 lg:px-16 py-24 lg:py-40 relative z-10">
+          {/* Header */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16 lg:mb-24">
             <div>
-              <span className="font-teko text-[18px] font-medium tracking-[0.2em] text-[#dbb462] block mb-2 uppercase">Why Compete With Us</span>
-              <h2 className="font-bebas text-7xl md:text-9xl tracking-tight mb-10 leading-[0.85] uppercase">
-                PROFESSIONAL<br />
-                <span className="zenith-gradient-text pr-2">TOURNAMENT QUALITY</span>
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-8 h-[2px] bg-[#dbb462]" />
+                <span className="font-teko text-[16px] tracking-[0.25em] text-[#dbb462] uppercase font-medium">Why Compete With Us</span>
+              </div>
+              <h2 className="font-bebas text-6xl md:text-8xl lg:text-[9rem] tracking-tight leading-[0.82] uppercase">
+                <span className="text-[#f2f2f2]">PROFESSIONAL</span><br />
+                <span className="zenith-gradient-text">TOURNAMENT QUALITY</span>
               </h2>
-              <p className="font-body text-[#d1c5b3] opacity-40 leading-relaxed text-xl mb-12 max-w-xl">
+            </div>
+            <div className="flex items-end lg:justify-end">
+              <p className="font-rajdhani text-[#d1c5b3] opacity-40 leading-relaxed text-lg max-w-md font-medium">
                 We focus on technical excellence and competitive fairness. Every tournament is run with strict rules to ensure the best experience for every team.
               </p>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                {[
-                  { title: 'Strict Integrity', desc: 'No shortcuts. We manually verify every player and character ID to ensure a fair battlefield for everyone.' },
-                  { title: 'High-End Broadcast', desc: 'Watch your matches with professional production. We use high-fidelity streams to showcase your gameplay.' },
-                  { title: 'Technical Brackets', desc: 'No manual bias. Our system handles group distribution and brackets automatically using tournament-grade logic.' },
-                  { title: 'Fast Settlements', desc: 'We value your time. Prize distributions are handled quickly once results are verified and finalized.' },
-                ].map(({ title, desc }) => (
-                  <div key={title} className="group">
-                    <h4 className="font-bebas text-3xl tracking-tight text-[#f2f2f2] mb-3 group-hover:text-[#dbb462] transition-colors uppercase">{title}</h4>
-                    <p className="font-body text-base text-[#d1c5b3] opacity-40 group-hover:opacity-100 transition-opacity leading-relaxed">{desc}</p>
-                  </div>
-                ))}
-              </div>
             </div>
+          </div>
 
-            <div className="relative group">
-              <div className="relative aspect-square bg-[#0e0e0e] border border-white/5 flex items-center justify-center p-20 overflow-hidden">
-                 <div className="absolute inset-0 bg-[#dbb462]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
-                <img
-                  src="/logo.png"
-                  alt="Zenith"
-                  className="w-full h-full object-contain filter grayscale transition-all duration-1000 group-hover:grayscale-0 group-hover:scale-105"
-                />
+          {/* Feature Grid — 4 Pillars */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-[1px] bg-white/[0.04]">
+            {[
+              { icon: Shield, num: '01', title: 'STRICT INTEGRITY', desc: 'No shortcuts. We manually verify every player and character ID to ensure a fair battlefield for everyone.' },
+              { icon: Tv, num: '02', title: 'HIGH-END BROADCAST', desc: 'Watch your matches with professional production. We use high-fidelity streams to showcase your gameplay.' },
+              { icon: GitBranch, num: '03', title: 'TECHNICAL BRACKETS', desc: 'No manual bias. Our system handles group distribution and brackets automatically using tournament-grade logic.' },
+              { icon: Banknote, num: '04', title: 'FAST SETTLEMENTS', desc: 'We value your time. Prize distributions are handled quickly once results are verified and finalized.' },
+            ].map(({ icon: Icon, num, title, desc }) => (
+              <div 
+                key={num} 
+                className="bg-[#0e0e0e] p-8 lg:p-10 group hover:bg-[#111] transition-all duration-500 relative overflow-hidden"
+              >
+                {/* Gold top edge on hover */}
+                <div className="absolute top-0 left-0 w-full h-[2px] bg-[#dbb462] scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
+                
+                {/* Number watermark */}
+                <span className="absolute top-4 right-6 font-bebas text-[80px] text-white/[0.03] leading-none select-none group-hover:text-[#dbb462]/[0.06] transition-colors duration-500">{num}</span>
+                
+                <div className="relative z-10">
+                  <Icon size={28} className="text-[#dbb462] mb-6 opacity-60 group-hover:opacity-100 transition-opacity" strokeWidth={1.5} />
+                  <h4 className="font-bebas text-3xl tracking-tight text-[#f2f2f2] mb-4 group-hover:text-[#dbb462] transition-colors uppercase">{title}</h4>
+                  <p className="font-rajdhani text-[15px] text-[#d1c5b3] opacity-40 group-hover:opacity-70 transition-opacity leading-relaxed font-medium">{desc}</p>
+                </div>
               </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════
+          CTA BANNER — Final Push 
+          ═══════════════════════════════════════════ */}
+      <section className="relative bg-[#0e0e0e] border-t border-b border-white/[0.04] overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-[#dbb462]/[0.03] via-transparent to-transparent" />
+        
+        <div className="container mx-auto max-w-7xl px-6 lg:px-16 py-20 lg:py-28 relative z-10">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-10">
+            <div>
+              <h3 className="font-bebas text-5xl md:text-7xl tracking-tight uppercase leading-[0.85] mb-4">
+                READY TO <span className="zenith-gradient-text">COMPETE?</span>
+              </h3>
+              <p className="font-rajdhani text-[#d1c5b3] opacity-40 text-lg max-w-lg font-medium">
+                Register your squad, gear up, and join Pakistan's most competitive PUBG Mobile circuit today.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-4">
+              <Link 
+                to={user ? "/tournaments" : "/auth"} 
+                className="btn-obsidian-primary font-bebas text-[24px] px-12 py-6 tracking-[0.2em] inline-flex items-center gap-4 uppercase"
+              >
+                {user ? 'VIEW TOURNAMENTS' : 'GET STARTED'} <ArrowRight size={24} strokeWidth={2.5} />
+              </Link>
             </div>
           </div>
         </div>
@@ -265,11 +463,28 @@ export default function LandingPage() {
   );
 }
 
+/* ── Floating Stat Block (Hero) ── */
+function FloatingStat({ label, value, accent, delay = 0 }) {
+  return (
+    <div 
+      className="bg-[#0e0e0e]/80 backdrop-blur-sm border border-white/[0.05] p-5 flex justify-between items-center hover:border-[#dbb462]/20 transition-all duration-300 group"
+      style={{ animationDelay: `${delay}ms` }}
+    >
+      <span className="font-teko text-[14px] tracking-[0.2em] text-[#d1c5b3] opacity-50 uppercase group-hover:text-[#dbb462] group-hover:opacity-80 transition-all">{label}</span>
+      <span className={`font-bebas text-3xl tracking-tight leading-none ${accent ? 'text-emerald-400' : 'text-[#f2f2f2]'}`}>
+        {accent && <span className="inline-block w-2.5 h-2.5 bg-emerald-400 mr-3 animate-pulse shadow-[0_0_12px_rgba(52,211,153,0.5)]" />}
+        {value}
+      </span>
+    </div>
+  );
+}
+
+/* ── Metric Box (Tournament) ── */
 function MetricBox({ label, value, gold }) {
   return (
-    <div className="bg-[#1b1b1b] border border-white/5 p-5 group hover:border-[#dbb462]/30 transition-all">
-      <p className="font-body text-[10px] tracking-wider text-[#d1c5b3] opacity-60 mb-2 uppercase">{label}</p>
-      <p className={`font-agency text-xl font-bold leading-none ${gold ? 'text-[#dbb462]' : 'text-[#f2f2f2]'}`}>
+    <div className="bg-[#0e0e0e] p-5 group hover:bg-[#141414] transition-all duration-300">
+      <p className="font-teko text-[11px] tracking-[0.2em] text-[#d1c5b3] opacity-40 mb-2 uppercase">{label}</p>
+      <p className={`font-bebas text-2xl leading-none tracking-tight ${gold ? 'text-[#dbb462]' : 'text-[#f2f2f2]'}`}>
         {value}
       </p>
     </div>

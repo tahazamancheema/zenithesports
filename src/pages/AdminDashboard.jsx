@@ -2,11 +2,12 @@ import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Download, Users, CheckCircle2, XCircle, Split,
-  Plus, Edit2, Trash2, BarChart3, Settings,
+  Plus, Edit2, Trash2, BarChart3,
   Eye, X, ToggleLeft, ToggleRight, Clock, Calendar,
-  FileText, Map, ListOrdered, Search, RefreshCw,
+  FileText, Map, ListOrdered, Search, RefreshCw, Trophy, TrendingUp,
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
+import { supabase } from '../supabase/config';
 import { useSupabaseDB } from '../hooks/useSupabaseDB';
 import { useTournaments } from '../hooks/useTournaments';
 import { partitionTeamsIntoGroups, assignGroupsToSupabase } from '../utils/groupPartitioner';
@@ -93,7 +94,6 @@ export default function AdminDashboard() {
           <nav className="flex-1 space-y-1">
             {[
               { id: 'tournaments', icon: BarChart3, label: 'Tournaments' },
-              { id: 'settings',    icon: Settings,  label: 'Settings'    },
             ].map(({ id, icon: Icon, label }) => (
               <button
                 key={id}
@@ -127,7 +127,7 @@ export default function AdminDashboard() {
 
         {/* ── Main ── */}
         <main className="flex-1 p-8 lg:p-12 overflow-auto">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
             <div>
               <h1 className="font-agency text-5xl md:text-6xl font-black italic tracking-tighter uppercase">
                 ZENITH ADMIN
@@ -143,6 +143,14 @@ export default function AdminDashboard() {
             </div>
           </div>
 
+          {/* ── Quick Stats Overview ── */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-[1px] bg-[rgba(78,70,56,0.15)] mb-10">
+            <QuickStatCard icon={Trophy} label="TOURNAMENTS" value={tournaments.length} />
+            <QuickStatCard icon={Users} label="TOTAL REGISTRATIONS" value={registrations.length} />
+            <QuickStatCard icon={Clock} label="PENDING APPROVAL" value={registrations.filter(r => r.status === 'pending').length} highlight />
+            <QuickStatCard icon={CheckCircle2} label="APPROVED TEAMS" value={registrations.filter(r => r.status === 'approved').length} />
+          </div>
+
           {activeTab === 'tournaments' && (
             <TournamentsTab
               tournaments={tournaments}
@@ -153,8 +161,6 @@ export default function AdminDashboard() {
                 
                 const toastId = toast.loading('Initiating tactical deletion...');
                 try {
-                  // Manually delete dependent registrations first to satisfy foreign key constraints
-                  // if ON DELETE CASCADE is not set in the DB.
                   const { error: regErr } = await supabase
                     .from('registrations')
                     .delete()
@@ -162,7 +168,6 @@ export default function AdminDashboard() {
                   
                   if (regErr) throw regErr;
                   
-                  // Now delete the tournament
                   await removeTournament(t.id);
                   toast.success('Tournament and all data purged successfully.', { id: toastId });
                 } catch (err) {
@@ -175,8 +180,6 @@ export default function AdminDashboard() {
               onExport={handleExport}
             />
           )}
-
-          {activeTab === 'settings' && <SettingsTab user={user} />}
         </main>
       </div>
 
@@ -299,25 +302,42 @@ function TournamentsTab({ tournaments, registrations, onEdit, onDelete, onViewRe
           const regCount = registrations.filter(
             (r) => r.tournament_id === t.id && r.status !== 'rejected'
           ).length;
+          const approvedCount = registrations.filter(
+            (r) => r.tournament_id === t.id && r.status === 'approved'
+          ).length;
           const pendingCount = registrations.filter(
             (r) => r.tournament_id === t.id && r.status === 'pending'
           ).length;
+          const capacityPct = t.max_teams ? Math.min((approvedCount / t.max_teams) * 100, 100) : 0;
+          const prizeFormatted = t.prize_pool ? `PKR ${Number(t.prize_pool).toLocaleString('en-PK')}` : null;
 
           return (
             <div
               key={t.id}
-              className="bg-[#1b1b1b] border border-[rgba(78,70,56,0.2)] hover:border-[rgba(78,70,56,0.4)] transition-colors"
+              className="bg-[#1b1b1b] border border-[rgba(78,70,56,0.2)] hover:border-[rgba(78,70,56,0.4)] transition-colors overflow-hidden"
             >
               {/* Header Row */}
               <div className="flex flex-col md:flex-row md:items-center justify-between p-5 md:p-6 border-b border-[rgba(78,70,56,0.1)] gap-4">
                 <div className="flex flex-row items-center gap-4 md:gap-6">
-                  <div className="shrink-0">
-                    <StatusBadge status={t.status} />
+                  {/* Poster thumbnail */}
+                  <div className="w-14 h-14 bg-[#0e0e0e] border border-[rgba(78,70,56,0.2)] flex-shrink-0 overflow-hidden">
+                    {t.poster_url ? (
+                      <img src={t.poster_url} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <Trophy size={20} className="text-[#f9d07a] opacity-20" />
+                      </div>
+                    )}
                   </div>
                   <div>
-                    <p className="font-agency text-xl md:text-2xl font-bold leading-tight">{t.title}</p>
-                    <p className="font-stretch text-[9px] md:text-[10px] text-[#d1c5b3] opacity-40 tracking-widest mt-1">
-                      {t.game || 'PUBG MOBILE'} &bull; {regCount}/{t.max_teams || 64} TEAMS
+                    <div className="flex items-center gap-3 mb-1">
+                      <p className="font-agency text-xl md:text-2xl font-bold leading-tight">{t.title}</p>
+                      <StatusBadge status={t.status} />
+                    </div>
+                    <p className="font-stretch text-[9px] md:text-[10px] text-[#d1c5b3] opacity-40 tracking-widest">
+                      {t.game || 'PUBG MOBILE'}
+                      {prizeFormatted && <> &bull; {prizeFormatted}</>}
+                      &bull; {approvedCount}/{t.max_teams || '∞'} TEAMS
                       {pendingCount > 0 && (
                         <span className="text-[#f9d07a] ml-2">• {pendingCount} PENDING</span>
                       )}
@@ -342,6 +362,13 @@ function TournamentsTab({ tournaments, registrations, onEdit, onDelete, onViewRe
                 </div>
               </div>
 
+              {/* Capacity bar */}
+              {t.max_teams && (
+                <div className="w-full bg-[#0e0e0e] h-1">
+                  <div className="zenith-gradient h-full transition-all duration-1000" style={{ width: `${capacityPct}%` }} />
+                </div>
+              )}
+
               {/* Action Buttons */}
               <div className="flex flex-wrap gap-0 divide-x divide-[rgba(78,70,56,0.15)]">
                   <ActionBtn
@@ -365,6 +392,18 @@ function TournamentsTab({ tournaments, registrations, onEdit, onDelete, onViewRe
           );
         })
       )}
+    </div>
+  );
+}
+
+function QuickStatCard({ icon: Icon, label, value, highlight }) {
+  return (
+    <div className={`bg-[#1b1b1b] p-5 md:p-6 ${highlight ? 'border-l-2 border-[#f9d07a]' : ''}`}>
+      <div className="flex items-center gap-2 mb-3">
+        <Icon size={14} className={`${highlight ? 'text-[#f9d07a]' : 'text-[#d1c5b3] opacity-40'}`} />
+        <span className="font-stretch text-[8px] tracking-widest text-[#d1c5b3] opacity-50 uppercase">{label}</span>
+      </div>
+      <p className={`font-agency text-3xl md:text-4xl font-bold ${highlight ? 'text-[#f9d07a]' : 'text-white'}`}>{value}</p>
     </div>
   );
 }
@@ -702,73 +741,7 @@ function TournamentGroupsModal({ tournament, registrations, allRegistrations, up
   );
 }
 
-// ─────────────────────────────────────────────────────────────
-// Settings Tab
-// ─────────────────────────────────────────────────────────────
-function SettingsTab({ user }) {
-  return (
-    <div className="max-w-lg space-y-6">
-      {/* Admin Profile */}
-      <div className="bg-[#1f1f1f] p-8">
-        <h3 className="font-stretch text-[10px] tracking-widest text-[#f9d07a] mb-6">ADMIN PROFILE</h3>
-        <div className="space-y-4">
-          <InfoRow label="EMAIL">{user?.email}</InfoRow>
-          <InfoRow label="ROLE"><span className="font-stretch text-[9px] tracking-widest text-[#f9d07a]">ADMINISTRATOR</span></InfoRow>
-          <InfoRow label="USER ID" mono>{user?.id}</InfoRow>
-        </div>
-      </div>
 
-      {/* Database */}
-      <div className="bg-[#1f1f1f] p-8">
-        <h3 className="font-stretch text-[10px] tracking-widest text-[#f9d07a] mb-4">DATABASE SETUP</h3>
-        <p className="text-[#d1c5b3] opacity-50 text-xs leading-relaxed mb-4">
-          Run this SQL in your Supabase SQL Editor to enable all features (auto-status, config, proofing):
-        </p>
-        <pre className="bg-[#0e0e0e] border border-[rgba(78,70,56,0.3)] p-4 text-[10px] text-[#f9d07a] overflow-x-auto leading-relaxed font-mono whitespace-pre-wrap">
-{`ALTER TABLE public.tournaments
-  ADD COLUMN IF NOT EXISTS registration_config jsonb DEFAULT '{"screenshots": []}',
-  ADD COLUMN IF NOT EXISTS briefing text,
-  ADD COLUMN IF NOT EXISTS schedule jsonb DEFAULT '[]',
-  ADD COLUMN IF NOT EXISTS roadmap jsonb DEFAULT '[]';
-
-ALTER TABLE public.registrations 
-  ADD COLUMN IF NOT EXISTS screenshot_urls text[] DEFAULT '{}',
-  ADD COLUMN IF NOT EXISTS real_name TEXT;
-
--- Allows public realtime stats to fetch total users securely
-create or replace function public.get_total_users()
-returns integer
-language sql
-security definer
-as $$
-  select count(*)::integer from public.users;
-$$;`}
-        </pre>
-      </div>
-
-      {/* Supabase RLS */}
-      <div className="bg-[#1f1f1f] p-8">
-        <h3 className="font-stretch text-[10px] tracking-widest text-[#f9d07a] mb-4">SECURITY REMINDER</h3>
-        <p className="text-[#d1c5b3] opacity-50 text-xs leading-relaxed">
-          Ensure Supabase Row Level Security (RLS) is enabled on all tables. Check&nbsp;
-          <span className="text-[#dbb462]">Supabase Dashboard → Table Editor → RLS</span> to verify policies are active.
-          Only admins should be able to INSERT/UPDATE/DELETE tournaments and UPDATE registrations.
-        </p>
-      </div>
-    </div>
-  );
-}
-
-function InfoRow({ label, children, mono }) {
-  return (
-    <div className="flex justify-between py-3 border-b border-[rgba(78,70,56,0.15)] last:border-0">
-      <span className="font-stretch text-[9px] tracking-widest text-[#d1c5b3] opacity-50">{label}</span>
-      <span className={`${mono ? 'font-mono text-xs text-[#d1c5b3] opacity-40 truncate max-w-[200px]' : 'font-body text-sm text-[#e2e2e2]'}`}>
-        {children}
-      </span>
-    </div>
-  );
-}
 
 // ─────────────────────────────────────────────────────────────
 // Tournament Create/Edit Modal

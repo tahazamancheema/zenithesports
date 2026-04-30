@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ChevronLeft, Trophy, Users, Clock, Calendar, FileText, Map, ListOrdered, BookOpen, MessageCircle } from 'lucide-react';
+import { ChevronLeft, Trophy, Users, Clock, Calendar, Map, ListOrdered, BookOpen, MessageCircle, ArrowRight, Shield, ChevronRight } from 'lucide-react';
 import { supabase } from '../supabase/config';
 import { computeTournamentStatus } from '../utils/tournamentStatus';
 import { useAuth } from '../hooks/useAuth';
@@ -12,7 +12,7 @@ const TABS = [
   { id: 'overview',  label: 'OVERVIEW',  icon: BookOpen },
   { id: 'schedule',  label: 'SCHEDULE',  icon: ListOrdered },
   { id: 'roadmap',   label: 'ROADMAP',   icon: Map },
-  { id: 'teams',     label: 'TEAMS',    icon: Users },
+  { id: 'teams',     label: 'TEAMS',     icon: Users },
 ];
 
 export default function TournamentDetailsPage() {
@@ -47,12 +47,7 @@ export default function TournamentDetailsPage() {
       }
     }
     loadData();
-
-    // Safety timeout to prevent stuck loading
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 5000);
-
+    const timer = setTimeout(() => setLoading(false), 5000);
     return () => clearTimeout(timer);
   }, [id]);
 
@@ -72,22 +67,21 @@ export default function TournamentDetailsPage() {
 
   if (!tournament) {
     return (
-      <div className="min-h-screen pt-32 pb-20 px-6 flex flex-col items-center justify-center text-center">
-        <h1 className="font-agency text-3xl md:text-5xl font-bold mb-4">TOURNAMENT NOT FOUND</h1>
-        <Link to="/tournaments" className="font-stretch text-[10px] text-[#dbb462] hover:underline uppercase tracking-widest">
+      <div className="min-h-screen pt-32 pb-20 px-6 flex flex-col items-center justify-center text-center bg-[#0a0a0a]">
+        <Trophy className="text-[#dbb462] opacity-[0.06] mb-8" size={80} />
+        <h1 className="font-bebas text-5xl mb-4 uppercase">TOURNAMENT NOT FOUND</h1>
+        <Link to="/tournaments" className="font-teko text-[16px] text-[#dbb462] hover:underline uppercase tracking-[0.2em]">
           RETURN TO DIRECTORY
         </Link>
       </div>
     );
   }
 
-  // Apply computed status
   let currentStatus = computeTournamentStatus(tournament);
   if (currentStatus === 'active' && phase === 'closed') currentStatus = 'closed';
   const t = { ...tournament, status: currentStatus };
   const { title, description, briefing, game, max_teams, prize_pool, status, start_date, registration_deadline, registration_open_date, poster_url } = t;
 
-  // Parse schedule / roadmap (may come back as array from JSONB or string)
   const parseJSON = (val) => {
     if (!val) return [];
     if (Array.isArray(val)) return val;
@@ -99,11 +93,9 @@ export default function TournamentDetailsPage() {
   const approvedCount = registrations.filter(r => r.status === 'approved').length;
   const totalCount    = registrations.length;
   const isUserRegistered = user && registrations.some(r => r.user_id === user.id);
+  const isOpen = status === 'active' && phase === 'closing' && (!max_teams || totalCount < max_teams);
+  const capacityPct = max_teams ? Math.min((approvedCount / max_teams) * 100, 100) : 100;
 
-  // Use total non-rejected count to determine if registrations should actually stop
-  const isOpen   = status === 'active' && phase === 'closing' && (!max_teams || totalCount < max_teams);
-
-  // Filter available tabs
   const visibleTabs = TABS.filter((tab) => {
     if (tab.id === 'schedule') return schedule.length > 0;
     if (tab.id === 'roadmap')  return roadmap.length > 0;
@@ -111,130 +103,130 @@ export default function TournamentDetailsPage() {
   });
 
   const statusConfig = {
-    active:      { label: 'REGISTRATIONS OPEN', cls: 'text-emerald-400 border-emerald-500/40' },
-    in_progress: { label: 'IN PROGRESS',        cls: 'text-[#dbb462] border-[#dbb462]/40' },
-    upcoming:    { label: 'UPCOMING',           cls: 'text-[#f9d07a] border-[#f9d07a]/30' },
-    closed:      { label: 'REGISTRATIONS CLOSED', cls: 'text-red-400 border-red-500/30' },
-    completed:   { label: 'COMPLETED',          cls: 'text-[#9a8f7f] border-[rgba(78,70,56,0.3)]' },
+    active:      { label: 'REGISTRATIONS OPEN',   cls: 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10', dot: 'bg-emerald-400' },
+    in_progress: { label: 'IN PROGRESS',          cls: 'text-[#dbb462] border-[#dbb462]/30 bg-[#dbb462]/10',      dot: 'bg-[#dbb462]' },
+    upcoming:    { label: 'UPCOMING',             cls: 'text-[#f9d07a] border-[#f9d07a]/30 bg-[#f9d07a]/10',      dot: 'bg-[#f9d07a]' },
+    closed:      { label: 'REGISTRATIONS CLOSED', cls: 'text-red-400 border-red-500/30 bg-red-500/10',             dot: 'bg-red-400' },
+    completed:   { label: 'COMPLETED',            cls: 'text-[#9a8f7f] border-[#9a8f7f]/30 bg-[#9a8f7f]/10',      dot: 'bg-[#9a8f7f]' },
   };
   const sPill = statusConfig[status] || statusConfig.upcoming;
+
+  const prizeFormatted = prize_pool ? `PKR ${Number(prize_pool).toLocaleString('en-PK')}` : 'TBA';
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] pt-20 md:pt-24 pb-20">
 
-      {/* ── Hero Banner ── */}
-      <div className="w-full h-96 md:h-[500px] lg:h-[600px] relative border-b border-white/5 overflow-hidden">
-        {poster_url ? (
-          <img src={poster_url} alt="Poster" className="w-full h-full object-cover grayscale-[0.2] hover:grayscale-0 transition-all duration-[3s]" />
-        ) : (
-          <div className="w-full h-full bg-[#131313] flex items-center justify-center">
-            <Trophy className="text-[#dbb462] opacity-10" size={120} />
-          </div>
-        )}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/60 to-transparent" />
+      {/* ═══ Hero Banner ═══ */}
+      <div className="w-full relative border-b border-white/[0.04] overflow-hidden">
+        {/* Poster BG */}
+        <div className="absolute inset-0">
+          {poster_url ? (
+            <img src={poster_url} alt="" className="w-full h-full object-cover scale-105" />
+          ) : (
+            <div className="w-full h-full bg-[#0e0e0e]" />
+          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/80 to-[#0a0a0a]/40" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/60 to-transparent" />
+        </div>
 
-        <div className="absolute bottom-0 left-0 w-full p-8 lg:p-20 max-w-7xl mx-auto z-10">
+        <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-16 py-16 md:py-24 lg:py-32">
+          {/* Breadcrumb */}
           <Link
             to="/tournaments"
-            className="inline-flex items-center text-[#d1c5b3] opacity-60 hover:opacity-100 hover:text-[#dbb462] transition-all mb-4 md:mb-8 font-teko text-[14px] md:text-[18px] tracking-widest uppercase"
+            className="inline-flex items-center gap-2 text-[#d1c5b3] opacity-50 hover:opacity-100 hover:text-[#dbb462] transition-all mb-8 font-teko text-[16px] tracking-[0.2em] uppercase"
           >
-            <ChevronLeft size={16} className="mr-2" />
-            Back to Directory
+            <ChevronLeft size={16} /> Back to Tournaments
           </Link>
-          <div className="flex flex-wrap gap-4 items-center mb-6">
-            <span className="font-teko text-[16px] tracking-widest text-[#dbb462] uppercase bg-[#dbb462]/10 px-4 py-1.5 border border-[#dbb462]/30">
+
+          {/* Badges */}
+          <div className="flex flex-wrap gap-3 items-center mb-6">
+            <span className="font-teko text-[14px] tracking-[0.2em] text-[#dbb462] uppercase bg-[#dbb462]/10 px-4 py-1.5 border border-[#dbb462]/20">
               {game || 'PUBG MOBILE'}
             </span>
-            <span className={`font-teko text-[16px] tracking-widest uppercase border px-4 py-1.5 ${sPill.cls}`}>
+            <span className={`flex items-center gap-2 font-teko text-[14px] tracking-[0.2em] uppercase border px-4 py-1.5 ${sPill.cls}`}>
+              <span className={`w-1.5 h-1.5 ${sPill.dot} ${status === 'active' ? 'animate-pulse' : ''}`} />
               {sPill.label}
             </span>
           </div>
-          <h1 className="font-bebas text-5xl md:text-9xl lg:text-[140px] uppercase leading-[0.9] md:leading-[0.8] tracking-tight mb-4 zenith-gradient-text pr-2">
+
+          {/* Title */}
+          <h1 className="font-bebas text-5xl md:text-8xl lg:text-[10rem] uppercase leading-[0.82] tracking-tight mb-8 zenith-gradient-text pr-2">
             {title}
           </h1>
+
+          {/* Quick stats row */}
+          <div className="flex flex-wrap gap-[1px] bg-white/[0.04] max-w-3xl">
+            <QuickStat label="PRIZE POOL" value={prizeFormatted} gold />
+            <QuickStat label="TEAMS" value={max_teams ? `${approvedCount}/${max_teams}` : `${approvedCount}`} />
+            <QuickStat label="STARTS" value={start_date ? new Date(start_date).toLocaleDateString('en-PK', { day: 'numeric', month: 'short' }) : 'TBA'} />
+            <QuickStat label="DEADLINE" value={registration_deadline ? new Date(registration_deadline).toLocaleDateString('en-PK', { day: 'numeric', month: 'short' }) : 'TBA'} />
+          </div>
         </div>
       </div>
 
-      {/* ── Tab Bar ── */}
-      <div className="border-b border-white/5 bg-[#0e0e0e]/80 backdrop-blur-xl sticky top-16 md:top-20 z-30">
-        <div className="max-w-7xl mx-auto px-6 lg:px-20 flex gap-4 overflow-x-auto no-scrollbar">
+      {/* ═══ Tab Bar ═══ */}
+      <div className="sticky top-16 md:top-20 z-30 bg-[#0a0a0a]/95 backdrop-blur-xl border-b border-white/[0.04]">
+        <div className="max-w-7xl mx-auto px-6 lg:px-16 flex gap-0 overflow-x-auto no-scrollbar">
           {visibleTabs.map(({ id: tabId, label, icon: Icon }) => (
             <button
               key={tabId}
               onClick={() => {
                 setActiveTab(tabId);
-                const el = document.getElementById('details-content');
-                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                document.getElementById('details-content')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
               }}
               className={`
-                flex items-center gap-3 font-teko text-[20px] tracking-widest px-8 py-5 whitespace-nowrap border-b-2 transition-all duration-300
+                flex items-center gap-3 font-teko text-[18px] tracking-[0.15em] px-6 md:px-8 py-5 whitespace-nowrap border-b-2 transition-all duration-300 uppercase
                 ${activeTab === tabId
                   ? 'text-[#dbb462] border-[#dbb462]'
-                  : 'text-[#d1c5b3] opacity-30 border-transparent hover:opacity-100'
+                  : 'text-[#d1c5b3] opacity-25 border-transparent hover:opacity-80'
                 }
               `}
             >
-              <Icon size={18} />
+              <Icon size={16} />
               {label}
             </button>
           ))}
         </div>
       </div>
 
-      {/* ── Tab Content ── */}
-      <div id="details-content" className="max-w-7xl mx-auto px-6 lg:px-20 py-16 scroll-mt-40 grid grid-cols-1 lg:grid-cols-3 gap-16">
+      {/* ═══ Content Area ═══ */}
+      <div id="details-content" className="max-w-7xl mx-auto px-6 lg:px-16 py-16 scroll-mt-40 grid grid-cols-1 lg:grid-cols-3 gap-12 lg:gap-16">
 
-        {/* Left: Main Details */}
-        <div className="lg:col-span-2 order-2 lg:order-1 space-y-20">
+        {/* ── Left: Tab Content ── */}
+        <div className="lg:col-span-2 order-2 lg:order-1 space-y-16">
 
           {/* OVERVIEW */}
           {activeTab === 'overview' && (
-            <section className="animate-in fade-in slide-in-from-bottom-4 duration-700">
-                <div className="flex items-center gap-4 mb-10">
-                  <div className="w-10 h-[2px] bg-[#dbb462]" />
-                  <h2 className="font-bebas text-5xl text-[#dbb462]">TOURNAMENT OVERVIEW</h2>
-                </div>
-                <div className="bg-[#111] border border-white/5 p-10 md:p-16">
-                  <p className="font-body text-[#d1c5b3] leading-[1.8] opacity-80 whitespace-pre-wrap text-lg">
-                    {briefing || description || 'No official briefing provided for this tournament.'}
-                  </p>
-                </div>
+            <section key="overview" style={{ animation: 'fadeIn 0.4s ease-out both' }}>
+              <SectionHeader title="TOURNAMENT OVERVIEW" />
+              <div className="bg-[#0e0e0e] border border-white/[0.06] p-8 md:p-12">
+                <p className="font-body text-[#d1c5b3] leading-[1.8] opacity-70 whitespace-pre-wrap text-lg">
+                  {briefing || description || 'No official briefing provided for this tournament.'}
+                </p>
+              </div>
             </section>
           )}
 
           {/* SCHEDULE */}
           {activeTab === 'schedule' && (
-            <section className="animate-in fade-in slide-in-from-bottom-4 duration-700">
-               <div className="flex items-center gap-4 mb-12">
-                  <div className="w-10 h-[2px] bg-[#dbb462]" />
-                  <h2 className="font-bebas text-5xl text-[#dbb462]">EVENT SCHEDULE</h2>
-                </div>
+            <section key="schedule" style={{ animation: 'fadeIn 0.4s ease-out both' }}>
+              <SectionHeader title="EVENT SCHEDULE" />
               {schedule.length === 0 ? (
-                <p className="font-teko text-[20px] text-white/20 tracking-widest uppercase">
-                  Schedule pending publication.
-                </p>
+                <p className="font-teko text-[18px] text-white/20 tracking-[0.2em] uppercase">Schedule pending publication.</p>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-[1px] bg-white/[0.04]">
                   {schedule.map((row, i) => (
-                    <div
-                      key={i}
-                      className="flex items-center gap-8 bg-[#111] border border-white/5 px-8 py-6 group hover:border-[#dbb462]/30 transition-all duration-300"
-                    >
-                      <span className="font-bebas text-4xl text-[#dbb462] opacity-20 w-12 flex-shrink-0 group-hover:opacity-40 transition-opacity">
+                    <div key={i} className="bg-[#0e0e0e] flex items-center gap-6 md:gap-8 px-6 md:px-8 py-6 group hover:bg-[#111] transition-all duration-300 relative overflow-hidden">
+                      <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#dbb462] scale-y-0 group-hover:scale-y-100 transition-transform duration-300 origin-top" />
+                      <span className="font-bebas text-3xl text-[#dbb462] opacity-20 w-10 flex-shrink-0 group-hover:opacity-50 transition-opacity">
                         {String(i + 1).padStart(2, '0')}
                       </span>
-                      <div className="flex-shrink-0 text-center min-w-[100px]">
-                        {row.date && (
-                          <p className="font-bebas text-3xl text-white">
-                            {new Date(row.date).toLocaleDateString('en-PK', { day: 'numeric', month: 'short' })}
-                          </p>
-                        )}
-                        {row.time && (
-                          <p className="font-teko text-[14px] text-[#dbb462] tracking-widest uppercase opacity-60">{row.time}</p>
-                        )}
+                      <div className="flex-shrink-0 text-center min-w-[80px]">
+                        {row.date && <p className="font-bebas text-2xl text-white">{new Date(row.date).toLocaleDateString('en-PK', { day: 'numeric', month: 'short' })}</p>}
+                        {row.time && <p className="font-teko text-[13px] text-[#dbb462] tracking-[0.15em] uppercase opacity-60">{row.time}</p>}
                       </div>
-                      <div className="w-px h-12 bg-white/5 flex-shrink-0" />
-                      <p className="font-bebas text-3xl tracking-tight flex-1 text-white/90 group-hover:text-white transition-colors">{row.event}</p>
+                      <div className="w-px h-10 bg-white/[0.06] flex-shrink-0" />
+                      <p className="font-bebas text-2xl md:text-3xl tracking-tight flex-1 text-white/80 group-hover:text-white transition-colors">{row.event}</p>
                     </div>
                   ))}
                 </div>
@@ -244,32 +236,27 @@ export default function TournamentDetailsPage() {
 
           {/* ROADMAP */}
           {activeTab === 'roadmap' && (
-            <section className="animate-in fade-in slide-in-from-bottom-4 duration-700">
-               <div className="flex items-center gap-4 mb-12">
-                  <div className="w-10 h-[2px] bg-[#dbb462]" />
-                  <h2 className="font-bebas text-5xl text-[#dbb462]">TOURNAMENT ROADMAP</h2>
-                </div>
+            <section key="roadmap" style={{ animation: 'fadeIn 0.4s ease-out both' }}>
+              <SectionHeader title="TOURNAMENT ROADMAP" />
               {roadmap.length === 0 ? (
-                 <p className="font-teko text-[20px] text-white/20 tracking-widest uppercase">
-                  Roadmap pending publication.
-                </p>
+                <p className="font-teko text-[18px] text-white/20 tracking-[0.2em] uppercase">Roadmap pending publication.</p>
               ) : (
                 <div className="space-y-0 pl-4">
-                  {roadmap.map((phase, i) => (
+                  {roadmap.map((p, i) => (
                     <div key={i} className="flex gap-8 group">
                       <div className="flex flex-col items-center flex-shrink-0">
-                        <div className="w-4 h-4 rounded-full zenith-gradient shadow-[0_0_15px_rgba(219,180,98,0.5)] flex-shrink-0 mt-2" />
+                        <div className="w-4 h-4 zenith-gradient shadow-[0_0_15px_rgba(219,180,98,0.4)] flex-shrink-0 mt-2" />
                         {i < roadmap.length - 1 && (
                           <div className="w-[1px] flex-1 bg-gradient-to-b from-[#dbb462]/30 to-white/5 mt-2 mb-2 min-h-[80px]" />
                         )}
                       </div>
-                      <div className="pb-16 group-last:pb-0">
-                        <span className="font-teko text-[14px] tracking-widest text-[#dbb462] block mb-2 uppercase opacity-60">
-                           STAGE {i + 1} &bull; {phase.phase?.toUpperCase()}
+                      <div className="pb-14 group-last:pb-0">
+                        <span className="font-teko text-[13px] tracking-[0.2em] text-[#dbb462] block mb-2 uppercase opacity-60">
+                          STAGE {i + 1} &bull; {p.phase?.toUpperCase()}
                         </span>
-                        <h3 className="font-bebas text-4xl mb-4 text-white group-hover:text-[#dbb462] transition-colors uppercase">{phase.title}</h3>
-                        {phase.description && (
-                          <p className="font-body text-[#d1c5b3] opacity-50 text-lg leading-relaxed max-w-xl group-hover:opacity-80 transition-opacity">{phase.description}</p>
+                        <h3 className="font-bebas text-3xl md:text-4xl mb-3 text-white group-hover:text-[#dbb462] transition-colors uppercase">{p.title}</h3>
+                        {p.description && (
+                          <p className="font-body text-[#d1c5b3] opacity-40 text-base leading-relaxed max-w-xl group-hover:opacity-70 transition-opacity">{p.description}</p>
                         )}
                       </div>
                     </div>
@@ -281,41 +268,30 @@ export default function TournamentDetailsPage() {
 
           {/* TEAMS */}
           {activeTab === 'teams' && (
-            <section className="animate-in fade-in slide-in-from-bottom-4 duration-700">
-               <div className="flex items-center gap-4 mb-12">
-                  <div className="w-10 h-[2px] bg-[#dbb462]" />
-                  <h2 className="font-bebas text-5xl text-[#dbb462]">REGISTERED TEAMS</h2>
-                </div>
+            <section key="teams" style={{ animation: 'fadeIn 0.4s ease-out both' }}>
+              <SectionHeader title="REGISTERED TEAMS" count={registrations.length} />
               {registrations.length === 0 ? (
-                <p className="font-teko text-[20px] text-white/20 tracking-widest uppercase">
-                  No teams registered for deployment.
-                </p>
+                <p className="font-teko text-[18px] text-white/20 tracking-[0.2em] uppercase">No teams registered yet.</p>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-[1px] bg-white/[0.04]">
                   {registrations.map((r, i) => (
-                    <div
-                      key={r.id}
-                      className="bg-[#111] border border-white/5 p-6 flex items-center gap-6 group hover:border-[#dbb462]/30 transition-all duration-300"
-                    >
-                      <span className="font-bebas text-4xl text-[#dbb462] opacity-10 w-10 flex-shrink-0 group-hover:opacity-30 transition-opacity">
+                    <div key={r.id} className="bg-[#0e0e0e] p-5 flex items-center gap-5 group hover:bg-[#111] transition-all duration-300 relative overflow-hidden">
+                      <div className="absolute top-0 left-0 w-full h-[2px] bg-[#dbb462] scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
+                      <span className="font-bebas text-3xl text-[#dbb462] opacity-10 w-8 flex-shrink-0 group-hover:opacity-30 transition-opacity">
                         {String(i + 1).padStart(2, '0')}
                       </span>
                       {r.logo_url ? (
-                        <img src={r.logo_url} alt="" className="w-12 h-12 object-cover border border-white/5 group-hover:border-[#dbb462]/30 transition-colors" />
+                        <img src={r.logo_url} alt="" className="w-10 h-10 object-cover border border-white/[0.06]" />
                       ) : (
-                        <div className="w-12 h-12 bg-[#1a1a1a] flex items-center justify-center font-bebas text-2xl text-[#dbb462] border border-white/5">
+                        <div className="w-10 h-10 bg-[#1a1a1a] flex items-center justify-center font-bebas text-xl text-[#dbb462] border border-white/[0.06]">
                           {r.team_name?.[0]}
                         </div>
                       )}
                       <div className="min-w-0 flex-1">
-                        <p className="font-bebas text-3xl truncate leading-none mb-1 text-white/90 group-hover:text-white transition-colors uppercase">{r.team_name}</p>
-                        {r.city && (
-                          <p className="font-teko text-[14px] tracking-widest text-[#d1c5b3] opacity-40 uppercase truncate leading-none">{r.city}</p>
-                        )}
+                        <p className="font-bebas text-2xl truncate leading-none mb-1 text-white/80 group-hover:text-white transition-colors uppercase">{r.team_name}</p>
+                        {r.city && <p className="font-teko text-[13px] tracking-[0.15em] text-[#d1c5b3] opacity-30 uppercase truncate leading-none">{r.city}</p>}
                       </div>
-                      <div className="flex-shrink-0">
-                        <StatusBadge status={r.status} />
-                      </div>
+                      <StatusBadge status={r.status} />
                     </div>
                   ))}
                 </div>
@@ -324,113 +300,130 @@ export default function TournamentDetailsPage() {
           )}
         </div>
 
-        {/* Right: Details Panel */}
-        <div className="lg:col-span-1 order-1 lg:order-2 space-y-8">
-          <div className="bg-[#111] border border-white/5 p-10 space-y-12 sticky top-40 relative overflow-hidden">
-             <div className="absolute top-0 right-0 w-32 h-32 bg-[#dbb462]/5 blur-3xl pointer-events-none" />
-            
-            {/* Registration Countdown */}
-            {phase !== 'closed' && (
-              <div className="pb-12 border-b border-white/5">
-                <RegistrationCountdown 
-                  openDate={registration_open_date} 
-                  deadlineDate={registration_deadline} 
-                />
-              </div>
-            )}
+        {/* ── Right: Sidebar ── */}
+        <div className="lg:col-span-1 order-1 lg:order-2">
+          <div className="sticky top-40 space-y-6">
 
-            {phase === 'closed' && (
-               <div className="bg-[#dbb462]/5 border border-[#dbb462]/20 p-8 rounded-sm mb-8">
-                 <div className="flex items-center gap-4 mb-4">
-                   <MessageCircle size={24} className="text-[#dbb462]" />
-                   <h3 className="font-bebas text-3xl text-white uppercase">CLOSED</h3>
-                 </div>
-                 <p className="font-body text-[#d1c5b3] text-sm leading-relaxed opacity-60 mb-8">
-                   Registrations for this tournament are now closed. Please contact us via WhatsApp for any queries.
-                 </p>
-                 <a 
-                   href="https://wa.me/923390715753" 
-                   target="_blank" 
-                   rel="noreferrer"
-                   className="btn-obsidian-ghost w-full py-4 text-[16px] tracking-widest"
-                 >
-                   WHATSAPP SUPPORT
-                 </a>
-               </div>
-            )}
+            {/* Registration CTA Card */}
+            <div className="bg-[#0e0e0e] border border-white/[0.06] relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-[2px] zenith-gradient" />
+              <div className="absolute top-0 right-0 w-40 h-40 bg-[#dbb462]/[0.04] blur-[60px] pointer-events-none" />
 
-            <div className="space-y-10">
-              <h3 className="font-teko text-[18px] text-[#dbb462] tracking-widest uppercase opacity-80 flex items-center gap-4">
-                <div className="w-8 h-[1px] bg-[#dbb462]/40" /> SPECIFICATIONS
-              </h3>
-
-              <div className="space-y-8">
-                <SpecRow icon={Trophy} label="Prize Distribution">
-                  {prize_pool ? `PKR ${Number(prize_pool).toLocaleString('en-PK')}` : 'TBA'}
-                </SpecRow>
-
-                <SpecRow icon={Users} label="No. of Teams">
-                  {max_teams ? `${approvedCount} / ${max_teams} VERIFIED` : `${approvedCount} / UNLIMITED`}
-                </SpecRow>
-
-                {start_date && (
-                  <SpecRow icon={Calendar} label="Matches Start On">
-                    {new Date(start_date).toLocaleDateString('en-PK', { day: 'numeric', month: 'long' })}
-                  </SpecRow>
+              <div className="relative z-10">
+                {/* Countdown / Status Banner */}
+                {phase !== 'closed' && (
+                  <div className="p-6 pb-0">
+                    <RegistrationCountdown openDate={registration_open_date} deadlineDate={registration_deadline} />
+                  </div>
                 )}
 
-                {registration_deadline && (
-                  <SpecRow icon={Clock} label="Registration Deadline">
-                    {new Date(registration_deadline).toLocaleDateString('en-PK', { day: 'numeric', month: 'long' })}
-                  </SpecRow>
+                {phase === 'closed' && (
+                  <div className="p-6 pb-0">
+                    <div className="flex items-center gap-3 mb-3">
+                      <MessageCircle size={18} className="text-[#dbb462]" />
+                      <h3 className="font-bebas text-2xl text-white uppercase">REGISTRATIONS CLOSED</h3>
+                    </div>
+                    <p className="font-body text-[#d1c5b3] text-sm leading-relaxed opacity-50 mb-4">
+                      Registrations are closed. Contact us via WhatsApp for any queries.
+                    </p>
+                    <a href="https://wa.me/923390715753" target="_blank" rel="noreferrer" className="btn-obsidian-ghost w-full py-3 font-bebas text-[16px] tracking-[0.15em]">
+                      WHATSAPP SUPPORT
+                    </a>
+                  </div>
                 )}
-              </div>
 
-              {/* Slot progress */}
-              <div className="pt-4">
-                <div className="flex justify-between mb-4">
-                  <span className="font-teko text-[14px] tracking-widest text-[#d1c5b3] opacity-60 uppercase">
-                    {max_teams ? 'CAPACITY STATUS' : 'REGISTRATION STATUS'}
-                  </span>
-                  {max_teams && (
-                    <span className="font-bebas text-xl text-[#dbb462]">
-                      {Math.round((approvedCount / max_teams) * 100)}%
-                    </span>
-                  )}
-                </div>
-                <div className="w-full bg-white/5 h-1.5 overflow-hidden">
-                  <div
-                    className="zenith-gradient h-full transition-all duration-[2s] ease-out"
-                    style={{ width: max_teams ? `${Math.min((approvedCount / max_teams) * 100, 100)}%` : '100%' }}
-                  />
+                {/* Specs Grid */}
+                <div className="p-6">
+                  <div className="grid grid-cols-2 gap-[1px] bg-white/[0.04] mb-6">
+                    <SpecCell icon={Trophy} label="PRIZE POOL" value={prizeFormatted} gold />
+                    <SpecCell icon={Users} label="TEAMS" value={max_teams ? `${approvedCount}/${max_teams}` : `${approvedCount}/∞`} />
+                    <SpecCell icon={Calendar} label="STARTS" value={start_date ? new Date(start_date).toLocaleDateString('en-PK', { day: 'numeric', month: 'short' }) : 'TBA'} />
+                    <SpecCell icon={Clock} label="DEADLINE" value={registration_deadline ? new Date(registration_deadline).toLocaleDateString('en-PK', { day: 'numeric', month: 'short' }) : 'TBA'} />
+                  </div>
+
+                  {/* Capacity Bar */}
+                  <div className="mb-6">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="font-teko text-[12px] tracking-[0.2em] text-[#d1c5b3] opacity-40 uppercase">
+                        {max_teams ? 'SLOT CAPACITY' : 'REGISTRATIONS'}
+                      </span>
+                      <span className="font-bebas text-xl text-[#dbb462]">
+                        {max_teams ? `${Math.round(capacityPct)}%` : approvedCount}
+                      </span>
+                    </div>
+                    <div className="w-full bg-white/[0.06] h-1.5 relative overflow-hidden">
+                      <div className="zenith-gradient h-full transition-all duration-[2s] ease-out" style={{ width: `${capacityPct}%` }} />
+                    </div>
+                    {max_teams && (
+                      <p className="font-teko text-[11px] tracking-[0.15em] text-[#d1c5b3] opacity-25 uppercase mt-2 text-right">
+                        {max_teams - approvedCount > 0 ? `${max_teams - approvedCount} SLOTS REMAINING` : 'FULL'}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* CTA Buttons */}
+                  <div className="space-y-3">
+                    {/* Show Register button: for logged-in users it goes to register, for logged-out it goes to auth */}
+                    {isOpen && !isUserRegistered && (
+                      <Link
+                        to={user ? `/register/${id}` : '/auth'}
+                        className="btn-obsidian-primary w-full py-5 font-bebas text-[22px] tracking-[0.2em] inline-flex items-center justify-center gap-3 uppercase group/cta"
+                      >
+                        {user ? 'REGISTER TEAM' : 'LOGIN TO REGISTER'} <ArrowRight size={20} className="group-hover/cta:translate-x-1 transition-transform" />
+                      </Link>
+                    )}
+
+                    {/* Also show Register CTA for non-logged-in users when status is active but not phase closing yet */}
+                    {!user && status === 'active' && phase !== 'closing' && phase !== 'closed' && (
+                      <Link
+                        to="/auth"
+                        className="btn-obsidian-primary w-full py-5 font-bebas text-[22px] tracking-[0.2em] inline-flex items-center justify-center gap-3 uppercase group/cta"
+                      >
+                        LOGIN TO REGISTER <ArrowRight size={20} className="group-hover/cta:translate-x-1 transition-transform" />
+                      </Link>
+                    )}
+
+                    {isUserRegistered && (() => {
+                      const userReg = registrations.find(r => r.user_id === user?.id);
+                      const cfg = {
+                        approved: { bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', text: 'text-emerald-400', label: 'APPROVED ✓' },
+                        pending:  { bg: 'bg-[#dbb462]/10',   border: 'border-[#dbb462]/20',   text: 'text-[#dbb462]',   label: 'PENDING REVIEW' },
+                        rejected: { bg: 'bg-red-500/10',     border: 'border-red-500/20',     text: 'text-red-400',     label: 'REJECTED' },
+                      }[userReg?.status] || { bg: 'bg-[#dbb462]/10', border: 'border-[#dbb462]/20', text: 'text-[#dbb462]', label: 'PENDING REVIEW' };
+                      return (
+                        <div className={`w-full py-5 text-center ${cfg.bg} border ${cfg.border} ${cfg.text} font-bebas text-[22px] tracking-[0.15em] uppercase`}>
+                          {cfg.label}
+                        </div>
+                      );
+                    })()}
+
+                    {!isOpen && !isUserRegistered && !user && status !== 'active' && (
+                      <Link
+                        to="/auth"
+                        className="btn-obsidian-ghost w-full py-4 font-bebas text-[20px] tracking-[0.15em] uppercase"
+                      >
+                        LOGIN TO REGISTER
+                      </Link>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Register CTA */}
-            {isOpen && !isUserRegistered && (
-              <Link
-                to={`/register/${id}`}
-                className="btn-obsidian-primary w-full py-5 text-2xl tracking-widest"
-              >
-                REGISTER TEAM →
-              </Link>
-            )}
-
-            {isUserRegistered && (() => {
-              const userReg = registrations.find(r => r.user_id === user?.id);
-              const statusMap = {
-                approved: { bg: 'bg-emerald-500/10', border: 'border-emerald-500/30', text: 'text-emerald-400', label: 'APPROVED & VERIFIED' },
-                pending:  { bg: 'bg-[#dbb462]/10', border: 'border-[#dbb462]/30', text: 'text-[#dbb462]', label: 'PENDING REVIEW' },
-                rejected: { bg: 'bg-red-500/10', border: 'border-red-500/30', text: 'text-red-400', label: 'REJECTED' }
-              };
-              const cfg = statusMap[userReg?.status] || statusMap.pending;
-              return (
-                <div className={`w-full py-5 text-center ${cfg.bg} border ${cfg.border} ${cfg.text} font-bebas text-2xl tracking-widest uppercase`}>
-                  {cfg.label}
-                </div>
-              );
-            })()}
+            {/* Support Card */}
+            <a
+              href="https://wa.me/923390715753"
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center gap-4 bg-[#0e0e0e] border border-white/[0.06] p-5 hover:border-[#dbb462]/20 transition-all group"
+            >
+              <Shield size={20} className="text-[#dbb462] opacity-60 group-hover:opacity-100 transition-opacity" />
+              <div className="flex-1">
+                <p className="font-bebas text-xl text-white group-hover:text-[#dbb462] transition-colors uppercase">Need Help?</p>
+                <p className="font-teko text-[12px] tracking-[0.15em] text-[#d1c5b3] opacity-40 uppercase">Contact Support via WhatsApp</p>
+              </div>
+              <ChevronRight size={16} className="text-[#dbb462] opacity-30 group-hover:opacity-100 transition-opacity" />
+            </a>
           </div>
         </div>
       </div>
@@ -438,14 +431,50 @@ export default function TournamentDetailsPage() {
   );
 }
 
+/* ── Sub-components ── */
+
+function SectionHeader({ title, count }) {
+  return (
+    <div className="flex items-center gap-4 mb-10">
+      <div className="w-8 h-[2px] bg-[#dbb462]" />
+      <h2 className="font-bebas text-4xl md:text-5xl text-[#dbb462] uppercase">{title}</h2>
+      {count !== undefined && (
+        <span className="font-teko text-[14px] tracking-[0.2em] text-[#d1c5b3] opacity-30 uppercase ml-2">{count}</span>
+      )}
+    </div>
+  );
+}
+
+function QuickStat({ label, value, gold }) {
+  return (
+    <div className="bg-[#0e0e0e]/80 backdrop-blur-sm px-6 py-4 flex-1 min-w-[120px]">
+      <span className="font-teko text-[11px] tracking-[0.2em] text-[#d1c5b3] opacity-40 uppercase block mb-1">{label}</span>
+      <span className={`font-bebas text-2xl leading-none ${gold ? 'text-[#dbb462]' : 'text-[#f2f2f2]'}`}>{value}</span>
+    </div>
+  );
+}
+
 function SpecRow({ icon: Icon, label, children }) {
   return (
-    <div className="flex items-start gap-4">
-      <Icon className="text-[#dbb462] flex-shrink-0 mt-0.5" size={18} />
+    <div className="flex items-start gap-4 group">
+      <Icon className="text-[#dbb462] flex-shrink-0 mt-0.5 opacity-50 group-hover:opacity-100 transition-opacity" size={16} />
       <div>
-        <p className="font-teko text-[14px] text-[#d1c5b3] tracking-widest uppercase opacity-60 mb-0.5 leading-none">{label}</p>
-        <p className="font-bebas text-2xl text-white leading-none uppercase">{children}</p>
+        <p className="font-teko text-[12px] text-[#d1c5b3] tracking-[0.15em] uppercase opacity-40 mb-0.5 leading-none">{label}</p>
+        <p className="font-bebas text-xl text-white leading-none uppercase">{children}</p>
       </div>
     </div>
   );
 }
+
+function SpecCell({ icon: Icon, label, value, gold }) {
+  return (
+    <div className="bg-[#0e0e0e] p-4 group hover:bg-[#111] transition-all duration-300">
+      <div className="flex items-center gap-2 mb-2">
+        <Icon size={14} className="text-[#dbb462] opacity-40 group-hover:opacity-80 transition-opacity" />
+        <span className="font-teko text-[11px] tracking-[0.2em] text-[#d1c5b3] opacity-40 uppercase">{label}</span>
+      </div>
+      <p className={`font-bebas text-xl leading-none ${gold ? 'text-[#dbb462]' : 'text-[#f2f2f2]'}`}>{value}</p>
+    </div>
+  );
+}
+
