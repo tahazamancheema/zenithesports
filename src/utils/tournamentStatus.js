@@ -12,12 +12,12 @@
 
 /**
  * @param {Object} tournament - A tournament record from Supabase
- * @returns {'upcoming' | 'active' | 'completed'}
+ * @returns {'upcoming' | 'registrations_open' | 'registrations_closed' | 'in_progress' | 'completed'}
  */
 export function computeTournamentStatus(tournament) {
   if (!tournament) return 'upcoming';
 
-  const { registration_open_date, start_date, is_completed } = tournament;
+  const { registration_open_date, registration_deadline, start_date, is_completed } = tournament;
 
   // Admin manually marked as completed
   if (is_completed) return 'completed';
@@ -30,10 +30,22 @@ export function computeTournamentStatus(tournament) {
     if (now >= startDate) return 'in_progress';
   }
 
+  // If deadline has passed, registrations are closed
+  if (registration_deadline) {
+    const deadline = new Date(registration_deadline);
+    if (now > deadline) return 'registrations_closed';
+  }
+
+  // If open date is set and we've reached it, registrations are open
   if (registration_open_date) {
     const openDate = new Date(registration_open_date);
     if (now < openDate) return 'upcoming';
-    if (now >= openDate) return 'active';
+    if (now >= openDate) return 'registrations_open';
+  }
+
+  // If no open date but a deadline exists, assume open until deadline
+  if (registration_deadline && now <= new Date(registration_deadline)) {
+    return 'registrations_open';
   }
 
   // No dates configured → upcoming by default

@@ -64,8 +64,13 @@ export default function AdminDashboard() {
   }
   async function handleDelete(reg) {
     if (!confirm(`Delete ${reg.team_name}? This cannot be undone.`)) return;
-    await removeReg(reg.id);
-    toast.success('Registration deleted');
+    try {
+      await removeReg(reg.id);
+      toast.success('Registration deleted');
+    } catch (e) {
+      toast.error(`Failed to delete: ${e.message}`);
+      console.error('Delete error:', e);
+    }
   }
 
   // ── XLSX Export (tournament-scoped) ──
@@ -230,11 +235,9 @@ export default function AdminDashboard() {
           onExport={() => handleExport(regsModal)}
           onEdit={(reg) => {
             setRegistrationModal({ open: true, data: reg, tournamentId: regsModal.id });
-            setRegsModal(null);
           }}
           onAdd={() => {
             setRegistrationModal({ open: true, data: null, tournamentId: regsModal.id });
-            setRegsModal(null);
           }}
         />
       )}
@@ -872,7 +875,7 @@ function TournamentModal({ isOpen, onClose, tournament, onSave }) {
     { id: 'content',  label: 'Briefing', icon: FileText },
     { id: 'schedule', label: 'Schedule', icon: ListOrdered },
     { id: 'roadmap',  label: 'Roadmap',  icon: Map },
-    { id: 'reg_config', label: 'Config', icon: Settings },
+    { id: 'reg_config', label: 'Config', icon: ListOrdered },
   ];
 
   const inputCls = 'w-full bg-[#131313] border border-[rgba(78,70,56,0.3)] p-2.5 text-sm text-[#e2e2e2] focus:outline-none focus:border-[#f9d07a] transition-colors font-mono placeholder:opacity-30';
@@ -984,11 +987,13 @@ function TournamentModal({ isOpen, onClose, tournament, onSave }) {
             <div className="flex items-center justify-between mb-3">
               <span className="font-stretch text-[9px] tracking-widest text-[#d1c5b3] opacity-50">AUTO-COMPUTED STATUS</span>
               <span className={`font-stretch text-[9px] tracking-widest px-3 py-1 border ${
-                computedStatus === 'active'    ? 'text-emerald-400 border-emerald-500/30' :
+                computedStatus === 'registrations_open'    ? 'text-emerald-400 border-emerald-500/30' :
+                computedStatus === 'in_progress' ? 'text-blue-400 border-blue-500/30' :
+                computedStatus === 'registrations_closed' ? 'text-red-400 border-red-500/30' :
                 computedStatus === 'completed' ? 'text-[#9a8f7f] border-[rgba(78,70,56,0.3)]' :
                 'text-[#f9d07a] border-[#f9d07a]/30'
               }`}>
-                {computedStatus.toUpperCase()}
+                {computedStatus.replace('_', ' ').toUpperCase()}
               </span>
             </div>
 
@@ -1196,9 +1201,11 @@ function TournamentModal({ isOpen, onClose, tournament, onSave }) {
 // ─────────────────────────────────────────────────────────────
 function RegistrationModal({ isOpen, onClose, registration, tournament, onSave }) {
   const [form, setForm] = useState({
-    team_name: '', city: '', whatsapp_number: '',
+    team_name: '', real_name: '', whatsapp_number: '', captain_discord: '',
     player_1_id: '', player_2_id: '', player_3_id: '',
     player_4_id: '', player_5_id: '', player_6_id: '',
+    player_1_ign: '', player_2_ign: '', player_3_ign: '',
+    player_4_ign: '', player_5_ign: '', player_6_ign: '',
     tournament_id: '', status: 'pending', group_id: '', logo_url: '',
   });
   const [file, setFile] = useState(null);
@@ -1210,12 +1217,19 @@ function RegistrationModal({ isOpen, onClose, registration, tournament, onSave }
         team_name:       registration.team_name || '',
         real_name:       registration.real_name || '',
         whatsapp_number: registration.whatsapp_number || '',
+        captain_discord: registration.captain_discord || '',
         player_1_id:     registration.player_ids?.[0] || '',
         player_2_id:     registration.player_ids?.[1] || '',
         player_3_id:     registration.player_ids?.[2] || '',
         player_4_id:     registration.player_ids?.[3] || '',
         player_5_id:     registration.player_ids?.[4] || '',
         player_6_id:     registration.player_ids?.[5] || '',
+        player_1_ign:    registration.player_igns?.[0] || '',
+        player_2_ign:    registration.player_igns?.[1] || '',
+        player_3_ign:    registration.player_igns?.[2] || '',
+        player_4_ign:    registration.player_igns?.[3] || '',
+        player_5_ign:    registration.player_igns?.[4] || '',
+        player_6_ign:    registration.player_igns?.[5] || '',
         tournament_id:   registration.tournament_id || '',
         status:          registration.status || 'pending',
         group_id:        registration.group_id || '',
@@ -1223,9 +1237,11 @@ function RegistrationModal({ isOpen, onClose, registration, tournament, onSave }
       });
     } else {
       setForm({
-        team_name: '', city: '', whatsapp_number: '',
+        team_name: '', real_name: '', whatsapp_number: '', captain_discord: '',
         player_1_id: '', player_2_id: '', player_3_id: '',
         player_4_id: '', player_5_id: '', player_6_id: '',
+        player_1_ign: '', player_2_ign: '', player_3_ign: '',
+        player_4_ign: '', player_5_ign: '', player_6_ign: '',
         tournament_id: tournament?.id || '',
         status: 'pending', group_id: '', logo_url: '',
       });
@@ -1242,7 +1258,12 @@ function RegistrationModal({ isOpen, onClose, registration, tournament, onSave }
         form.player_1_id, form.player_2_id, form.player_3_id,
         form.player_4_id, form.player_5_id, form.player_6_id,
       ].filter(Boolean).map((x) => x.trim().toUpperCase());
-      await onSave({ ...form, player_ids: playerIds }, file);
+      const playerIgns = [
+        form.player_1_ign, form.player_2_ign, form.player_3_ign,
+        form.player_4_ign, form.player_5_ign, form.player_6_ign,
+      ].filter(Boolean).map((x) => x.trim());
+      
+      await onSave({ ...form, player_ids: playerIds, player_igns: playerIgns }, file);
     } finally {
       setSaving(false);
     }
@@ -1278,11 +1299,12 @@ function RegistrationModal({ isOpen, onClose, registration, tournament, onSave }
 
         <div className="grid grid-cols-2 gap-4">
           <GhostInput label="Team Name" value={form.team_name} onChange={(e) => setForm((f) => ({ ...f, team_name: e.target.value }))} required />
-          <GhostInput label="Real Name" value={form.real_name} onChange={(e) => setForm((f) => ({ ...f, real_name: e.target.value }))} />
+          <GhostInput label="Captain Real Name" value={form.real_name} onChange={(e) => setForm((f) => ({ ...f, real_name: e.target.value }))} />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-3 gap-4">
           <GhostInput label="WhatsApp" value={form.whatsapp_number} onChange={(e) => setForm((f) => ({ ...f, whatsapp_number: e.target.value }))} />
+          <GhostInput label="Discord" value={form.captain_discord} onChange={(e) => setForm((f) => ({ ...f, captain_discord: e.target.value }))} />
           <div className="space-y-1">
             <label className={labelCls}>Status</label>
             <select value={form.status} onChange={(e) => setForm((f) => ({ ...f, status: e.target.value }))} className={inputCls}>
@@ -1293,17 +1315,24 @@ function RegistrationModal({ isOpen, onClose, registration, tournament, onSave }
           </div>
         </div>
 
-        <div className="space-y-1">
-          <label className={labelCls}>Player Character IDs</label>
-          <div className="grid grid-cols-2 gap-3">
+        <div className="space-y-3">
+          <label className={labelCls}>Players Info (IGN & Character ID)</label>
+          <div className="space-y-2">
             {[1, 2, 3, 4, 5, 6].map((num) => (
-              <GhostInput
-                key={num}
-                label={`Player ${num}${num <= 4 ? ' *' : ''}`}
-                value={form[`player_${num}_id`]}
-                onChange={(e) => setForm((f) => ({ ...f, [`player_${num}_id`]: e.target.value }))}
-                placeholder="5XXXXXXXXXX"
-              />
+              <div key={num} className="grid grid-cols-2 gap-3">
+                <GhostInput
+                  label={`Player ${num} IGN${num <= 4 ? ' *' : ''}`}
+                  value={form[`player_${num}_ign`]}
+                  onChange={(e) => setForm((f) => ({ ...f, [`player_${num}_ign`]: e.target.value }))}
+                  placeholder="In-Game Name"
+                />
+                <GhostInput
+                  label={`Player ${num} ID${num <= 4 ? ' *' : ''}`}
+                  value={form[`player_${num}_id`]}
+                  onChange={(e) => setForm((f) => ({ ...f, [`player_${num}_id`]: e.target.value }))}
+                  placeholder="5XXXXXXXXXX"
+                />
+              </div>
             ))}
           </div>
         </div>

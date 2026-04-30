@@ -41,7 +41,7 @@ export default function LandingPage() {
   const maxTeams = currentTournament?.max_teams;
   const isUnlimited = !maxTeams || maxTeams === 0;
   const fillPct = isUnlimited ? 100 : Math.min((approvedCount / maxTeams) * 100, 100);
-  const isOpen = currentTournament?.status === 'active';
+  const isOpen = currentTournament?.status === 'registrations_open';
 
   const prizeFormatted = currentTournament?.prize_pool
     ? `PKR ${Number(currentTournament.prize_pool).toLocaleString('en-PK')}`
@@ -56,8 +56,8 @@ export default function LandingPage() {
       <section className="relative min-h-screen flex items-end pb-20 lg:pb-32 pt-28 overflow-hidden">
         {/* BG Layers */}
         <div className="absolute inset-0 z-0">
-          <img src={heroBg} className="w-full h-full object-cover opacity-25 scale-110" alt="" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/80 to-transparent" />
+          <img src="/image-3.webp" className="w-full h-full object-cover opacity-50 scale-105" alt="" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/60 to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/40 to-transparent" />
         </div>
 

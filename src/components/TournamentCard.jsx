@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Trophy, ChevronRight, MessageCircle } from 'lucide-react';
 import { useTournamentCountdown } from '../hooks/useTournamentCountdown';
+import StatusBadge from './ui/StatusBadge';
 
 export default function TournamentCard({ tournament, registrationCount = 0, isUserRegistered = false }) {
   const {
@@ -12,18 +13,7 @@ export default function TournamentCard({ tournament, registrationCount = 0, isUs
 
   const { phase } = useTournamentCountdown(registration_open_date, registration_deadline);
   const slotsPercent = max_teams ? Math.min((registrationCount / max_teams) * 100, 100) : null;
-  const isOpen = status === 'active' && phase === 'closing' && (!max_teams || registrationCount < max_teams);
-
-  const statusConfig = {
-    active:      { label: 'OPEN',        dot: 'bg-emerald-400', text: 'text-emerald-400', border: 'border-emerald-500/30', bg: 'bg-emerald-500/10' },
-    in_progress: { label: 'IN PROGRESS', dot: 'bg-[#dbb462]',  text: 'text-[#dbb462]',  border: 'border-[#dbb462]/30',   bg: 'bg-[#dbb462]/10' },
-    upcoming:    { label: 'UPCOMING',    dot: 'bg-[#f9d07a]',  text: 'text-[#f9d07a]',  border: 'border-[#f9d07a]/30',   bg: 'bg-[#f9d07a]/10' },
-    completed:   { label: 'COMPLETED',   dot: 'bg-[#9a8f7f]',  text: 'text-[#9a8f7f]',  border: 'border-[#9a8f7f]/30',   bg: 'bg-[#9a8f7f]/10' },
-    closed:      { label: 'CLOSED',      dot: 'bg-red-400',    text: 'text-red-400',    border: 'border-red-500/30',      bg: 'bg-red-500/10' },
-  };
-
-  const currentStatus = (status === 'completed' || status === 'in_progress') ? status : (phase === 'closed' ? 'closed' : status);
-  const pill = statusConfig[currentStatus] || statusConfig.upcoming;
+  const isOpen = status === 'registrations_open' && phase === 'closing' && (!max_teams || registrationCount < max_teams);
 
   const startFormatted = start_date ? new Date(start_date).toLocaleDateString('en-PK', { day: 'numeric', month: 'short' }) : null;
   const prizeFormatted = prize_pool ? `PKR ${Number(prize_pool).toLocaleString('en-PK')}` : null;
@@ -46,10 +36,7 @@ export default function TournamentCard({ tournament, registrationCount = 0, isUs
 
         {/* Status Badge */}
         <div className="absolute top-4 left-4 z-20">
-          <div className={`flex items-center gap-2 ${pill.bg} backdrop-blur-md px-3 py-1.5 border ${pill.border}`}>
-            <span className={`w-1.5 h-1.5 ${pill.dot} ${status === 'active' && phase === 'closing' ? 'animate-pulse' : ''}`} />
-            <span className={`font-teko text-[13px] tracking-[0.2em] uppercase ${pill.text}`}>{pill.label}</span>
-          </div>
+          <StatusBadge status={status} />
         </div>
 
         {/* Prize overlay */}

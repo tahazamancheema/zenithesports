@@ -22,9 +22,9 @@ export function useTournaments() {
     status: computeTournamentStatus(t),
   }));
 
-  const activeTournaments = tournaments.filter((t) => t.status === 'active');
+  const activeTournaments = tournaments.filter((t) => t.status === 'registrations_open' || t.status === 'in_progress');
   const upcomingTournaments = tournaments.filter((t) => t.status === 'upcoming');
-  const completedTournaments = tournaments.filter((t) => t.status === 'completed');
+  const completedTournaments = tournaments.filter((t) => t.status === 'completed' || t.status === 'registrations_closed');
 
   // The primary active tournament (first one)
   const currentTournament = activeTournaments[0] || upcomingTournaments[0] || null;

@@ -109,10 +109,6 @@ export default function AboutPage() {
             <div className="space-y-6 md:space-y-8 font-body text-[#d1c5b3] opacity-40 text-lg md:text-xl leading-relaxed">
               <p>We believe the future of Pakistani esports depends on a reliable foundation. Competitive gaming requires more than just high skill—it requires an arena built on trust and transparency.</p>
               <p>Founded in 2021, we have consistently focused on technical quality. We don't just host matches; we provide a professional ecosystem where hard work meets opportunity.</p>
-              <div className="pt-8 border-t border-white/5">
-                 <p className="font-bebas text-3xl tracking-tight text-white uppercase mb-1">PART OF BEYOND ZENITH</p>
-                 <p className="font-teko text-[16px] tracking-widest text-[#dbb462] uppercase font-bold">Performance & Operations Unit</p>
-              </div>
             </div>
           </div>
           <div className="relative group overflow-hidden border border-white/5 bg-[#111]">
@@ -213,18 +209,18 @@ export default function AboutPage() {
       </section>
 
       {/* ── CALL TO ACTION ── */}
-      <section className="py-48 px-6 lg:px-16 text-center bg-[#0a0a0a] relative overflow-hidden">
+      <section className="py-32 px-6 lg:px-16 text-center bg-[#0a0a0a] relative overflow-hidden">
         <div className="container mx-auto max-w-3xl relative z-10">
-          <h2 className="font-bebas text-7xl md:text-[140px] tracking-tight mb-10 leading-[0.8] uppercase">
-            BUILD YOUR<br />
-            <span className="zenith-gradient-text pr-2">LEGACY</span>
+          <h2 className="font-agency font-bold text-6xl md:text-8xl tracking-tight mb-6 leading-none uppercase">
+            Join Zenith<br />
+            <span className="zenith-gradient-text pr-2">Esports</span>
           </h2>
-          <p className="font-body text-[#d1c5b3] text-xl opacity-40 mb-16 leading-relaxed">
-            Every professional squad started somewhere. Join our circuit today and take your first step toward world-class competition.
+          <p className="font-body text-[#d1c5b3] text-xl opacity-60 mb-12 leading-relaxed">
+            Every professional team started somewhere. Register today and take your first step into competitive gaming.
           </p>
           <div className="flex flex-wrap gap-6 justify-center">
-            <Link to="/auth" className="btn-obsidian-primary font-bebas text-3xl px-16 py-6 tracking-widest uppercase">
-              ACCESS THE CIRCUIT
+            <Link to="/auth" className="bg-[#dbb462] hover:bg-[#e9c16e] text-[#111] font-agency font-bold text-2xl px-12 py-4 uppercase transition-colors">
+              Register Now
             </Link>
           </div>
         </div>

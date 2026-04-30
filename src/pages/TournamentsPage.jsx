@@ -7,8 +7,8 @@ import { useAuth } from '../hooks/useAuth';
 
 const FILTERS = [
   { label: 'ALL',       value: 'all' },
-  { label: 'ACTIVE',    value: 'active' },
-  { label: 'UPCOMING',  value: 'upcoming' },
+  { label: 'OPEN',      value: 'registrations_open' },
+  { label: 'ONGOING',   value: 'in_progress' },
   { label: 'COMPLETED', value: 'completed' },
 ];
 
@@ -52,8 +52,8 @@ export default function TournamentsPage() {
   // Count by status for filter badges
   const countByStatus = {
     all: tournaments.length,
-    active: tournaments.filter(t => t.status === 'active').length,
-    upcoming: tournaments.filter(t => t.status === 'upcoming').length,
+    registrations_open: tournaments.filter(t => t.status === 'registrations_open').length,
+    in_progress: tournaments.filter(t => t.status === 'in_progress').length,
     completed: tournaments.filter(t => t.status === 'completed').length,
   };
 

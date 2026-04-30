@@ -78,7 +78,6 @@ export default function TournamentDetailsPage() {
   }
 
   let currentStatus = computeTournamentStatus(tournament);
-  if (currentStatus === 'active' && phase === 'closed') currentStatus = 'closed';
   const t = { ...tournament, status: currentStatus };
   const { title, description, briefing, game, max_teams, prize_pool, status, start_date, registration_deadline, registration_open_date, poster_url } = t;
 
@@ -93,7 +92,7 @@ export default function TournamentDetailsPage() {
   const approvedCount = registrations.filter(r => r.status === 'approved').length;
   const totalCount    = registrations.length;
   const isUserRegistered = user && registrations.some(r => r.user_id === user.id);
-  const isOpen = status === 'active' && phase === 'closing' && (!max_teams || totalCount < max_teams);
+  const isOpen = status === 'registrations_open' && phase === 'closing' && (!max_teams || totalCount < max_teams);
   const capacityPct = max_teams ? Math.min((approvedCount / max_teams) * 100, 100) : 100;
 
   const visibleTabs = TABS.filter((tab) => {
@@ -101,15 +100,6 @@ export default function TournamentDetailsPage() {
     if (tab.id === 'roadmap')  return roadmap.length > 0;
     return true;
   });
-
-  const statusConfig = {
-    active:      { label: 'REGISTRATIONS OPEN',   cls: 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10', dot: 'bg-emerald-400' },
-    in_progress: { label: 'IN PROGRESS',          cls: 'text-[#dbb462] border-[#dbb462]/30 bg-[#dbb462]/10',      dot: 'bg-[#dbb462]' },
-    upcoming:    { label: 'UPCOMING',             cls: 'text-[#f9d07a] border-[#f9d07a]/30 bg-[#f9d07a]/10',      dot: 'bg-[#f9d07a]' },
-    closed:      { label: 'REGISTRATIONS CLOSED', cls: 'text-red-400 border-red-500/30 bg-red-500/10',             dot: 'bg-red-400' },
-    completed:   { label: 'COMPLETED',            cls: 'text-[#9a8f7f] border-[#9a8f7f]/30 bg-[#9a8f7f]/10',      dot: 'bg-[#9a8f7f]' },
-  };
-  const sPill = statusConfig[status] || statusConfig.upcoming;
 
   const prizeFormatted = prize_pool ? `PKR ${Number(prize_pool).toLocaleString('en-PK')}` : 'TBA';
 
@@ -143,10 +133,7 @@ export default function TournamentDetailsPage() {
             <span className="font-teko text-[14px] tracking-[0.2em] text-[#dbb462] uppercase bg-[#dbb462]/10 px-4 py-1.5 border border-[#dbb462]/20">
               {game || 'PUBG MOBILE'}
             </span>
-            <span className={`flex items-center gap-2 font-teko text-[14px] tracking-[0.2em] uppercase border px-4 py-1.5 ${sPill.cls}`}>
-              <span className={`w-1.5 h-1.5 ${sPill.dot} ${status === 'active' ? 'animate-pulse' : ''}`} />
-              {sPill.label}
-            </span>
+            <StatusBadge status={status} />
           </div>
 
           {/* Title */}
@@ -374,7 +361,7 @@ export default function TournamentDetailsPage() {
                     )}
 
                     {/* Also show Register CTA for non-logged-in users when status is active but not phase closing yet */}
-                    {!user && status === 'active' && phase !== 'closing' && phase !== 'closed' && (
+                    {!user && status === 'registrations_open' && phase !== 'closed' && (
                       <Link
                         to="/auth"
                         className="btn-obsidian-primary w-full py-5 font-bebas text-[22px] tracking-[0.2em] inline-flex items-center justify-center gap-3 uppercase group/cta"
@@ -390,14 +377,10 @@ export default function TournamentDetailsPage() {
                         pending:  { bg: 'bg-[#dbb462]/10',   border: 'border-[#dbb462]/20',   text: 'text-[#dbb462]',   label: 'PENDING REVIEW' },
                         rejected: { bg: 'bg-red-500/10',     border: 'border-red-500/20',     text: 'text-red-400',     label: 'REJECTED' },
                       }[userReg?.status] || { bg: 'bg-[#dbb462]/10', border: 'border-[#dbb462]/20', text: 'text-[#dbb462]', label: 'PENDING REVIEW' };
-                      return (
-                        <div className={`w-full py-5 text-center ${cfg.bg} border ${cfg.border} ${cfg.text} font-bebas text-[22px] tracking-[0.15em] uppercase`}>
-                          {cfg.label}
-                        </div>
-                      );
+                      return <StatusBadge status={userReg?.status} className="w-full justify-center py-5" />;
                     })()}
 
-                    {!isOpen && !isUserRegistered && !user && status !== 'active' && (
+                    {!isOpen && !isUserRegistered && !user && status !== 'registrations_open' && (
                       <Link
                         to="/auth"
                         className="btn-obsidian-ghost w-full py-4 font-bebas text-[20px] tracking-[0.15em] uppercase"

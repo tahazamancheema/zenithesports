@@ -58,14 +58,14 @@ export default function Navbar() {
               <img
                 src="/logo.png"
                 alt="Zenith"
-                className="relative h-12 md:h-14 w-auto object-contain transition-all duration-700 group-hover:scale-105"
+                className="relative h-12 md:h-14 w-auto object-contain transition-transform duration-500 group-hover:scale-105"
                 onError={(e) => { e.target.style.display = 'none'; }}
               />
             </div>
-            <div className="flex flex-col">
-              <div className="font-bebas text-3xl md:text-4xl tracking-tight leading-none uppercase">
-                <span className="text-[#f2f2f2]">ZENITH</span>
-                <span className="ml-2 text-[#dbb462]">ESPORTS</span>
+            <div className="flex flex-col justify-center">
+              <div className="font-agency font-bold text-3xl md:text-4xl tracking-tight leading-none uppercase">
+                <span className="text-[#f2f2f2] group-hover:text-white transition-colors">ZENITH</span>
+                <span className="ml-1.5 text-[#dbb462] transition-colors">ESPORTS</span>
               </div>
             </div>
           </Link>

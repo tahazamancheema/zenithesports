@@ -21,12 +21,13 @@ export default function RegistrationPage() {
     team_name: '',
     real_name: '',
     whatsapp_number: '',
-    player_1_id: '',
-    player_2_id: '',
-    player_3_id: '',
-    player_4_id: '',
-    player_5_id: '',
-    player_6_id: '',
+    captain_discord: '',
+    player_1_ign: '', player_1_id: '',
+    player_2_ign: '', player_2_id: '',
+    player_3_ign: '', player_3_id: '',
+    player_4_ign: '', player_4_id: '',
+    player_5_ign: '', player_5_id: '',
+    player_6_ign: '', player_6_id: '',
   });
 
   const handleAutoFill = () => {
@@ -36,12 +37,13 @@ export default function RegistrationPage() {
       team_name: userDoc.team_name || '',
       real_name: userDoc.display_name || '',
       whatsapp_number: userDoc.whatsapp_number || '',
-      player_1_id: pids[0] || '',
-      player_2_id: pids[1] || '',
-      player_3_id: pids[2] || '',
-      player_4_id: pids[3] || '',
-      player_5_id: pids[4] || '',
-      player_6_id: pids[5] || '',
+      captain_discord: userDoc.captain_discord || '',
+      player_1_id: pids[0] || '', player_1_ign: userDoc.player_igns?.[0] || '',
+      player_2_id: pids[1] || '', player_2_ign: userDoc.player_igns?.[1] || '',
+      player_3_id: pids[2] || '', player_3_ign: userDoc.player_igns?.[2] || '',
+      player_4_id: pids[3] || '', player_4_ign: userDoc.player_igns?.[3] || '',
+      player_5_id: pids[4] || '', player_5_ign: userDoc.player_igns?.[4] || '',
+      player_6_id: pids[5] || '', player_6_ign: userDoc.player_igns?.[5] || '',
     });
     toast.success('Profile data synchronized successfully.');
   };
@@ -88,10 +90,6 @@ export default function RegistrationPage() {
   const handleRegisterSub = async (e) => {
     e.preventDefault();
     if (saving || submitting) return;
-    if (!file) {
-      setFieldErrors(prev => ({ ...prev, team_logo: 'Logo is required' }));
-      return toast.error('Team logo is required for identification.', { id: 'reg' });
-    }
 
     // Validate WhatsApp
     const waClean = form.whatsapp_number.trim().replace(/[^0-9]/g, '');
@@ -113,7 +111,10 @@ export default function RegistrationPage() {
       toast.loading('Saving your registration details...', { id: 'reg' });
       
       // Upload Team Logo
-      const logoUrl = await uploadFile('ze-logos', file, `logo_${user.id}_${Date.now()}`);
+      let logoUrl = '';
+      if (file) {
+        logoUrl = await uploadFile('ze-logos', file, `logo_${user.id}_${Date.now()}`);
+      }
       
       // Upload Screenshots
       const screenshotURLs = [];
@@ -131,12 +132,13 @@ export default function RegistrationPage() {
       }
       
       const playerIds = [
-        form.player_1_id,
-        form.player_2_id,
-        form.player_3_id,
-        form.player_4_id,
-        form.player_5_id,
-        form.player_6_id
+        form.player_1_id, form.player_2_id, form.player_3_id,
+        form.player_4_id, form.player_5_id, form.player_6_id
+      ];
+      
+      const playerIgns = [
+        form.player_1_ign, form.player_2_ign, form.player_3_ign,
+        form.player_4_ign, form.player_5_ign, form.player_6_ign
       ];
 
       const result = await submitRegistration({
@@ -146,7 +148,9 @@ export default function RegistrationPage() {
         realName: form.real_name,
         teamLogoURL: logoUrl,
         whatsapp: form.whatsapp_number,
+        captainDiscord: form.captain_discord,
         playerIDs: playerIds,
+        playerIgns: playerIgns,
         screenshotURLs: screenshotURLs
       });
 
@@ -257,12 +261,13 @@ export default function RegistrationPage() {
         )}
 
         <form onSubmit={handleRegisterSub} className="space-y-12">
-          {/* Logo Section */}
+          {/* Section 1: Team Information */}
           <div className="bg-[#111] border border-white/5 p-8">
             <h2 className="font-bebas text-3xl text-white mb-6 flex items-center gap-3">
-              <ShieldAlert className="text-[#dbb462]" size={24} /> TEAM BRANDING
+              <ShieldAlert className="text-[#dbb462]" size={24} /> 1 - TEAM INFORMATION
             </h2>
-            <div className="flex gap-6 items-center">
+            
+            <div className="flex gap-6 items-center mb-8">
               <div className="w-24 h-24 bg-[#131313] border border-[rgba(78,70,56,0.2)] flex-shrink-0 flex items-center justify-center rounded-full overflow-hidden object-cover">
                 {file ? (
                   <img src={URL.createObjectURL(file)} alt="Logo Preview" className="w-full h-full object-cover" />
@@ -272,7 +277,7 @@ export default function RegistrationPage() {
               </div>
               <div className="flex-1">
                 <label className="font-teko text-[16px] tracking-widest text-[#d1c5b3] uppercase block mb-3 opacity-60">
-                  Team Logo (JPEG/PNG) {fieldErrors.team_logo && <span className="text-red-400 ml-2 italic">— {fieldErrors.team_logo}</span>}
+                  Team Logo (Optional) {fieldErrors.team_logo && <span className="text-red-400 ml-2 italic">— {fieldErrors.team_logo}</span>}
                 </label>
                 <input 
                   type="file" 
@@ -281,16 +286,11 @@ export default function RegistrationPage() {
                     setFile(e.target.files[0]);
                     clearFieldError('team_logo');
                   }}
-                  required
                   className={`w-full text-[14px] text-[#d1c5b3] file:mr-4 file:py-2 file:px-6 file:border-0 file:bg-[#1f1f1f] file:text-[#dbb462] file:font-teko file:text-[16px] file:cursor-pointer hover:file:bg-[#2a2a2a] file:uppercase file:tracking-widest ${fieldErrors.team_logo ? 'outline outline-1 outline-red-400' : ''}`}
                 />
               </div>
             </div>
-          </div>
 
-          {/* Comms Section */}
-          <div className="bg-[#111] border border-white/5 p-8">
-            <h2 className="font-bebas text-3xl text-white mb-6">CONTACT DETAILS</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <GhostInput 
                 label="Team Name *" 
@@ -314,93 +314,72 @@ export default function RegistrationPage() {
                 placeholder="Enter Captain's full name" 
                 error={fieldErrors.real_name}
               />
-              <div className="md:col-span-2">
-                <GhostInput 
-                  label="WhatsApp Contact Number *" 
-                  value={form.whatsapp_number} 
-                  onChange={e => {
-                    setForm(f => ({ ...f, whatsapp_number: e.target.value }));
-                    clearFieldError('whatsapp_number');
-                  }} 
-                  required 
-                  placeholder="03XX XXXXXXX (11 Digits)" 
-                  error={fieldErrors.whatsapp_number}
-                />
-              </div>
+              <GhostInput 
+                label="Captain's WhatsApp Number *" 
+                value={form.whatsapp_number} 
+                onChange={e => {
+                  setForm(f => ({ ...f, whatsapp_number: e.target.value }));
+                  clearFieldError('whatsapp_number');
+                }} 
+                required 
+                placeholder="03XX XXXXXXX (11 Digits)" 
+                error={fieldErrors.whatsapp_number}
+              />
+              <GhostInput 
+                label="Captain's Discord *" 
+                value={form.captain_discord} 
+                onChange={e => {
+                  setForm(f => ({ ...f, captain_discord: e.target.value }));
+                  clearFieldError('captain_discord');
+                }} 
+                required 
+                placeholder="Discord Username" 
+                error={fieldErrors.captain_discord}
+              />
             </div>
           </div>
 
-          {/* Team Roster Section */}
+          {/* Section 2: Player Information */}
           <div className="bg-[#111] border border-white/5 p-8">
-            <h2 className="font-bebas text-3xl text-white mb-2">TEAM ROSTER</h2>
+            <h2 className="font-bebas text-3xl text-white mb-2">2 - PLAYER INFORMATION</h2>
             <p className="font-teko text-[16px] tracking-widest text-[#d1c5b3] opacity-40 uppercase mb-8">
               Minimum 4 players required. Character IDs must be exactly 10-14 digits.
             </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
-              <GhostInput 
-                label="Player 1 (Captain) *" 
-                value={form.player_1_id} 
-                onChange={e => {
-                  setForm(f => ({ ...f, player_1_id: e.target.value }));
-                  clearFieldError('player_1_id');
-                }} 
-                required 
-                placeholder="5XXXXXXXXX" 
-                error={fieldErrors.player_1_id}
-              />
-              <GhostInput 
-                label="Player 2 *" 
-                value={form.player_2_id} 
-                onChange={e => {
-                  setForm(f => ({ ...f, player_2_id: e.target.value }));
-                  clearFieldError('player_2_id');
-                }} 
-                required 
-                placeholder="5XXXXXXXXX" 
-                error={fieldErrors.player_2_id}
-              />
-              <GhostInput 
-                label="Player 3 *" 
-                value={form.player_3_id} 
-                onChange={e => {
-                  setForm(f => ({ ...f, player_3_id: e.target.value }));
-                  clearFieldError('player_3_id');
-                }} 
-                required 
-                placeholder="5XXXXXXXXX" 
-                error={fieldErrors.player_3_id}
-              />
-              <GhostInput 
-                label="Player 4 *" 
-                value={form.player_4_id} 
-                onChange={e => {
-                  setForm(f => ({ ...f, player_4_id: e.target.value }));
-                  clearFieldError('player_4_id');
-                }} 
-                required 
-                placeholder="5XXXXXXXXX" 
-                error={fieldErrors.player_4_id}
-              />
-              <GhostInput 
-                label="Player 5 (Sub)" 
-                value={form.player_5_id} 
-                onChange={e => {
-                  setForm(f => ({ ...f, player_5_id: e.target.value }));
-                  clearFieldError('player_5_id');
-                }} 
-                placeholder="Optional" 
-                error={fieldErrors.player_5_id}
-              />
-              <GhostInput 
-                label="Player 6 (Sub)" 
-                value={form.player_6_id} 
-                onChange={e => {
-                  setForm(f => ({ ...f, player_6_id: e.target.value }));
-                  clearFieldError('player_6_id');
-                }} 
-                placeholder="Optional" 
-                error={fieldErrors.player_6_id}
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
+              {[1, 2, 3, 4, 5, 6].map(num => (
+                <div key={num} className="space-y-4 bg-[#131313] p-5 border border-white/5 relative">
+                  <span className="absolute -top-3 -left-3 bg-[#dbb462] text-[#131313] w-6 h-6 flex items-center justify-center font-bebas text-lg">
+                    {num}
+                  </span>
+                  <div className="font-bebas text-xl text-white tracking-widest">
+                    Player {num} {num <= 4 ? '*' : '(Optional)'}
+                  </div>
+                  <div className="grid grid-cols-1 gap-4">
+                    <GhostInput 
+                      label={`Player ${num} IGN${num <= 4 ? ' *' : ''}`}
+                      value={form[`player_${num}_ign`]} 
+                      onChange={e => {
+                        setForm(f => ({ ...f, [`player_${num}_ign`]: e.target.value }));
+                        clearFieldError(`player_${num}_ign`);
+                      }} 
+                      required={num <= 4} 
+                      placeholder="In-Game Name" 
+                      error={fieldErrors[`player_${num}_ign`]}
+                    />
+                    <GhostInput 
+                      label={`Player ${num} Character ID${num <= 4 ? ' *' : ''}`}
+                      value={form[`player_${num}_id`]} 
+                      onChange={e => {
+                        setForm(f => ({ ...f, [`player_${num}_id`]: e.target.value }));
+                        clearFieldError(`player_${num}_id`);
+                      }} 
+                      required={num <= 4} 
+                      placeholder="5XXXXXXXXX" 
+                      error={fieldErrors[`player_${num}_id`]}
+                    />
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
@@ -408,7 +387,7 @@ export default function RegistrationPage() {
           {tournament.registration_config?.screenshots?.length > 0 && (
             <div className="bg-[#111] border border-white/5 p-8">
               <h2 className="font-bebas text-3xl text-white mb-2 flex items-center gap-3">
-                <Camera className="text-[#dbb462]" size={24} /> REQUIRED PROOF
+                <Camera className="text-[#dbb462]" size={24} /> 3 - REQUIRED PROOF
               </h2>
               <p className="font-teko text-[16px] tracking-widest text-[#d1c5b3] opacity-40 uppercase mb-8">
                 Upload the following required documents to proceed.

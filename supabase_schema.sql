@@ -60,6 +60,8 @@ create table if not exists public.registrations (
 
 -- Add missing columns to registrations if they don't exist
 alter table public.registrations add column if not exists real_name text;
+alter table public.registrations add column if not exists captain_discord text;
+alter table public.registrations add column if not exists player_igns text[] default '{}';
 
 -- ─────────────────────────────────────────
 -- SECURITY (Row Level Security)
@@ -119,6 +121,9 @@ create policy "Users can insert their own registrations." on public.registration
 
 drop policy if exists "Admins can update all registrations." on public.registrations;
 create policy "Admins can update all registrations." on public.registrations for update using (public.is_admin());
+
+drop policy if exists "Admins can delete registrations." on public.registrations;
+create policy "Admins can delete registrations." on public.registrations for delete using (public.is_admin());
 
 drop policy if exists "Users can update their own pending registrations." on public.registrations;
 create policy "Users can update their own pending registrations." on public.registrations for update using (auth.uid() = user_id and status = 'pending');
