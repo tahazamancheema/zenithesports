@@ -90,7 +90,7 @@ export default function AuthPage() {
           </Link>
 
           <div className="relative z-10 space-y-6 my-12">
-            <h1 className="font-agency font-bold text-6xl lg:text-8xl leading-none uppercase tracking-tight">
+            <h1 className="font-bebas font-bold text-6xl lg:text-8xl leading-none uppercase tracking-tight">
               <span className="zenith-gradient-text pr-2">WELCOME</span>
               {mode === 'login' && (
                 <>
@@ -113,7 +113,7 @@ export default function AuthPage() {
         {/* Right Side: Simple Access Form */}
         <div className="w-full md:w-1/2 p-12 lg:p-16 flex flex-col justify-center bg-[#131313]">
           <div className="mb-12">
-            <h2 className="font-agency font-bold text-5xl tracking-tight text-white mb-2 uppercase">
+            <h2 className="font-bebas font-bold text-5xl tracking-tight text-white mb-2 uppercase">
               {mode === 'login' ? 'ACCESS PORTAL' : 'ACCOUNT CREATION'}
             </h2>
             <button 

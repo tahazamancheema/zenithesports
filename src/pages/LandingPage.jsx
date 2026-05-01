@@ -53,10 +53,10 @@ export default function LandingPage() {
       {/* ═══════════════════════════════════════════
           HERO — Full Bleed Cinematic 
           ═══════════════════════════════════════════ */}
-      <section className="relative min-h-screen flex items-end pb-20 lg:pb-32 pt-28 overflow-hidden">
+      <section className="relative min-h-[100dvh] flex items-end pb-20 lg:pb-32 pt-28 overflow-hidden">
         {/* BG Layers */}
         <div className="absolute inset-0 z-0">
-          <img src="/image-3.webp" className="w-full h-full object-cover opacity-50 scale-105" alt="" />
+          <img src={heroBg} className="w-full h-full object-cover opacity-50 scale-110" alt="Hero Background" />
           <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/60 to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/40 to-transparent" />
         </div>
@@ -71,8 +71,8 @@ export default function LandingPage() {
         <div className="absolute inset-0 scanline opacity-[0.06] pointer-events-none z-[2]" />
 
         {/* Gold accent lines */}
-        <div className="absolute top-0 left-0 w-[1px] h-full bg-gradient-to-b from-transparent via-[#dbb462]/20 to-transparent z-[3]" style={{left: '8%'}} />
-        <div className="absolute top-0 left-0 w-[1px] h-full bg-gradient-to-b from-transparent via-[#dbb462]/10 to-transparent z-[3] hidden lg:block" style={{left: '50%'}} />
+        <div className="hidden lg:block absolute top-0 left-0 w-[1px] h-full bg-gradient-to-b from-transparent via-[#dbb462]/20 to-transparent z-[3]" style={{left: '8%'}} />
+        <div className="hidden lg:block absolute top-0 left-0 w-[1px] h-full bg-gradient-to-b from-transparent via-[#dbb462]/10 to-transparent z-[3]" style={{left: '50%'}} />
 
         {/* Main Content */}
         <div className="relative z-10 w-full px-6 lg:px-16 container mx-auto">
@@ -117,12 +117,12 @@ export default function LandingPage() {
             </div>
 
             {/* Right Column — Floating Stats Panel */}
-            <div className="lg:col-span-5 xl:col-span-6 flex justify-end">
-              <div className="w-full max-w-md space-y-[2px]">
-                <FloatingStat label="ACTIVE PLAYERS" value={platformStats.activePlayers} delay={0} />
-                <FloatingStat label="PRIZE POOLS DISTRIBUTED" value={platformStats.prizePools} delay={100} />
-                <FloatingStat label="TOURNAMENTS COMPLETED" value={platformStats.tournamentsRun} delay={200} />
-                <FloatingStat label="REGION" value="PAKISTAN" accent delay={300} />
+            <div className="lg:col-span-5 xl:col-span-6 flex justify-end w-full mt-16 lg:mt-0">
+              <div className="w-full grid grid-cols-2 lg:grid-cols-1 gap-2 lg:gap-[2px] max-w-full lg:max-w-md">
+                <FloatingStat label="ACTIVE PLAYERS" value={platformStats.activePlayers} delay={100} />
+                <FloatingStat label="PRIZES PAID" value={platformStats.prizePools} delay={200} />
+                <FloatingStat label="EVENTS DONE" value={platformStats.tournamentsRun} delay={300} />
+                <FloatingStat label="REGION" value="PAKISTAN" accent delay={400} />
               </div>
             </div>
           </div>
@@ -467,14 +467,22 @@ export default function LandingPage() {
 function FloatingStat({ label, value, accent, delay = 0 }) {
   return (
     <div 
-      className="bg-[#0e0e0e]/80 backdrop-blur-sm border border-white/[0.05] p-5 flex justify-between items-center hover:border-[#dbb462]/20 transition-all duration-300 group"
-      style={{ animationDelay: `${delay}ms` }}
+      className="relative overflow-hidden bg-[#0e0e0e]/60 backdrop-blur-md border border-white/[0.05] p-4 md:p-6 group hover:border-[#dbb462]/30 hover:bg-[#111]/80 transition-all duration-500 flex flex-col justify-center animate-stat-enter opacity-0"
+      style={{ animationDelay: `${delay}ms`, animationFillMode: 'forwards' }}
     >
-      <span className="font-teko text-[14px] tracking-[0.2em] text-[#d1c5b3] opacity-50 uppercase group-hover:text-[#dbb462] group-hover:opacity-80 transition-all">{label}</span>
-      <span className={`font-bebas text-3xl tracking-tight leading-none ${accent ? 'text-emerald-400' : 'text-[#f2f2f2]'}`}>
-        {accent && <span className="inline-block w-2.5 h-2.5 bg-emerald-400 mr-3 animate-pulse shadow-[0_0_12px_rgba(52,211,153,0.5)]" />}
-        {value}
-      </span>
+      {/* Decorative gradient glow */}
+      <div className={`absolute -top-12 -right-12 w-24 h-24 ${accent ? 'bg-emerald-500/10' : 'bg-[#dbb462]/10'} blur-2xl rounded-full group-hover:scale-150 transition-transform duration-700 pointer-events-none`} />
+      
+      {/* Accent corner */}
+      <div className={`absolute top-0 right-0 w-4 h-4 border-t border-r ${accent ? 'border-emerald-500/50' : 'border-[#dbb462]/50'} opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`} />
+
+      <div className="relative z-10 flex flex-col gap-1.5">
+        <span className="font-teko text-[12px] md:text-[14px] tracking-[0.2em] text-[#d1c5b3] opacity-50 uppercase group-hover:opacity-90 transition-opacity">{label}</span>
+        <span className={`font-bebas text-[28px] md:text-4xl tracking-tight leading-none flex items-center gap-2 ${accent ? 'text-emerald-400' : 'text-[#f2f2f2]'}`}>
+          {accent && <span className="inline-block w-2 h-2 bg-emerald-400 shrink-0 rounded-full animate-pulse shadow-[0_0_10px_rgba(52,211,153,0.5)]" />}
+          {value}
+        </span>
+      </div>
     </div>
   );
 }

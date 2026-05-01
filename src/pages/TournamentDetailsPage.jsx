@@ -123,7 +123,7 @@ export default function TournamentDetailsPage() {
           {/* Breadcrumb */}
           <Link
             to="/tournaments"
-            className="inline-flex items-center gap-2 text-[#d1c5b3] opacity-50 hover:opacity-100 hover:text-[#dbb462] transition-all mb-8 font-teko text-[16px] tracking-[0.2em] uppercase"
+            className="inline-flex items-center gap-2 text-[#d1c5b3] opacity-70 hover:opacity-100 hover:text-[#dbb462] transition-all mb-8 font-teko text-[16px] tracking-[0.2em] uppercase"
           >
             <ChevronLeft size={16} /> Back to Tournaments
           </Link>
@@ -165,7 +165,7 @@ export default function TournamentDetailsPage() {
                 flex items-center gap-3 font-teko text-[18px] tracking-[0.15em] px-6 md:px-8 py-5 whitespace-nowrap border-b-2 transition-all duration-300 uppercase
                 ${activeTab === tabId
                   ? 'text-[#dbb462] border-[#dbb462]'
-                  : 'text-[#d1c5b3] opacity-25 border-transparent hover:opacity-80'
+                  : 'text-[#d1c5b3] opacity-60 border-transparent hover:opacity-100'
                 }
               `}
             >
@@ -187,7 +187,7 @@ export default function TournamentDetailsPage() {
             <section key="overview" style={{ animation: 'fadeIn 0.4s ease-out both' }}>
               <SectionHeader title="TOURNAMENT OVERVIEW" />
               <div className="bg-[#0e0e0e] border border-white/[0.06] p-8 md:p-12">
-                <p className="font-body text-[#d1c5b3] leading-[1.8] opacity-70 whitespace-pre-wrap text-lg">
+                <p className="font-body text-[#d1c5b3] leading-[1.8] opacity-80 whitespace-pre-wrap text-lg">
                   {briefing || description || 'No official briefing provided for this tournament.'}
                 </p>
               </div>
@@ -210,7 +210,7 @@ export default function TournamentDetailsPage() {
                       </span>
                       <div className="flex-shrink-0 text-center min-w-[80px]">
                         {row.date && <p className="font-bebas text-2xl text-white">{new Date(row.date).toLocaleDateString('en-PK', { day: 'numeric', month: 'short' })}</p>}
-                        {row.time && <p className="font-teko text-[13px] text-[#dbb462] tracking-[0.15em] uppercase opacity-60">{row.time}</p>}
+                        {row.time && <p className="font-teko text-[13px] text-[#dbb462] tracking-[0.15em] uppercase opacity-80">{row.time}</p>}
                       </div>
                       <div className="w-px h-10 bg-white/[0.06] flex-shrink-0" />
                       <p className="font-bebas text-2xl md:text-3xl tracking-tight flex-1 text-white/80 group-hover:text-white transition-colors">{row.event}</p>
@@ -238,12 +238,12 @@ export default function TournamentDetailsPage() {
                         )}
                       </div>
                       <div className="pb-14 group-last:pb-0">
-                        <span className="font-teko text-[13px] tracking-[0.2em] text-[#dbb462] block mb-2 uppercase opacity-60">
+                        <span className="font-teko text-[13px] tracking-[0.2em] text-[#dbb462] block mb-2 uppercase opacity-80">
                           STAGE {i + 1} &bull; {p.phase?.toUpperCase()}
                         </span>
                         <h3 className="font-bebas text-3xl md:text-4xl mb-3 text-white group-hover:text-[#dbb462] transition-colors uppercase">{p.title}</h3>
                         {p.description && (
-                          <p className="font-body text-[#d1c5b3] opacity-40 text-base leading-relaxed max-w-xl group-hover:opacity-70 transition-opacity">{p.description}</p>
+                          <p className="font-body text-[#d1c5b3] opacity-70 text-base leading-relaxed max-w-xl group-hover:opacity-100 transition-opacity">{p.description}</p>
                         )}
                       </div>
                     </div>
@@ -276,7 +276,7 @@ export default function TournamentDetailsPage() {
                       )}
                       <div className="min-w-0 flex-1">
                         <p className="font-bebas text-2xl truncate leading-none mb-1 text-white/80 group-hover:text-white transition-colors uppercase">{r.team_name}</p>
-                        {r.city && <p className="font-teko text-[13px] tracking-[0.15em] text-[#d1c5b3] opacity-30 uppercase truncate leading-none">{r.city}</p>}
+                        {r.city && <p className="font-teko text-[13px] tracking-[0.15em] text-[#d1c5b3] opacity-60 uppercase truncate leading-none">{r.city}</p>}
                       </div>
                       <StatusBadge status={r.status} />
                     </div>
@@ -310,7 +310,7 @@ export default function TournamentDetailsPage() {
                       <MessageCircle size={18} className="text-[#dbb462]" />
                       <h3 className="font-bebas text-2xl text-white uppercase">REGISTRATIONS CLOSED</h3>
                     </div>
-                    <p className="font-body text-[#d1c5b3] text-sm leading-relaxed opacity-50 mb-4">
+                    <p className="font-body text-[#d1c5b3] text-sm leading-relaxed opacity-70 mb-4">
                       Registrations are closed. Contact us via WhatsApp for any queries.
                     </p>
                     <a href="https://wa.me/923390715753" target="_blank" rel="noreferrer" className="btn-obsidian-ghost w-full py-3 font-bebas text-[16px] tracking-[0.15em]">
@@ -323,7 +323,7 @@ export default function TournamentDetailsPage() {
                 <div className="p-6">
                   <div className="grid grid-cols-2 gap-[1px] bg-white/[0.04] mb-6">
                     <SpecCell icon={Trophy} label="PRIZE POOL" value={prizeFormatted} gold />
-                    <SpecCell icon={Users} label="TEAMS" value={max_teams ? `${approvedCount}/${max_teams}` : `${approvedCount}/∞`} />
+                    <SpecCell icon={Users} label="TEAMS" value={max_teams ? `${approvedCount}/${max_teams}` : `${approvedCount}/UNLIMITED`} />
                     <SpecCell icon={Calendar} label="STARTS" value={start_date ? new Date(start_date).toLocaleDateString('en-PK', { day: 'numeric', month: 'short' }) : 'TBA'} />
                     <SpecCell icon={Clock} label="DEADLINE" value={registration_deadline ? new Date(registration_deadline).toLocaleDateString('en-PK', { day: 'numeric', month: 'short' }) : 'TBA'} />
                   </div>
@@ -331,7 +331,7 @@ export default function TournamentDetailsPage() {
                   {/* Capacity Bar */}
                   <div className="mb-6">
                     <div className="flex justify-between items-center mb-2">
-                      <span className="font-teko text-[12px] tracking-[0.2em] text-[#d1c5b3] opacity-40 uppercase">
+                      <span className="font-teko text-[12px] tracking-[0.2em] text-[#d1c5b3] opacity-60 uppercase">
                         {max_teams ? 'SLOT CAPACITY' : 'REGISTRATIONS'}
                       </span>
                       <span className="font-bebas text-xl text-[#dbb462]">
@@ -342,7 +342,7 @@ export default function TournamentDetailsPage() {
                       <div className="zenith-gradient h-full transition-all duration-[2s] ease-out" style={{ width: `${capacityPct}%` }} />
                     </div>
                     {max_teams && (
-                      <p className="font-teko text-[11px] tracking-[0.15em] text-[#d1c5b3] opacity-25 uppercase mt-2 text-right">
+                      <p className="font-teko text-[11px] tracking-[0.15em] text-[#d1c5b3] opacity-50 uppercase mt-2 text-right">
                         {max_teams - approvedCount > 0 ? `${max_teams - approvedCount} SLOTS REMAINING` : 'FULL'}
                       </p>
                     )}
@@ -431,7 +431,7 @@ function SectionHeader({ title, count }) {
 function QuickStat({ label, value, gold }) {
   return (
     <div className="bg-[#0e0e0e]/80 backdrop-blur-sm px-6 py-4 flex-1 min-w-[120px]">
-      <span className="font-teko text-[11px] tracking-[0.2em] text-[#d1c5b3] opacity-40 uppercase block mb-1">{label}</span>
+      <span className="font-teko text-[11px] tracking-[0.2em] text-[#d1c5b3] opacity-60 uppercase block mb-1">{label}</span>
       <span className={`font-bebas text-2xl leading-none ${gold ? 'text-[#dbb462]' : 'text-[#f2f2f2]'}`}>{value}</span>
     </div>
   );
@@ -453,8 +453,8 @@ function SpecCell({ icon: Icon, label, value, gold }) {
   return (
     <div className="bg-[#0e0e0e] p-4 group hover:bg-[#111] transition-all duration-300">
       <div className="flex items-center gap-2 mb-2">
-        <Icon size={14} className="text-[#dbb462] opacity-40 group-hover:opacity-80 transition-opacity" />
-        <span className="font-teko text-[11px] tracking-[0.2em] text-[#d1c5b3] opacity-40 uppercase">{label}</span>
+        <Icon size={14} className="text-[#dbb462] opacity-60 group-hover:opacity-100 transition-opacity" />
+        <span className="font-teko text-[11px] tracking-[0.2em] text-[#d1c5b3] opacity-60 uppercase">{label}</span>
       </div>
       <p className={`font-bebas text-xl leading-none ${gold ? 'text-[#dbb462]' : 'text-[#f2f2f2]'}`}>{value}</p>
     </div>

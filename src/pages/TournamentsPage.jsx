@@ -97,7 +97,7 @@ export default function TournamentsPage() {
                     font-teko text-[15px] tracking-[0.2em] px-6 md:px-8 py-3 transition-all duration-300 uppercase whitespace-nowrap relative
                     ${filter === value
                       ? 'bg-[#dbb462] text-[#402d00]'
-                      : 'bg-[#0e0e0e] text-[#d1c5b3] opacity-40 hover:opacity-100 hover:bg-[#111]'
+                      : 'bg-[#0e0e0e] text-[#d1c5b3] opacity-60 hover:opacity-100 hover:bg-[#111]'
                     }
                   `}
                 >

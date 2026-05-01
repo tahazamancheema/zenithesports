@@ -20,7 +20,7 @@ export default function ProtectedRoute({
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#131313]">
-        <div className="font-agency text-4xl font-bold italic text-[#dbb462] animate-pulse">
+        <div className="font-bebas text-4xl font-bold italic text-[#dbb462] animate-pulse">
           ZENITH
         </div>
       </div>

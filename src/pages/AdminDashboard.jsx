@@ -93,7 +93,7 @@ export default function AdminDashboard() {
         <aside className="hidden md:flex flex-col w-64 bg-[#131313] border-r border-[rgba(78,70,56,0.15)] min-h-[calc(100vh-5rem)] shrink-0">
           <div className="p-8">
             <h2 className="font-bebas text-2xl font-bold text-[#dbb462] tracking-widest">ZENITH DASHBOARD</h2>
-            <p className="font-stretch text-[8px] tracking-widest text-[#d1c5b3] opacity-40 mt-1">ADMIN OVERVIEW</p>
+            <p className="font-teko text-[12px] tracking-widest text-[#d1c5b3] opacity-60 mt-1">ADMIN OVERVIEW</p>
           </div>
 
           <nav className="flex-1 space-y-1">
@@ -105,11 +105,11 @@ export default function AdminDashboard() {
                 onClick={() => setActiveTab(id)}
                 className={`
                   w-full flex items-center gap-4 px-8 py-4
-                  font-stretch text-[10px] tracking-widest text-left
+                  font-teko text-[14px] tracking-widest text-left
                   transition-all duration-200 ease-out
                   ${activeTab === id
                     ? 'text-[#f9d07a] bg-[#1f1f1f] border-l-4 border-[#f9d07a]'
-                    : 'text-[#d1c5b3] opacity-50 hover:opacity-100 hover:bg-[#2a2a2a]'
+                    : 'text-[#d1c5b3] opacity-70 hover:opacity-100 hover:bg-[#2a2a2a]'
                   }
                 `}
               >
@@ -134,10 +134,10 @@ export default function AdminDashboard() {
         <main className="flex-1 p-8 lg:p-12 overflow-auto">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
             <div>
-              <h1 className="font-agency text-5xl md:text-6xl font-black italic tracking-tighter uppercase">
+              <h1 className="font-bebas text-5xl md:text-6xl font-black italic tracking-tighter uppercase">
                 ZENITH ADMIN
               </h1>
-              <p className="font-stretch text-[9px] tracking-widest text-[#d1c5b3] opacity-50 mt-2">
+              <p className="font-teko text-[13px] tracking-widest text-[#d1c5b3] opacity-70 mt-2">
                 REAL-TIME MANAGEMENT & GRID LOGISTICS
               </p>
             </div>
@@ -296,7 +296,7 @@ function TournamentsTab({ tournaments, registrations, onEdit, onDelete, onViewRe
     <div className="space-y-4">
       {tournaments.length === 0 ? (
         <div className="text-center py-20 bg-[#1b1b1b]">
-          <p className="font-stretch text-[10px] tracking-widest text-[#d1c5b3] opacity-30">
+          <p className="font-teko text-[14px] tracking-widest text-[#d1c5b3] opacity-70">
             NO TOURNAMENTS YET — CREATE ONE ABOVE
           </p>
         </div>
@@ -334,13 +334,13 @@ function TournamentsTab({ tournaments, registrations, onEdit, onDelete, onViewRe
                   </div>
                   <div>
                     <div className="flex items-center gap-3 mb-1">
-                      <p className="font-agency text-xl md:text-2xl font-bold leading-tight">{t.title}</p>
+                      <p className="font-bebas text-xl md:text-2xl font-bold leading-tight">{t.title}</p>
                       <StatusBadge status={t.status} />
                     </div>
-                    <p className="font-stretch text-[9px] md:text-[10px] text-[#d1c5b3] opacity-40 tracking-widest">
+                    <p className="font-teko text-[13px] md:text-[10px] text-[#d1c5b3] opacity-60 tracking-widest">
                       {t.game || 'PUBG MOBILE'}
                       {prizeFormatted && <> &bull; {prizeFormatted}</>}
-                      &bull; {approvedCount}/{t.max_teams || '∞'} TEAMS
+                      &bull; {approvedCount}/{t.max_teams || 'UNLIMITED'} TEAMS
                       {pendingCount > 0 && (
                         <span className="text-[#f9d07a] ml-2">• {pendingCount} PENDING</span>
                       )}
@@ -403,10 +403,10 @@ function QuickStatCard({ icon: Icon, label, value, highlight }) {
   return (
     <div className={`bg-[#1b1b1b] p-5 md:p-6 ${highlight ? 'border-l-2 border-[#f9d07a]' : ''}`}>
       <div className="flex items-center gap-2 mb-3">
-        <Icon size={14} className={`${highlight ? 'text-[#f9d07a]' : 'text-[#d1c5b3] opacity-40'}`} />
-        <span className="font-stretch text-[8px] tracking-widest text-[#d1c5b3] opacity-50 uppercase">{label}</span>
+        <Icon size={14} className={`${highlight ? 'text-[#f9d07a]' : 'text-[#d1c5b3] opacity-60'}`} />
+        <span className="font-teko text-[12px] tracking-widest text-[#d1c5b3] opacity-70 uppercase">{label}</span>
       </div>
-      <p className={`font-agency text-3xl md:text-4xl font-bold ${highlight ? 'text-[#f9d07a]' : 'text-white'}`}>{value}</p>
+      <p className={`font-bebas text-3xl md:text-4xl font-bold ${highlight ? 'text-[#f9d07a]' : 'text-white'}`}>{value}</p>
     </div>
   );
 }
@@ -415,7 +415,7 @@ function ActionBtn({ icon: Icon, label, badge, onClick }) {
   return (
     <button
       onClick={onClick}
-      className="flex items-center justify-center gap-2 px-3 md:px-6 py-4 font-stretch text-[10px] md:text-[11px] tracking-widest text-[#d1c5b3] opacity-60 hover:opacity-100 hover:bg-[#2a2a2a] transition-all flex-1 min-w-[33.33%]"
+      className="flex items-center justify-center gap-2 px-3 md:px-6 py-4 font-teko text-[14px] md:text-[11px] tracking-widest text-[#d1c5b3] opacity-60 hover:opacity-100 hover:bg-[#2a2a2a] transition-all flex-1 min-w-[33.33%]"
     >
       <Icon size={14} className="md:w-4 md:h-4" />
       {label}
@@ -458,21 +458,21 @@ function TournamentRegsModal({ tournament, registrations, onClose, onApprove, on
         {/* Modal Header */}
         <div className="flex items-center justify-between px-8 py-5 border-b border-[rgba(78,70,56,0.2)] flex-shrink-0">
           <div>
-            <h2 className="font-agency text-2xl font-bold text-[#f9d07a]">REGISTRATIONS</h2>
-            <p className="font-stretch text-[9px] tracking-widest text-[#d1c5b3] opacity-50 mt-1">
+            <h2 className="font-bebas text-2xl font-bold text-[#f9d07a]">REGISTRATIONS</h2>
+            <p className="font-teko text-[13px] tracking-widest text-[#d1c5b3] opacity-70 mt-1">
               {tournament.title.toUpperCase()}
             </p>
           </div>
           <div className="flex items-center gap-2 md:gap-3">
             <button
               onClick={onExport}
-              className="flex items-center gap-2 border border-[rgba(78,70,56,0.3)] px-3 md:px-4 py-2 font-stretch text-[8px] md:text-[9px] tracking-widest text-[#d1c5b3] hover:bg-[#2a2a2a] transition-colors"
+              className="flex items-center gap-2 border border-[rgba(78,70,56,0.3)] px-3 md:px-4 py-2 font-teko text-[12px] md:text-[9px] tracking-widest text-[#d1c5b3] hover:bg-[#2a2a2a] transition-colors"
             >
               <Download size={12} /> <span className="hidden sm:inline">EXPORT</span>
             </button>
             <button
               onClick={onAdd}
-              className="flex items-center gap-2 bg-[#f9d07a]/10 border border-[#f9d07a]/30 text-[#f9d07a] px-3 md:px-4 py-2 font-stretch text-[8px] md:text-[9px] tracking-widest hover:bg-[#f9d07a]/20 transition-colors"
+              className="flex items-center gap-2 bg-[#f9d07a]/10 border border-[#f9d07a]/30 text-[#f9d07a] px-3 md:px-4 py-2 font-teko text-[12px] md:text-[9px] tracking-widest hover:bg-[#f9d07a]/20 transition-colors"
             >
               <Plus size={12} /> <span className="hidden sm:inline">ADD</span>
             </button>
@@ -491,8 +491,8 @@ function TournamentRegsModal({ tournament, registrations, onClose, onApprove, on
             { label: 'REJECTED', value: stats.rejected, hi: true },
           ].map(({ label, value, hi }) => (
             <div key={label} className={`p-4 ${hi ? 'bg-[#1b1b1b]' : ''}`}>
-              <p className="font-stretch text-[7px] text-[#c6c6c6] tracking-widest">{label}</p>
-              <p className="font-agency text-2xl font-bold text-[#f9d07a]">{value}</p>
+              <p className="font-teko text-[11px] text-[#c6c6c6] tracking-widest">{label}</p>
+              <p className="font-bebas text-2xl font-bold text-[#f9d07a]">{value}</p>
             </div>
           ))}
         </div>
@@ -500,23 +500,23 @@ function TournamentRegsModal({ tournament, registrations, onClose, onApprove, on
         {/* Filters */}
         <div className="flex gap-3 px-6 py-4 border-b border-[rgba(78,70,56,0.1)] flex-wrap flex-shrink-0">
           <div className="flex items-center gap-2 bg-[#1f1f1f] border border-[rgba(78,70,56,0.3)] px-3 py-2">
-            <Search size={12} className="text-[#d1c5b3] opacity-40" />
+            <Search size={12} className="text-[#d1c5b3] opacity-60" />
             <input
               type="text"
               placeholder="Search teams..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="bg-transparent text-[11px] font-stretch tracking-widest text-[#d1c5b3] placeholder:opacity-30 w-36 focus:outline-none"
+              className="bg-transparent text-[11px] font-teko text-[14px] tracking-widest text-[#d1c5b3] placeholder:opacity-70 w-36 focus:outline-none"
             />
           </div>
           {['all', 'pending', 'approved', 'rejected'].map((s) => (
             <button
               key={s}
               onClick={() => setFilterStatus(s)}
-              className={`font-stretch text-[9px] tracking-widest px-4 py-2 transition-all ${
+              className={`font-teko text-[13px] tracking-widest px-4 py-2 transition-all ${
                 filterStatus === s
                   ? 'bg-[#f9d07a] text-[#402d00]'
-                  : 'border border-[rgba(78,70,56,0.3)] text-[#d1c5b3] opacity-50 hover:opacity-100'
+                  : 'border border-[rgba(78,70,56,0.3)] text-[#d1c5b3] opacity-70 hover:opacity-100'
               }`}
             >
               {s.toUpperCase()}
@@ -530,7 +530,7 @@ function TournamentRegsModal({ tournament, registrations, onClose, onApprove, on
             <thead className="sticky top-0 bg-[#1a1a1a] z-10">
               <tr>
                 {['TEAM', 'REAL NAME', 'WHATSAPP', 'PLAYERS', 'STATUS', 'GROUP', 'ACTIONS'].map((h) => (
-                  <th key={h} className="px-4 py-3 font-stretch text-[8px] text-[#d1c5b3] tracking-widest opacity-50 text-left">
+                  <th key={h} className="px-4 py-3 font-teko text-[12px] text-[#d1c5b3] tracking-widest opacity-70 text-left">
                     {h}
                   </th>
                 ))}
@@ -539,7 +539,7 @@ function TournamentRegsModal({ tournament, registrations, onClose, onApprove, on
             <tbody>
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-4 py-16 text-center font-stretch text-[9px] text-[#d1c5b3] opacity-20 tracking-widest">
+                  <td colSpan={7} className="px-4 py-16 text-center font-teko text-[13px] text-[#d1c5b3] opacity-20 tracking-widest">
                     NO REGISTRATIONS FOUND
                   </td>
                 </tr>
@@ -551,24 +551,24 @@ function TournamentRegsModal({ tournament, registrations, onClose, onApprove, on
                         {reg.logo_url ? (
                           <img src={reg.logo_url} alt="" className="w-8 h-8 object-cover rounded-full border border-[#4e4638] flex-shrink-0" />
                         ) : (
-                          <div className="w-8 h-8 bg-[#2a2a2a] rounded-full flex items-center justify-center font-agency text-sm text-[#f9d07a] font-bold flex-shrink-0">
+                          <div className="w-8 h-8 bg-[#2a2a2a] rounded-full flex items-center justify-center font-bebas text-sm text-[#f9d07a] font-bold flex-shrink-0">
                             {reg.team_name?.[0]}
                           </div>
                         )}
-                        <span className="font-agency font-bold text-base whitespace-nowrap">{reg.team_name}</span>
+                        <span className="font-bebas font-bold text-base whitespace-nowrap">{reg.team_name}</span>
                       </div>
                     </td>
                     <td className="px-4 py-4 font-body text-sm text-[#d1c5b3] opacity-70">{reg.real_name || '—'}</td>
-                    <td className="px-4 py-4 font-body text-xs text-[#d1c5b3] opacity-50">{reg.whatsapp_number}</td>
+                    <td className="px-4 py-4 font-body text-xs text-[#d1c5b3] opacity-70">{reg.whatsapp_number}</td>
                     <td className="px-4 py-4">
-                      <span className="font-stretch text-[9px] text-[#f9d07a] tracking-widest">
+                      <span className="font-teko text-[13px] text-[#f9d07a] tracking-widest">
                         {reg.player_ids?.length || 0} PLAYERS
                       </span>
                     </td>
                     <td className="px-4 py-4">
                       <StatusBadge status={reg.status} />
                     </td>
-                    <td className="px-4 py-4 font-stretch text-[9px] text-[#d1c5b3] opacity-40 tracking-widest">
+                    <td className="px-4 py-4 font-teko text-[13px] text-[#d1c5b3] opacity-60 tracking-widest">
                       {reg.group_id || '—'}
                     </td>
                     <td className="px-4 py-4">
@@ -672,8 +672,8 @@ function TournamentGroupsModal({ tournament, registrations, allRegistrations, up
         {/* Header */}
         <div className="flex items-center justify-between px-8 py-5 border-b border-[rgba(78,70,56,0.2)]">
           <div>
-            <h2 className="font-agency text-2xl font-bold text-[#f9d07a]">GROUPS</h2>
-            <p className="font-stretch text-[9px] tracking-widest text-[#d1c5b3] opacity-50 mt-1">
+            <h2 className="font-bebas text-2xl font-bold text-[#f9d07a]">GROUPS</h2>
+            <p className="font-teko text-[13px] tracking-widest text-[#d1c5b3] opacity-70 mt-1">
               {tournament.title.toUpperCase()} &bull; {registrations.length} APPROVED TEAMS
             </p>
           </div>
@@ -681,7 +681,7 @@ function TournamentGroupsModal({ tournament, registrations, allRegistrations, up
             {groupNames.length > 0 && (
               <button
                 onClick={handleReset}
-                className="border border-[rgba(78,70,56,0.3)] px-4 py-2 font-stretch text-[9px] tracking-widest text-[#d1c5b3] hover:bg-[#2a2a2a] transition-colors"
+                className="border border-[rgba(78,70,56,0.3)] px-4 py-2 font-teko text-[13px] tracking-widest text-[#d1c5b3] hover:bg-[#2a2a2a] transition-colors"
               >
                 RESET ALL
               </button>
@@ -699,7 +699,7 @@ function TournamentGroupsModal({ tournament, registrations, allRegistrations, up
         <div className="p-8">
           {groupNames.length === 0 ? (
             <div className="text-center py-16 bg-[#1b1b1b]">
-              <p className="font-stretch text-[10px] tracking-widest text-[#d1c5b3] opacity-30 mb-2">
+              <p className="font-teko text-[14px] tracking-widest text-[#d1c5b3] opacity-70 mb-2">
                 NO GROUPS ASSIGNED YET
               </p>
               <p className="text-[#d1c5b3] opacity-20 text-sm">
@@ -715,12 +715,12 @@ function TournamentGroupsModal({ tournament, registrations, allRegistrations, up
                   <div key={groupName} className={`bg-[#1f1f1f] p-5 border-l-4 ${isFull ? 'border-[#dbb462]' : 'border-[rgba(78,70,56,0.3)]'}`}>
                     <div className="flex justify-between items-start mb-3">
                       <div>
-                        <p className="font-agency text-xl font-bold">{groupName.toUpperCase()}</p>
-                        <p className="font-stretch text-[9px] text-[#d1c5b3] opacity-50 tracking-widest">
+                        <p className="font-bebas text-xl font-bold">{groupName.toUpperCase()}</p>
+                        <p className="font-teko text-[13px] text-[#d1c5b3] opacity-70 tracking-widest">
                           {teams.length} / 20 SLOTS
                         </p>
                       </div>
-                      {isFull ? <CheckCircle2 size={18} className="text-[#f9d07a]" /> : <Clock size={18} className="text-[#9a8f7f] opacity-40" />}
+                      {isFull ? <CheckCircle2 size={18} className="text-[#f9d07a]" /> : <Clock size={18} className="text-[#9a8f7f] opacity-60" />}
                     </div>
                     <div className="w-full bg-[#353535] h-0.5 mb-3">
                       <div className="zenith-gradient h-full" style={{ width: `${(teams.length / 20) * 100}%` }} />
@@ -878,8 +878,8 @@ function TournamentModal({ isOpen, onClose, tournament, onSave }) {
     { id: 'reg_config', label: 'Config', icon: ListOrdered },
   ];
 
-  const inputCls = 'w-full bg-[#131313] border border-[rgba(78,70,56,0.3)] p-2.5 text-sm text-[#e2e2e2] focus:outline-none focus:border-[#f9d07a] transition-colors font-mono placeholder:opacity-30';
-  const labelCls = 'font-stretch text-[9px] tracking-widest text-[#d1c5b3] uppercase block mb-1';
+  const inputCls = 'w-full bg-[#131313] border border-[rgba(78,70,56,0.3)] p-2.5 text-sm text-[#e2e2e2] focus:outline-none focus:border-[#f9d07a] transition-colors font-mono placeholder:opacity-70';
+  const labelCls = 'font-teko text-[13px] tracking-widest text-[#d1c5b3] uppercase block mb-1';
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={tournament ? 'EDIT TOURNAMENT' : 'CREATE TOURNAMENT'}>
@@ -889,8 +889,8 @@ function TournamentModal({ isOpen, onClose, tournament, onSave }) {
           <button
             key={id}
             onClick={() => setSection(id)}
-            className={`flex items-center gap-1.5 flex-1 justify-center py-2 font-stretch text-[9px] tracking-widest transition-all ${
-              section === id ? 'bg-[#f9d07a] text-[#402d00]' : 'bg-[#1f1f1f] text-[#d1c5b3] opacity-50 hover:opacity-100'
+            className={`flex items-center gap-1.5 flex-1 justify-center py-2 font-teko text-[13px] tracking-widest transition-all ${
+              section === id ? 'bg-[#f9d07a] text-[#402d00]' : 'bg-[#1f1f1f] text-[#d1c5b3] opacity-70 hover:opacity-100'
             }`}
           >
             <Icon size={11} /> {label}
@@ -918,9 +918,9 @@ function TournamentModal({ isOpen, onClose, tournament, onSave }) {
                 type="file"
                 accept="image/*"
                 onChange={(e) => setFile(e.target.files[0])}
-                className="w-full text-[10px] text-[#d1c5b3] file:mr-4 file:py-2 file:px-4 file:border-0 file:bg-[#1f1f1f] file:text-[#f9d07a] file:font-stretch file:text-[9px] file:cursor-pointer hover:file:bg-[#2a2a2a]"
+                className="w-full text-[10px] text-[#d1c5b3] file:mr-4 file:py-2 file:px-4 file:border-0 file:bg-[#1f1f1f] file:text-[#f9d07a] file:font-teko text-[14px] file:text-[9px] file:cursor-pointer hover:file:bg-[#2a2a2a]"
               />
-              <p className="text-[9px] text-[#d1c5b3] opacity-30">Recommended: 16:9 or 3:4 ratio</p>
+              <p className="text-[9px] text-[#d1c5b3] opacity-70">Recommended: 16:9 or 3:4 ratio</p>
             </div>
           </div>
 
@@ -958,7 +958,7 @@ function TournamentModal({ isOpen, onClose, tournament, onSave }) {
                     onChange={(e) => setForm((f) => ({ ...f, max_teams: e.target.checked ? '' : 64 }))}
                     className="accent-[#dbb462]"
                   />
-                  <label htmlFor="unlimitedTeams" className="font-stretch text-[8px] text-[#dbb462] cursor-pointer tracking-widest uppercase">
+                  <label htmlFor="unlimitedTeams" className="font-teko text-[12px] text-[#dbb462] cursor-pointer tracking-widest uppercase">
                     Unset (Unlimited)
                   </label>
                 </div>
@@ -968,7 +968,7 @@ function TournamentModal({ isOpen, onClose, tournament, onSave }) {
                 value={form.max_teams === null ? '' : form.max_teams}
                 onChange={(e) => setForm((f) => ({ ...f, max_teams: e.target.value }))}
                 disabled={form.max_teams === '' || form.max_teams === null}
-                className={inputCls + (form.max_teams === '' || form.max_teams === null ? ' opacity-30 cursor-not-allowed' : '')}
+                className={inputCls + (form.max_teams === '' || form.max_teams === null ? ' opacity-70 cursor-not-allowed' : '')}
                 placeholder="Unlimited"
               />
             </div>
@@ -985,8 +985,8 @@ function TournamentModal({ isOpen, onClose, tournament, onSave }) {
           {/* ── Dates & Auto Status ── */}
           <div className="bg-[#0e0e0e] border border-[rgba(78,70,56,0.2)] p-4 space-y-3">
             <div className="flex items-center justify-between mb-3">
-              <span className="font-stretch text-[9px] tracking-widest text-[#d1c5b3] opacity-50">AUTO-COMPUTED STATUS</span>
-              <span className={`font-stretch text-[9px] tracking-widest px-3 py-1 border ${
+              <span className="font-teko text-[13px] tracking-widest text-[#d1c5b3] opacity-70">AUTO-COMPUTED STATUS</span>
+              <span className={`font-teko text-[13px] tracking-widest px-3 py-1 border ${
                 computedStatus === 'registrations_open'    ? 'text-emerald-400 border-emerald-500/30' :
                 computedStatus === 'in_progress' ? 'text-blue-400 border-blue-500/30' :
                 computedStatus === 'registrations_closed' ? 'text-red-400 border-red-500/30' :
@@ -1027,7 +1027,7 @@ function TournamentModal({ isOpen, onClose, tournament, onSave }) {
 
             {/* Completed toggle */}
             <div className="flex items-center justify-between pt-2 border-t border-[rgba(78,70,56,0.15)]">
-              <span className="font-stretch text-[9px] tracking-widest text-[#d1c5b3] opacity-70">
+              <span className="font-teko text-[13px] tracking-widest text-[#d1c5b3] opacity-70">
                 MARK AS COMPLETED
               </span>
               <button
@@ -1073,13 +1073,13 @@ function TournamentModal({ isOpen, onClose, tournament, onSave }) {
       {/* ── SCHEDULE ── */}
       {section === 'schedule' && (
         <div className="space-y-3">
-          <p className="font-stretch text-[9px] tracking-widest text-[#d1c5b3] opacity-40">
+          <p className="font-teko text-[13px] tracking-widest text-[#d1c5b3] opacity-60">
             Add events in chronological order. They will be displayed on the Schedule tab.
           </p>
 
           {scheduleRows.length === 0 && (
             <div className="text-center py-8 bg-[#0e0e0e]">
-              <p className="font-stretch text-[9px] text-[#d1c5b3] opacity-30 tracking-widest">NO EVENTS YET</p>
+              <p className="font-teko text-[13px] text-[#d1c5b3] opacity-70 tracking-widest">NO EVENTS YET</p>
             </div>
           )}
 
@@ -1114,9 +1114,62 @@ function TournamentModal({ isOpen, onClose, tournament, onSave }) {
 
           <button
             onClick={addScheduleRow}
-            className="flex items-center gap-2 border border-dashed border-[rgba(78,70,56,0.4)] px-4 py-3 w-full font-stretch text-[9px] tracking-widest text-[#d1c5b3] opacity-50 hover:opacity-100 hover:bg-[#1f1f1f] transition-all"
+            className="flex items-center gap-2 border border-dashed border-[rgba(78,70,56,0.4)] px-4 py-3 w-full font-teko text-[13px] tracking-widest text-[#d1c5b3] opacity-70 hover:opacity-100 hover:bg-[#1f1f1f] transition-all"
           >
             <Plus size={14} /> ADD EVENT
+          </button>
+        </div>
+      )}
+
+      {/* ── ROADMAP ── */}
+      {section === 'roadmap' && (
+        <div className="space-y-3">
+          <p className="font-teko text-[13px] tracking-widest text-[#d1c5b3] opacity-60">
+            Define the tournament phases (e.g., Qualifiers, Quarter Finals).
+          </p>
+
+          {roadmapRows.length === 0 && (
+            <div className="text-center py-8 bg-[#0e0e0e]">
+              <p className="font-teko text-[13px] text-[#d1c5b3] opacity-70 tracking-widest">NO ROADMAP PHASES YET</p>
+            </div>
+          )}
+
+          <div className="space-y-2 max-h-64 overflow-y-auto no-scrollbar">
+            {roadmapRows.map((row) => (
+              <div key={row.id} className="grid grid-cols-[1fr_2fr_3fr_auto] gap-2 items-center">
+                <input
+                  type="text"
+                  placeholder="Phase (e.g. QF)"
+                  value={row.phase}
+                  onChange={(e) => updRoad(row.id, 'phase', e.target.value)}
+                  className={inputCls}
+                />
+                <input
+                  type="text"
+                  placeholder="Title"
+                  value={row.title}
+                  onChange={(e) => updRoad(row.id, 'title', e.target.value)}
+                  className={inputCls}
+                />
+                <input
+                  type="text"
+                  placeholder="Description"
+                  value={row.description}
+                  onChange={(e) => updRoad(row.id, 'description', e.target.value)}
+                  className={inputCls}
+                />
+                <button onClick={() => delRoad(row.id)} className="text-[#ffb4ab] hover:opacity-70 p-1">
+                  <X size={16} />
+                </button>
+              </div>
+            ))}
+          </div>
+
+          <button
+            onClick={addRoadmapRow}
+            className="flex items-center gap-2 border border-dashed border-[rgba(78,70,56,0.4)] px-4 py-3 w-full font-teko text-[13px] tracking-widest text-[#d1c5b3] opacity-70 hover:opacity-100 hover:bg-[#1f1f1f] transition-all"
+          >
+            <Plus size={14} /> ADD PHASE
           </button>
         </div>
       )}
@@ -1126,7 +1179,7 @@ function TournamentModal({ isOpen, onClose, tournament, onSave }) {
         <div className="space-y-6">
           <div>
             <h4 className={labelCls}>Screenshot Verification</h4>
-            <p className="text-[10px] text-[#d1c5b3] opacity-40 mb-4 leading-relaxed">
+            <p className="text-[10px] text-[#d1c5b3] opacity-60 mb-4 leading-relaxed">
               Require users to upload proof (e.g., Discord join, YouTube sub, In-game profile) during registration.
             </p>
 
@@ -1134,7 +1187,7 @@ function TournamentModal({ isOpen, onClose, tournament, onSave }) {
               {(form.registration_config?.screenshots || []).map((ss, idx) => (
                 <div key={idx} className="bg-[#0e0e0e] border border-[rgba(78,70,56,0.2)] p-4 flex gap-4 items-end">
                   <div className="flex-1 space-y-1">
-                    <label className="font-stretch text-[8px] text-[#dbb462]/60 uppercase tracking-widest">Requirement Label</label>
+                    <label className="font-teko text-[12px] text-[#dbb462]/60 uppercase tracking-widest">Requirement Label</label>
                     <input
                       type="text"
                       value={ss.label}
@@ -1148,7 +1201,7 @@ function TournamentModal({ isOpen, onClose, tournament, onSave }) {
                     />
                   </div>
                   <div className="flex flex-col items-center gap-1">
-                    <label className="font-stretch text-[8px] text-[#dbb462]/60 uppercase tracking-widest">Required</label>
+                    <label className="font-teko text-[12px] text-[#dbb462]/60 uppercase tracking-widest">Required</label>
                     <button
                       onClick={() => {
                         const newSS = [...form.registration_config.screenshots];
@@ -1165,7 +1218,7 @@ function TournamentModal({ isOpen, onClose, tournament, onSave }) {
                       const newSS = form.registration_config.screenshots.filter((_, i) => i !== idx);
                       setForm(f => ({ ...f, registration_config: { ...f.registration_config, screenshots: newSS } }));
                     }}
-                    className="text-red-400 opacity-40 hover:opacity-100 p-2"
+                    className="text-red-400 opacity-60 hover:opacity-100 p-2"
                   >
                     <Trash2 size={16} />
                   </button>
@@ -1178,7 +1231,7 @@ function TournamentModal({ isOpen, onClose, tournament, onSave }) {
                     const newSS = [...(form.registration_config?.screenshots || []), { label: '', required: true }];
                     setForm(f => ({ ...f, registration_config: { ...f.registration_config, screenshots: newSS } }));
                   }}
-                  className="w-full py-4 border border-dashed border-[#dbb462]/20 text-[#dbb462]/40 hover:text-[#dbb462] hover:bg-[#dbb462]/5 font-stretch text-[9px] tracking-[0.2em] transition-all uppercase"
+                  className="w-full py-4 border border-dashed border-[#dbb462]/20 text-[#dbb462]/40 hover:text-[#dbb462] hover:bg-[#dbb462]/5 font-teko text-[13px] tracking-[0.2em] transition-all uppercase"
                 >
                   + Add Screenshot Requirement
                 </button>
@@ -1269,8 +1322,8 @@ function RegistrationModal({ isOpen, onClose, registration, tournament, onSave }
     }
   }
 
-  const inputCls = 'w-full bg-[#131313] border border-[rgba(78,70,56,0.3)] p-2.5 text-sm text-[#e2e2e2] focus:outline-none focus:border-[#f9d07a] transition-colors font-mono placeholder:opacity-30';
-  const labelCls = 'font-stretch text-[9px] tracking-widest text-[#d1c5b3] uppercase block mb-1';
+  const inputCls = 'w-full bg-[#131313] border border-[rgba(78,70,56,0.3)] p-2.5 text-sm text-[#e2e2e2] focus:outline-none focus:border-[#f9d07a] transition-colors font-mono placeholder:opacity-70';
+  const labelCls = 'font-teko text-[13px] tracking-widest text-[#d1c5b3] uppercase block mb-1';
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={registration ? 'EDIT REGISTRATION' : 'ADD REGISTRATION'}>
@@ -1292,7 +1345,7 @@ function RegistrationModal({ isOpen, onClose, registration, tournament, onSave }
               type="file"
               accept="image/*"
               onChange={(e) => setFile(e.target.files[0])}
-              className="w-full text-[10px] text-[#d1c5b3] file:mr-3 file:py-1.5 file:px-3 file:border-0 file:bg-[#1f1f1f] file:text-[#f9d07a] file:font-stretch file:text-[9px] file:cursor-pointer"
+              className="w-full text-[10px] text-[#d1c5b3] file:mr-3 file:py-1.5 file:px-3 file:border-0 file:bg-[#1f1f1f] file:text-[#f9d07a] file:font-teko text-[14px] file:text-[9px] file:cursor-pointer"
             />
           </div>
         </div>
@@ -1344,6 +1397,28 @@ function RegistrationModal({ isOpen, onClose, registration, tournament, onSave }
           placeholder="e.g. Group 1"
         />
 
+        {registration?.screenshot_urls?.length > 0 && (
+          <div className="space-y-2 pt-4 border-t border-white/10">
+            <label className={labelCls}>Verification Proofs (Screenshots)</label>
+            <div className="grid grid-cols-2 gap-4">
+              {registration.screenshot_urls.filter(Boolean).map((url, i) => (
+                <a 
+                  key={i} 
+                  href={url} 
+                  target="_blank" 
+                  rel="noreferrer" 
+                  className="group relative aspect-video bg-[#1a1a1a] border border-white/5 overflow-hidden flex items-center justify-center"
+                >
+                   <img src={url} alt={`Proof ${i+1}`} className="w-full h-full object-cover opacity-50 group-hover:opacity-100 transition-opacity" />
+                   <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/60">
+                      <span className="font-teko text-[13px] text-[#f9d07a] tracking-widest uppercase border border-[#f9d07a]/30 px-3 py-1">View Full</span>
+                   </div>
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+
         <GradientButton className="w-full" onClick={handleSave} disabled={saving}>
           {saving ? 'SAVING...' : (registration ? 'UPDATE REGISTRATION' : 'ADD REGISTRATION')}
         </GradientButton>
@@ -1358,7 +1433,7 @@ function RegistrationModal({ isOpen, onClose, registration, tournament, onSave }
 function LoadingScreen() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#131313] pt-20">
-      <div className="font-agency text-4xl font-bold italic text-[#dbb462] animate-pulse">LOADING...</div>
+      <div className="font-bebas text-4xl font-bold italic text-[#dbb462] animate-pulse">LOADING...</div>
     </div>
   );
 }

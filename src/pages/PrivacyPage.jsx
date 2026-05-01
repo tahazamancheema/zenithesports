@@ -9,7 +9,7 @@ export default function PrivacyPage() {
       {/* Hero */}
       <section className="py-20 px-6 md:px-12 bg-[#1b1b1b]">
         <span className="font-stretch text-[#f9d07a] text-[10px] tracking-[0.4em] block mb-4">LEGAL</span>
-        <h1 className="font-agency text-6xl md:text-7xl font-black italic tracking-tighter leading-tight mb-4">
+        <h1 className="font-bebas text-6xl md:text-7xl font-black italic tracking-tighter leading-tight mb-4">
           PRIVACY POLICY
         </h1>
         <p className="font-stretch text-[9px] tracking-widest text-[#d1c5b3] opacity-30">
@@ -117,7 +117,7 @@ export default function PrivacyPage() {
 function Clause({ title, children }) {
   return (
     <div>
-      <h2 className="font-agency text-2xl font-bold italic tracking-tight text-[#f9d07a] mb-4">{title}</h2>
+      <h2 className="font-bebas text-2xl font-bold italic tracking-tight text-[#f9d07a] mb-4">{title}</h2>
       <div className="space-y-3 text-sm leading-relaxed [&_ul]:list-none [&_ul]:space-y-2 [&_ul>li]:pl-4 [&_ul>li]:border-l-2 [&_ul>li]:border-[rgba(78,70,56,0.4)]">
         {children}
       </div>

@@ -42,8 +42,8 @@ export default function TournamentCard({ tournament, registrationCount = 0, isUs
         {/* Prize overlay */}
         {prizeFormatted && (
           <div className="absolute bottom-4 right-4 z-20">
-            <div className="bg-[#0e0e0e]/90 backdrop-blur-md border border-[#dbb462]/20 px-4 py-2">
-              <span className="font-bebas text-2xl text-[#dbb462] leading-none">{prizeFormatted}</span>
+            <div className="bg-[#0e0e0e]/90 backdrop-blur-md border border-[#dbb462]/20 px-3 py-1.5">
+              <span className="font-bebas text-lg text-[#dbb462] leading-none">{prizeFormatted}</span>
             </div>
           </div>
         )}
@@ -57,7 +57,7 @@ export default function TournamentCard({ tournament, registrationCount = 0, isUs
           {startFormatted && (
             <>
               <div className="w-1 h-1 bg-white/20" />
-              <span className="font-teko text-[14px] text-[#d1c5b3] opacity-50 tracking-[0.15em] uppercase">{startFormatted}</span>
+              <span className="font-teko text-[14px] text-[#d1c5b3] opacity-70 tracking-[0.15em] uppercase">{startFormatted}</span>
             </>
           )}
         </div>
@@ -72,14 +72,14 @@ export default function TournamentCard({ tournament, registrationCount = 0, isUs
         {/* Stats row */}
         <div className="grid grid-cols-2 gap-[1px] bg-white/[0.04] mb-6">
           <div className="bg-[#0e0e0e] py-3 px-4">
-            <span className="font-teko text-[11px] tracking-[0.2em] text-[#d1c5b3] opacity-40 uppercase block mb-1">Squads</span>
+            <span className="font-teko text-[13px] tracking-[0.2em] text-[#d1c5b3] opacity-60 uppercase block mb-1">Squads</span>
             <div className="flex items-baseline gap-1.5">
               <span className="font-bebas text-xl text-white leading-none">{registrationCount}</span>
-              <span className="font-teko text-sm text-white/25 tracking-wider uppercase">/ {max_teams || '∞'}</span>
+              <span className="font-teko text-base text-white/50 tracking-wider uppercase">/ {max_teams || 'UNLIMITED'}</span>
             </div>
           </div>
           <div className="bg-[#0e0e0e] py-3 px-4">
-            <span className="font-teko text-[11px] tracking-[0.2em] text-[#d1c5b3] opacity-40 uppercase block mb-1">Prize Pool</span>
+            <span className="font-teko text-[13px] tracking-[0.2em] text-[#d1c5b3] opacity-60 uppercase block mb-1">Prize Pool</span>
             <span className="font-bebas text-xl text-[#dbb462] leading-none">{prizeFormatted || 'TBA'}</span>
           </div>
         </div>

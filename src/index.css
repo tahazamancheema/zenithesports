@@ -202,6 +202,21 @@ body {
   animation: fadeIn 0.4s ease-out forwards;
 }
 
+@keyframes statEnter {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-stat-enter {
+  animation: statEnter 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }

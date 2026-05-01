@@ -12,13 +12,14 @@ export default function ProfilePage() {
   const [form, setForm] = useState({
     displayName: '',
     whatsapp_number: '',
+    captain_discord: '',
     team_name: '',
-    player_1_id: '',
-    player_2_id: '',
-    player_3_id: '',
-    player_4_id: '',
-    player_5_id: '',
-    player_6_id: '',
+    player_1_id: '', player_1_ign: '',
+    player_2_id: '', player_2_ign: '',
+    player_3_id: '', player_3_ign: '',
+    player_4_id: '', player_4_ign: '',
+    player_5_id: '', player_5_ign: '',
+    player_6_id: '', player_6_ign: '',
   });
 
   const [saving, setSaving] = useState(false);
@@ -26,16 +27,18 @@ export default function ProfilePage() {
   useEffect(() => {
     if (userDoc) {
         const pids = userDoc.player_ids || [];
+        const pigns = userDoc.player_igns || [];
         setForm({
           displayName: userDoc.display_name || '',
           whatsapp_number: userDoc.whatsapp_number || '',
+          captain_discord: userDoc.captain_discord || '',
           team_name: userDoc.team_name || '',
-          player_1_id: pids[0] || '',
-          player_2_id: pids[1] || '',
-          player_3_id: pids[2] || '',
-          player_4_id: pids[3] || '',
-          player_5_id: pids[4] || '',
-          player_6_id: pids[5] || '',
+          player_1_id: pids[0] || '', player_1_ign: pigns[0] || '',
+          player_2_id: pids[1] || '', player_2_ign: pigns[1] || '',
+          player_3_id: pids[2] || '', player_3_ign: pigns[2] || '',
+          player_4_id: pids[3] || '', player_4_ign: pigns[3] || '',
+          player_5_id: pids[4] || '', player_5_ign: pigns[4] || '',
+          player_6_id: pids[5] || '', player_6_ign: pigns[5] || '',
         });
     }
   }, [userDoc]);
@@ -65,15 +68,16 @@ export default function ProfilePage() {
           .update({
             display_name: form.displayName,
             whatsapp_number: form.whatsapp_number,
+            captain_discord: form.captain_discord,
             team_name: form.team_name,
             player_ids: [
-              form.player_1_id,
-              form.player_2_id,
-              form.player_3_id,
-              form.player_4_id,
-              form.player_5_id,
-              form.player_6_id,
-            ].map(id => id.trim()).filter(Boolean),
+              form.player_1_id, form.player_2_id, form.player_3_id,
+              form.player_4_id, form.player_5_id, form.player_6_id,
+            ].map(id => id?.trim()).filter(Boolean),
+            player_igns: [
+              form.player_1_ign, form.player_2_ign, form.player_3_ign,
+              form.player_4_ign, form.player_5_ign, form.player_6_ign,
+            ],
           })
           .eq('id', user.id);
 
@@ -148,6 +152,13 @@ export default function ProfilePage() {
                     placeholder="+92 3XX XXXXXXX"
                   />
                 </div>
+                <GhostInput
+                  id="discord"
+                  label="Captain's Discord"
+                  value={form.captain_discord}
+                  onChange={(e) => handleChange('captain_discord', e.target.value)}
+                  placeholder="Discord Username"
+                />
               </div>
             </div>
           </div>
@@ -176,14 +187,21 @@ export default function ProfilePage() {
                   placeholder="e.g. 100 Thieves"
                 />
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-8">
                   {[1, 2, 3, 4, 5, 6].map((num) => (
-                    <div key={num} className="relative group">
-                      <span className="absolute -left-6 top-1.5 font-bebas text-sm text-[#dbb462] opacity-20 group-hover:opacity-100 transition-opacity">
-                        0{num}
+                    <div key={num} className="relative group bg-[#131313] p-4 border border-white/5 space-y-4">
+                      <span className="absolute -left-3 -top-3 w-6 h-6 flex items-center justify-center bg-[#dbb462] font-bebas text-sm text-[#131313]">
+                        {num}
                       </span>
                       <GhostInput
-                        id={`player_${num}`}
+                        id={`player_${num}_ign`}
+                        label={num <= 4 ? `Player ${num} IGN *` : `Substitute ${num} IGN`}
+                        value={form[`player_${num}_ign`]}
+                        onChange={(e) => handleChange(`player_${num}_ign`, e.target.value)}
+                        placeholder="In-Game Name"
+                      />
+                      <GhostInput
+                        id={`player_${num}_id`}
                         label={num <= 4 ? `Player ${num} ID *` : `Substitute ${num} ID`}
                         value={form[`player_${num}_id`]}
                         onChange={(e) => handleChange(`player_${num}_id`, e.target.value)}

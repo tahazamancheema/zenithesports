@@ -160,8 +160,10 @@ export default function RegistrationPage() {
       } else {
         toast.error(result.error || 'Registration failed', { id: 'reg' });
         // Try to map error to field if possible
-        if (result.error.includes('Character ID')) setFieldErrors(prev => ({ ...prev, player_1_id: 'Invalid ID' }));
-        if (result.error.includes('WhatsApp')) setFieldErrors(prev => ({ ...prev, whatsapp_number: '11 digits required' }));
+        if (result.error && typeof result.error === 'string') {
+          if (result.error.includes('Character ID')) setFieldErrors(prev => ({ ...prev, player_1_id: 'Invalid ID' }));
+          if (result.error.includes('WhatsApp')) setFieldErrors(prev => ({ ...prev, whatsapp_number: '11 digits required' }));
+        }
       }
     } catch (err) {
       toast.error(`Registration uplink failed: ${err.message}`, { id: 'reg' });

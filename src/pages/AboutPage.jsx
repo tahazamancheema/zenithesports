@@ -29,13 +29,13 @@ const VALUES = [
 
 const STATIC_MILESTONES = [
   { year: '2021', event: 'Established on 6th June, 2021.' },
-  { year: '2022', event: 'Event 1: PUBG Mobile Championship Series (January, 2022)' },
-  { year: '2022', event: 'Event 2: Firebird Championship (March 2022)' },
-  { year: '2022', event: 'Event 3: The Grind (April 2022)' },
-  { year: '2022', event: 'Event 4: Pakistan National Series (May 2022)' },
-  { year: '2023', event: 'Event 5: Madmax Season 3 (Feburary, 2023)' },
-  { year: '2026', event: 'Event 6: Zenith Revival (Feburary, 2026)' },
-  { year: '2026', event: 'Event 7: Zenith Showdown Season 1 (March 2026)' },
+  { year: '2022', event: 'PUBG Mobile Championship Series (January, 2022)' },
+  { year: '2022', event: 'Firebird Championship (March 2022)' },
+  { year: '2022', event: 'The Grind (April 2022)' },
+  { year: '2022', event: 'Pakistan National Series (May 2022)' },
+  { year: '2023', event: 'Madmax Season 3 (February, 2023)' },
+  { year: '2026', event: 'Zenith Revival (February, 2026)' },
+  { year: '2026', event: 'Zenith Showdown Season 1 (March 2026)' },
 ];
 
 export default function AboutPage() {
@@ -51,13 +51,13 @@ export default function AboutPage() {
   });
 
   const dynamicMilestones = [...STATIC_MILESTONES];
-  sortedTournaments.forEach((t, idx) => {
+  sortedTournaments.forEach((t) => {
     const d = new Date(t.start_date || t.created_at);
     const month = d.toLocaleString('default', { month: 'long' });
     const year = d.getFullYear();
     dynamicMilestones.push({
       year: year.toString(),
-      event: `Event ${8 + idx}: ${t.title} (${month} ${year})`,
+      event: `${t.title} (${month} ${year})`,
     });
   });
 
@@ -79,7 +79,7 @@ export default function AboutPage() {
       <section className="relative py-48 px-6 lg:px-16 bg-[#0e0e0e] border-b border-white/5 overflow-hidden">
         <StaticBackground variant="mesh" />
         <div className="absolute inset-0 flex items-center justify-center opacity-[0.02] pointer-events-none">
-           <img src="/logo.png" alt="" className="w-full max-w-4xl h-auto object-contain" />
+          <img src="/logo.png" alt="" className="w-full max-w-4xl h-auto object-contain" />
         </div>
         <div className="relative z-10 container mx-auto max-w-7xl text-left">
           <div className="flex items-center justify-start gap-4 mb-8">
@@ -112,10 +112,10 @@ export default function AboutPage() {
             </div>
           </div>
           <div className="relative group overflow-hidden border border-white/5 bg-[#111]">
-             <div className="absolute inset-0 bg-[#dbb462]/[0.02] opacity-0 group-hover:opacity-100 transition-opacity" />
-             <div className="relative aspect-video md:aspect-square flex items-center justify-center p-12 md:p-20">
-                <img src="/logo.png" alt="Zenith" className="w-1/2 md:w-full h-auto md:h-full object-contain grayscale opacity-20 filter transition-all duration-[2s] group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105" />
-             </div>
+            <div className="absolute inset-0 bg-[#dbb462]/[0.02] opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="relative aspect-video md:aspect-square flex items-center justify-center p-12 md:p-20">
+              <img src="/logo.png" alt="Zenith" className="w-1/2 md:w-full h-auto md:h-full object-contain grayscale opacity-20 filter transition-all duration-[2s] group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105" />
+            </div>
           </div>
         </div>
       </section>
@@ -131,7 +131,7 @@ export default function AboutPage() {
 
           {/* Interactive Timeline */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-0">
-            
+
             {/* Year Selector (Left) */}
             <div className="lg:col-span-4 xl:col-span-3">
               <div className="flex lg:flex-col gap-2">
@@ -151,7 +151,7 @@ export default function AboutPage() {
                     >
                       {/* Active indicator */}
                       <div className={`absolute left-0 top-0 bottom-0 w-[3px] bg-[#dbb462] transition-all duration-300 ${isActive ? 'opacity-100' : 'opacity-0'}`} />
-                      
+
                       <div className="flex items-center justify-between">
                         <span className={`font-bebas text-4xl md:text-5xl tracking-tight transition-colors duration-300 ${isActive ? 'text-[#dbb462]' : 'text-[#f2f2f2] opacity-30 group-hover/yr:opacity-60'}`}>
                           {yr}
@@ -186,7 +186,7 @@ export default function AboutPage() {
                       <span className="font-bebas text-3xl text-[#dbb462] opacity-30 leading-none pt-1 min-w-[40px]">
                         {String(idx + 1).padStart(2, '0')}
                       </span>
-                      
+
                       {/* Event content */}
                       <div className="flex-1">
                         <p className="font-body text-xl md:text-2xl text-[#d1c5b3] leading-relaxed group-hover:text-[#f2f2f2] transition-colors duration-300">
@@ -211,7 +211,7 @@ export default function AboutPage() {
       {/* ── CALL TO ACTION ── */}
       <section className="py-32 px-6 lg:px-16 text-center bg-[#0a0a0a] relative overflow-hidden">
         <div className="container mx-auto max-w-3xl relative z-10">
-          <h2 className="font-agency font-bold text-6xl md:text-8xl tracking-tight mb-6 leading-none uppercase">
+          <h2 className="font-bebas font-bold text-6xl md:text-8xl tracking-tight mb-6 leading-none uppercase">
             Join Zenith<br />
             <span className="zenith-gradient-text pr-2">Esports</span>
           </h2>
@@ -219,7 +219,7 @@ export default function AboutPage() {
             Every professional team started somewhere. Register today and take your first step into competitive gaming.
           </p>
           <div className="flex flex-wrap gap-6 justify-center">
-            <Link to="/auth" className="bg-[#dbb462] hover:bg-[#e9c16e] text-[#111] font-agency font-bold text-2xl px-12 py-4 uppercase transition-colors">
+            <Link to="/auth" className="bg-[#dbb462] hover:bg-[#e9c16e] text-[#111] font-bebas font-bold text-2xl px-12 py-4 uppercase transition-colors">
               Register Now
             </Link>
           </div>

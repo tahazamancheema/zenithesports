@@ -37,13 +37,13 @@ class ErrorBoundary extends React.Component {
       return (
         <div className="min-h-screen bg-[#131313] flex items-center justify-center p-8">
           <div className="max-w-md w-full text-center space-y-6">
-            <h1 className="font-agency text-6xl font-black italic text-[#dbb462]">SYSTEM FAULT</h1>
+            <h1 className="font-bebas text-6xl font-black italic text-[#dbb462]">SYSTEM FAULT</h1>
             <p className="font-body text-[#d1c5b3] opacity-60">
               The Zenith engine encountered an unexpected exception. Protocol requires a tactical reset.
             </p>
             <button
               onClick={() => window.location.reload()}
-              className="zenith-gradient text-[#402d00] font-agency font-bold text-lg px-12 py-4 tracking-widest hover:brightness-110 active:scale-95 transition-all"
+              className="zenith-gradient text-[#402d00] font-bebas font-bold text-lg px-12 py-4 tracking-widest hover:brightness-110 active:scale-95 transition-all"
             >
               INITIALIZE REBOOT
             </button>
@@ -60,7 +60,7 @@ function PageLoader() {
     <div className="min-h-screen flex items-center justify-center bg-[#131313]">
       <div className="flex flex-col items-center gap-4">
         <div className="w-12 h-1 zenith-gradient animate-pulse" />
-        <span className="font-agency text-3xl font-bold italic text-[#dbb462] animate-pulse">
+        <span className="font-bebas text-3xl font-bold italic text-[#dbb462] animate-pulse">
           ZENITH
         </span>
         <div className="w-12 h-1 zenith-gradient animate-pulse" />

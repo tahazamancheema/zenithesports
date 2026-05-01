@@ -18,6 +18,8 @@ create table if not exists public.users (
   whatsapp_number text,
   city text,
   player_ids text[] default '{}',
+  player_igns text[] default '{}',
+  captain_discord text,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
@@ -62,6 +64,7 @@ create table if not exists public.registrations (
 alter table public.registrations add column if not exists real_name text;
 alter table public.registrations add column if not exists captain_discord text;
 alter table public.registrations add column if not exists player_igns text[] default '{}';
+alter table public.registrations add column if not exists screenshot_urls text[] default '{}';
 
 -- ─────────────────────────────────────────
 -- SECURITY (Row Level Security)

@@ -53,7 +53,7 @@ export function useRegistration() {
    * Submit a new registration after all guards pass.
    */
   const submitRegistration = useCallback(
-    async ({ uid, tournamentID, teamName, realName, teamLogoURL, whatsapp, playerIDs, screenshotURLs }) => {
+    async ({ uid, tournamentID, teamName, realName, teamLogoURL, whatsapp, captainDiscord, playerIDs, playerIgns, screenshotURLs }) => {
       setSubmitting(true);
       setError(null);
 
@@ -106,7 +106,9 @@ export function useRegistration() {
             real_name: realName.trim(),
             logo_url: teamLogoURL || null,
             whatsapp_number: whatsapp.trim(),
+            captain_discord: captainDiscord?.trim() || null,
             player_ids: cleanIDs,
+            player_igns: playerIgns || [],
             screenshot_urls: screenshotURLs || [],
             status: 'pending',
           }])

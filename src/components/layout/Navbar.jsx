@@ -63,7 +63,7 @@ export default function Navbar() {
               />
             </div>
             <div className="flex flex-col justify-center">
-              <div className="font-agency font-bold text-3xl md:text-4xl tracking-tight leading-none uppercase">
+              <div className="font-bebas font-bold text-3xl md:text-4xl tracking-tight leading-none uppercase">
                 <span className="text-[#f2f2f2] group-hover:text-white transition-colors">ZENITH</span>
                 <span className="ml-1.5 text-[#dbb462] transition-colors">ESPORTS</span>
               </div>
