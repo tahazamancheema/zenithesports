@@ -441,6 +441,8 @@ function ActionBtn({ icon: Icon, label, badge, onClick }) {
       )}
     </button>
   );
+}
+
 // ─────────────────────────────────────────────────────────────
 // Tournament Registrations Modal
 // ─────────────────────────────────────────────────────────────
