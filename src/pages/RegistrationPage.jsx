@@ -405,7 +405,7 @@ export default function RegistrationPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <GhostInput 
-                label="Team Name *" 
+                label="Team Name" 
                 value={form.team_name} 
                 onChange={e => {
                   setForm(f => ({ ...f, team_name: e.target.value }));
@@ -416,7 +416,7 @@ export default function RegistrationPage() {
                 error={fieldErrors.team_name}
               />
               <GhostInput 
-                label="Captain Real Name *" 
+                label="Captain Real Name" 
                 value={form.real_name} 
                 onChange={e => {
                   setForm(f => ({ ...f, real_name: e.target.value }));
@@ -427,7 +427,7 @@ export default function RegistrationPage() {
                 error={fieldErrors.real_name}
               />
               <GhostInput 
-                label="Captain's WhatsApp Number *" 
+                label="Captain's WhatsApp Number" 
                 value={form.whatsapp_number} 
                 onChange={e => {
                   setForm(f => ({ ...f, whatsapp_number: e.target.value }));
@@ -438,7 +438,7 @@ export default function RegistrationPage() {
                 error={fieldErrors.whatsapp_number}
               />
               <GhostInput 
-                label="Captain's Discord *" 
+                label="Captain's Discord" 
                 value={form.captain_discord} 
                 onChange={e => {
                   setForm(f => ({ ...f, captain_discord: e.target.value }));
@@ -468,7 +468,7 @@ export default function RegistrationPage() {
                   </div>
                   <div className="grid grid-cols-1 gap-4">
                     <GhostInput 
-                      label={`Player ${num} IGN${num <= 4 ? ' *' : ''}`}
+                      label={`Player ${num} IGN${num <= 4 ? '' : ''}`}
                       value={form[`player_${num}_ign`]} 
                       onChange={e => {
                         setForm(f => ({ ...f, [`player_${num}_ign`]: e.target.value }));
@@ -479,7 +479,7 @@ export default function RegistrationPage() {
                       error={fieldErrors[`player_${num}_ign`]}
                     />
                     <GhostInput 
-                      label={`Player ${num} Character ID${num <= 4 ? ' *' : ''}`}
+                      label={`Player ${num} Character ID${num <= 4 ? '' : ''}`}
                       value={form[`player_${num}_id`]} 
                       onChange={e => {
                         setForm(f => ({ ...f, [`player_${num}_id`]: e.target.value }));
