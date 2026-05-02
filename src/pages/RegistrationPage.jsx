@@ -14,7 +14,7 @@ export default function RegistrationPage() {
   const { tournamentId } = useParams();
   const navigate = useNavigate();
   const { tournaments, loading: tLoading } = useTournaments();
-  const { submitRegistration, submitting } = useRegistration();
+  const { submitRegistration, hasPendingRegistration, findDuplicatePlayerID, submitting } = useRegistration();
   const { user, userDoc, loading: aLoading } = useAuth();
   
   const [form, setForm] = useState({
@@ -124,8 +124,6 @@ export default function RegistrationPage() {
     setFieldErrors({});
     try {
       toast.loading('Verifying competitive eligibility...', { id: 'reg' });
-      
-      const { hasPendingRegistration, findDuplicatePlayerID } = resultHook; // I need to make sure I have access to these
       
       const cleanIDs = [
         form.player_1_id, form.player_2_id, form.player_3_id,
