@@ -3,68 +3,71 @@ import { supabase } from '../supabase/config';
 
 /**
  * useRegistration — handles registration submission with validation guards:
- * 1. User can only have ONE pending / approved registration at a time (per tournament or globally - currently global per requirement)
- * 2. No player character ID can already exist in ANY active registration globally.
- * 3. Character IDs must be numeric and 5-12 digits long.
+ * 1. User can only have ONE pending / approved / reapplied registration at a time per tournament.
+ * 2. If rejected, they can RE-APPLY (which updates their existing record).
+ * 3. No player character ID can already exist in ANY active registration globally.
  */
 export function useRegistration() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
   /**
-   * Check if the current user already has a pending registration.
+   * Check if the current user already has an active (pending/approved/reapplied) registration.
+   * If they are rejected, this returns false to allow re-applying.
    */
-  const hasPendingRegistration = useCallback(async (uid) => {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 15000);
+  const hasPendingRegistration = useCallback(async (uid, tournamentID) => {
     try {
       const { data, error } = await supabase
         .from('registrations')
-        .select('id')
+        .select('id, status')
         .eq('user_id', uid)
-        .eq('status', 'pending')
-        .abortSignal(controller.signal);
+        .eq('tournament_id', tournamentID)
+        .in('status', ['pending', 'approved', 'reapplied'])
+        .limit(1);
 
       if (error) throw error;
       return data && data.length > 0;
-    } finally {
-      clearTimeout(timer);
+    } catch (err) {
+      console.error('Pending check error:', err);
+      return false;
     }
   }, []);
 
   /**
    * Check if any player ID already exists in any registration using efficient Postgres array operators.
+   * Excludes 'rejected' records so those IDs are freed up (unless the same user is re-applying).
    */
-  const findDuplicatePlayerID = useCallback(async (playerIDs) => {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 15000);
+  const findDuplicatePlayerID = useCallback(async (playerIDs, excludeRegId = null) => {
     try {
-      // Use Postgres 'overlaps' operator (&&) to find if any of the provided IDs
-      // exist in the player_ids array column of ANY existing active registration.
-      const { data, error } = await supabase
+      let query = supabase
         .from('registrations')
-        .select('player_ids')
+        .select('id, player_ids')
         .neq('status', 'rejected')
-        .overlaps('player_ids', playerIDs)
-        .limit(1)
-        .abortSignal(controller.signal);
+        .overlaps('player_ids', playerIDs);
+
+      if (excludeRegId) {
+        query = query.neq('id', excludeRegId);
+      }
+
+      const { data, error } = await query.limit(1);
 
       if (error) throw error;
       
-      // If we found a match, return the first one from the result set for feedback
       if (data && data.length > 0) {
         const matchedID = playerIDs.find(id => data[0].player_ids.includes(id));
         return matchedID || playerIDs[0];
       }
       
       return null;
-    } finally {
-      clearTimeout(timer);
+    } catch (err) {
+      console.error('Duplicate check error:', err);
+      return null;
     }
   }, []);
 
   /**
-   * Submit a new registration after all guards pass.
+   * Submit a registration. If a 'rejected' record exists, we UPDATE it 
+   * to status 'reapplied' to avoid duplicates. Otherwise, we INSERT.
    */
   const submitRegistration = useCallback(
     async ({ uid, tournamentID, teamName, realName, teamLogoURL, whatsapp, captainDiscord, playerIDs, playerIgns, screenshotURLs }) => {
@@ -72,75 +75,70 @@ export function useRegistration() {
       setError(null);
 
       try {
-        // Guard 1 — Pending registration check
-        const pending = await hasPendingRegistration(uid);
-        if (pending) {
-          throw new Error(
-            'آپ کی ایک پہلے سے Pending Registration موجود ہے۔ براہ کرم پہلے اسے مکمل ہونے دیں۔\n(You already have a pending registration. Please wait for it to be reviewed.)'
-          );
-        }
-
-        // Guard 2 — Character ID Validation
         const idRegex = /^\d{10,14}$/;
         const cleanIDs = playerIDs.filter(Boolean).map((id) => id.trim());
         
-        // Check for duplicates within the team itself
-        const uniqueInTeam = new Set(cleanIDs);
-        if (uniqueInTeam.size !== cleanIDs.length) {
-          throw new Error('ایک ہی ٹیم میں ایک ہی کریکٹر آئی ڈی دو بار استعمال نہیں کی جا سکتی۔\n(Duplicate Character IDs detected within the same squad.)');
-        }
+        // 1. Check for existing record
+        const { data: existing } = await supabase
+          .from('registrations')
+          .select('id, status')
+          .eq('user_id', uid)
+          .eq('tournament_id', tournamentID)
+          .maybeSingle();
 
-        for (const pid of cleanIDs) {
-          if (!idRegex.test(pid)) {
-            throw new Error(`کریکٹر آئی ڈی "${pid}" درست نہیں ہے۔ یہ صرف 10 سے 14 ہندسوں پر مشتمل ہونی چاہیے۔\n(Character ID "${pid}" is invalid. It must be numeric and between 10-14 digits.)`);
-          }
-        }
-
-        // Guard 3 — Global Duplicate character ID check
-        const duplicate = await findDuplicatePlayerID(cleanIDs);
+        // 2. Global Duplicate character ID check (exclude current record if updating)
+        const duplicate = await findDuplicatePlayerID(cleanIDs, existing?.id);
         if (duplicate) {
           throw new Error(
             `Player ID "${duplicate}" پہلے سے ڈیٹابیس میں موجود ہے۔\n(Player ID "${duplicate}" is already registered in the database.)`
           );
         }
 
-        // Guard 4 — WhatsApp Validation
-        const cleanWhatsApp = whatsapp.trim().replace(/[^0-9]/g, '');
-        if (cleanWhatsApp.length !== 11) {
-          throw new Error('واٹس ایپ نمبر 11 ہندسوں کا ہونا چاہیے۔\n(WhatsApp number must be exactly 11 digits.)');
+        // 3. Validation
+        if (cleanIDs.length < 4) throw new Error('At least 4 players are required.');
+        for (const pid of cleanIDs) {
+          if (!idRegex.test(pid)) throw new Error(`Invalid ID format: ${pid}`);
         }
 
-        // All guards passed — submit
-        const insertController = new AbortController();
-        const insertTimer = setTimeout(() => insertController.abort(), 20000);
-        let data, insertErr;
-        try {
-          const result = await supabase
+        const payload = {
+          user_id: uid,
+          tournament_id: tournamentID,
+          team_name: teamName.trim(),
+          real_name: realName.trim(),
+          logo_url: teamLogoURL || null,
+          whatsapp_number: whatsapp.trim(),
+          captain_discord: captainDiscord?.trim() || null,
+          player_ids: cleanIDs,
+          player_igns: playerIgns || [],
+          screenshot_urls: screenshotURLs || [],
+          rejection_reason: null, // Clear old reason
+          updated_at: new Date().toISOString(),
+        };
+
+        let finalResult;
+        if (existing && (existing.status === 'rejected')) {
+          // UPDATE existing to 'reapplied'
+          payload.status = 'reapplied';
+          finalResult = await supabase
             .from('registrations')
-            .insert([{
-              user_id: uid,
-              tournament_id: tournamentID,
-              team_name: teamName.trim(),
-              real_name: realName.trim(),
-              logo_url: teamLogoURL || null,
-              whatsapp_number: whatsapp.trim(),
-              captain_discord: captainDiscord?.trim() || null,
-              player_ids: cleanIDs,
-              player_igns: playerIgns || [],
-              screenshot_urls: screenshotURLs || [],
-              status: 'pending',
-            }])
+            .update(payload)
+            .eq('id', existing.id)
             .select()
-            .single()
-            .abortSignal(insertController.signal);
-          data = result.data;
-          insertErr = result.error;
-        } finally {
-          clearTimeout(insertTimer);
+            .single();
+        } else if (existing && (existing.status === 'pending' || existing.status === 'approved' || existing.status === 'reapplied')) {
+          throw new Error('You already have an active registration for this tournament.');
+        } else {
+          // INSERT new
+          payload.status = 'pending';
+          finalResult = await supabase
+            .from('registrations')
+            .insert([payload])
+            .select()
+            .single();
         }
 
-        if (insertErr) throw insertErr;
-        return { success: true, id: data.id };
+        if (finalResult.error) throw finalResult.error;
+        return { success: true, id: finalResult.data.id };
       } catch (err) {
         setError(err.message);
         return { success: false, error: err.message };
@@ -148,7 +146,7 @@ export function useRegistration() {
         setSubmitting(false);
       }
     },
-    [hasPendingRegistration, findDuplicatePlayerID]
+    [findDuplicatePlayerID]
   );
 
   return { 

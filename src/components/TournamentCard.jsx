@@ -106,7 +106,7 @@ export default function TournamentCard({ tournament, registrationCount = 0, isUs
               </Link>
             ) : isUserRegistered ? (
               <div className="flex-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-teko text-[18px] py-3.5 tracking-[0.15em] uppercase text-center flex items-center justify-center">
-                SQUAD REGISTERED ✓
+                SQUAD REGISTERED
               </div>
             ) : null}
 

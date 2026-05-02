@@ -98,26 +98,63 @@ export default function RegistrationPage() {
       return toast.error('WhatsApp number must be exactly 11 digits.', { id: 'reg' });
     }
 
-    // Validate Player IDs (All required and optional if provided)
+    // Validate Player IDs & Names (All required and optional if provided)
     const idRegex = /^\d{10,14}$/;
     let firstErrorField = null;
+    const squadIDs = new Set();
+    const squadIGNs = new Set();
     
     for (let i = 1; i <= 6; i++) {
       const pid = form[`player_${i}_id`]?.trim();
+      const pign = form[`player_${i}_ign`]?.trim().toLowerCase();
+      
       // Required for 1-4, or if provided for 5-6
-      if (i <= 4 || pid) {
+      if (i <= 4 || pid || pign) {
+        // ID Checks
         if (!pid) {
-          if (!firstErrorField) firstErrorField = `player_${i}_id`;
-          setFieldErrors(prev => ({ ...prev, [`player_${i}_id`]: 'Required' }));
+          if (i <= 4) {
+            if (!firstErrorField) firstErrorField = `player_${i}_id`;
+            setFieldErrors(prev => ({ ...prev, [`player_${i}_id`]: 'Required' }));
+          }
         } else if (!idRegex.test(pid)) {
           if (!firstErrorField) firstErrorField = `player_${i}_id`;
-          setFieldErrors(prev => ({ ...prev, [`player_${i}_id`]: 'Invalid ID' }));
+          setFieldErrors(prev => ({ ...prev, [`player_${i}_id`]: 'Invalid ID (10-14 digits)' }));
+        } else if (squadIDs.has(pid)) {
+          if (!firstErrorField) firstErrorField = `player_${i}_id`;
+          setFieldErrors(prev => ({ ...prev, [`player_${i}_id`]: 'Duplicate ID in Squad' }));
+        } else {
+          squadIDs.add(pid);
+        }
+
+        // IGN Checks
+        if (!pign) {
+          if (i <= 4) {
+            if (!firstErrorField) firstErrorField = `player_${i}_ign`;
+            setFieldErrors(prev => ({ ...prev, [`player_${i}_ign`]: 'Required' }));
+          }
+        } else if (squadIGNs.has(pign)) {
+          if (!firstErrorField) firstErrorField = `player_${i}_ign`;
+          setFieldErrors(prev => ({ ...prev, [`player_${i}_ign`]: 'Duplicate Name in Squad' }));
+        } else {
+          squadIGNs.add(pign);
         }
       }
     }
 
     if (firstErrorField) {
-      return toast.error('Please fix Character ID errors (10-14 digits required).', { id: 'reg' });
+      return toast.error('Please fix squad errors (Duplicate names/IDs or invalid formats).', { id: 'reg' });
+    }
+
+    // Validate Screenshot Uniqueness
+    const uniqueFiles = new Set();
+    for (const f of screenshotFiles) {
+      if (f) {
+        const fileKey = `${f.name}-${f.size}`;
+        if (uniqueFiles.has(fileKey)) {
+          return toast.error('Each proof screenshot must be a unique image. Please do not upload the same file multiple times.', { id: 'reg' });
+        }
+        uniqueFiles.add(fileKey);
+      }
     }
     
     setSaving(true);

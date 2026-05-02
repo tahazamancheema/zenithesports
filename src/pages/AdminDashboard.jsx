@@ -59,8 +59,12 @@ export default function AdminDashboard() {
     toast.success(`${reg.team_name} approved!`);
   }
   async function handleReject(reg) {
-    await updateReg(reg.id, { status: 'rejected' });
-    toast.success(`${reg.team_name} rejected`);
+    const reason = window.prompt(`Enter rejection reason for ${reg.team_name}:`, 'Incorrect Player ID / Incomplete Screenshots');
+    if (reason === null) return;
+    if (!reason.trim()) return toast.error('Rejection reason is required');
+
+    await updateReg(reg.id, { status: 'rejected', rejection_reason: reason.trim() });
+    toast.success(`${reg.team_name} rejected with reason`);
   }
   async function handleDelete(reg) {
     if (!confirm(`Delete ${reg.team_name}? This cannot be undone.`)) return;
@@ -74,12 +78,23 @@ export default function AdminDashboard() {
   }
 
   // ── XLSX Export (tournament-scoped) ──
-  function handleExport(tournament) {
-    const filtered = registrations.filter((r) => r.tournament_id === tournament.id);
+  function handleExport(tournament, type = 'all') {
+    let filtered = registrations.filter((r) => r.tournament_id === tournament.id);
+    
+    if (type === 'verified' || type === 'approved') {
+      filtered = filtered.filter(r => r.status === 'approved');
+    } else if (type === 'rejected') {
+      filtered = filtered.filter(r => r.status === 'rejected');
+    }
+
+    if (filtered.length === 0) {
+      return toast.error(`No ${type} records found to export.`);
+    }
+
     // Strip out all characters that are unsafe for Windows filenames
     const safeTitle = tournament.title.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-    exportRegistrationsToXLSX(filtered, `zenith_${safeTitle}`);
-    toast.success(`XLSX exported: ${filtered.length} records`);
+    exportRegistrationsToXLSX(filtered, `zenith_${safeTitle}_${type}`);
+    toast.success(`XLSX exported: ${filtered.length} ${type} records`);
   }
 
   if (authLoading) return <LoadingScreen />;
@@ -134,7 +149,7 @@ export default function AdminDashboard() {
         <main className="flex-1 p-8 lg:p-12 overflow-auto">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
             <div>
-              <h1 className="font-bebas text-5xl md:text-6xl font-black italic tracking-tighter uppercase">
+              <h1 className="font-bebas text-5xl md:text-6xl font-black italic tracking-wider uppercase">
                 ZENITH ADMIN
               </h1>
               <p className="font-teko text-[13px] tracking-widest text-[#d1c5b3] opacity-70 mt-2">
@@ -232,7 +247,7 @@ export default function AdminDashboard() {
           onApprove={handleApprove}
           onReject={handleReject}
           onDelete={handleDelete}
-          onExport={() => handleExport(regsModal)}
+          onExport={(type) => handleExport(regsModal, type)}
           onEdit={(reg) => {
             setRegistrationModal({ open: true, data: reg, tournamentId: regsModal.id });
           }}
@@ -426,14 +441,13 @@ function ActionBtn({ icon: Icon, label, badge, onClick }) {
       )}
     </button>
   );
-}
-
 // ─────────────────────────────────────────────────────────────
 // Tournament Registrations Modal
 // ─────────────────────────────────────────────────────────────
 function TournamentRegsModal({ tournament, registrations, onClose, onApprove, onReject, onDelete, onExport, onEdit, onAdd }) {
   const [search, setSearch] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
+  const [exportMenuOpen, setExportMenuOpen] = useState(false);
 
   const filtered = registrations
     .filter((r) => filterStatus === 'all' || r.status === filterStatus)
@@ -445,10 +459,11 @@ function TournamentRegsModal({ tournament, registrations, onClose, onApprove, on
     );
 
   const stats = {
-    total:    registrations.length,
-    pending:  registrations.filter((r) => r.status === 'pending').length,
-    approved: registrations.filter((r) => r.status === 'approved').length,
-    rejected: registrations.filter((r) => r.status === 'rejected').length,
+    total:     registrations.length,
+    pending:   registrations.filter((r) => r.status === 'pending').length,
+    reapplied: registrations.filter((r) => r.status === 'reapplied').length,
+    approved:  registrations.filter((r) => r.status === 'approved').length,
+    rejected:  registrations.filter((r) => r.status === 'rejected').length,
   };
 
   return (
@@ -464,12 +479,40 @@ function TournamentRegsModal({ tournament, registrations, onClose, onApprove, on
             </p>
           </div>
           <div className="flex items-center gap-2 md:gap-3">
-            <button
-              onClick={onExport}
-              className="flex items-center gap-2 border border-[rgba(78,70,56,0.3)] px-3 md:px-4 py-2 font-teko text-[12px] md:text-[9px] tracking-widest text-[#d1c5b3] hover:bg-[#2a2a2a] transition-colors"
-            >
-              <Download size={12} /> <span className="hidden sm:inline">EXPORT</span>
-            </button>
+            <div className="relative">
+              <button
+                onClick={() => setExportMenuOpen(!exportMenuOpen)}
+                className="flex items-center gap-2 border border-[rgba(78,70,56,0.3)] px-3 md:px-4 py-2 font-teko text-[12px] md:text-[9px] tracking-widest text-[#d1c5b3] hover:bg-[#2a2a2a] transition-colors"
+              >
+                <Download size={12} /> <span className="hidden sm:inline">EXPORT</span>
+              </button>
+              
+              {exportMenuOpen && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setExportMenuOpen(false)} />
+                  <div className="absolute top-full right-0 mt-2 w-48 bg-[#1a1a1a] border border-[rgba(78,70,56,0.4)] shadow-2xl z-50 flex flex-col py-1 animate-page-enter">
+                    <button 
+                      onClick={() => { onExport('verified'); setExportMenuOpen(false); }}
+                      className="px-4 py-3 text-left font-teko text-[13px] tracking-widest text-[#d1c5b3] hover:bg-[#2a2a2a] hover:text-[#f9d07a] transition-colors border-b border-white/5"
+                    >
+                      EXPORT VERIFIED TEAMS
+                    </button>
+                    <button 
+                      onClick={() => { onExport('rejected'); setExportMenuOpen(false); }}
+                      className="px-4 py-3 text-left font-teko text-[13px] tracking-widest text-[#d1c5b3] hover:bg-[#2a2a2a] hover:text-[#ffb4ab] transition-colors border-b border-white/5"
+                    >
+                      EXPORT REJECTED TEAMS
+                    </button>
+                    <button 
+                      onClick={() => { onExport('all'); setExportMenuOpen(false); }}
+                      className="px-4 py-3 text-left font-teko text-[13px] tracking-widest text-[#d1c5b3] hover:bg-[#2a2a2a] hover:text-white transition-colors"
+                    >
+                      EXPORT ALL (BOTH)
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
             <button
               onClick={onAdd}
               className="flex items-center gap-2 bg-[#f9d07a]/10 border border-[#f9d07a]/30 text-[#f9d07a] px-3 md:px-4 py-2 font-teko text-[12px] md:text-[9px] tracking-widest hover:bg-[#f9d07a]/20 transition-colors"
@@ -483,12 +526,13 @@ function TournamentRegsModal({ tournament, registrations, onClose, onApprove, on
         </div>
 
         {/* Stats strip */}
-        <div className="grid grid-cols-4 border-b border-[rgba(78,70,56,0.15)] flex-shrink-0">
+        <div className="grid grid-cols-5 border-b border-[rgba(78,70,56,0.15)] flex-shrink-0">
           {[
-            { label: 'TOTAL',    value: stats.total },
-            { label: 'PENDING',  value: stats.pending,  hi: true },
-            { label: 'APPROVED', value: stats.approved },
-            { label: 'REJECTED', value: stats.rejected, hi: true },
+            { label: 'TOTAL',      value: stats.total },
+            { label: 'PENDING',    value: stats.pending,  hi: true },
+            { label: 'RE-APPLIED', value: stats.reapplied, hi: true },
+            { label: 'APPROVED',   value: stats.approved },
+            { label: 'REJECTED',   value: stats.rejected, hi: true },
           ].map(({ label, value, hi }) => (
             <div key={label} className={`p-4 ${hi ? 'bg-[#1b1b1b]' : ''}`}>
               <p className="font-teko text-[11px] text-[#c6c6c6] tracking-widest">{label}</p>
@@ -509,7 +553,7 @@ function TournamentRegsModal({ tournament, registrations, onClose, onApprove, on
               className="bg-transparent text-[11px] font-teko text-[14px] tracking-widest text-[#d1c5b3] placeholder:opacity-70 w-36 focus:outline-none"
             />
           </div>
-          {['all', 'pending', 'approved', 'rejected'].map((s) => (
+          {['all', 'pending', 'reapplied', 'approved', 'rejected'].map((s) => (
             <button
               key={s}
               onClick={() => setFilterStatus(s)}
@@ -558,7 +602,14 @@ function TournamentRegsModal({ tournament, registrations, onClose, onApprove, on
                         <span className="font-bebas font-bold text-base whitespace-nowrap">{reg.team_name}</span>
                       </div>
                     </td>
-                    <td className="px-4 py-4 font-body text-sm text-[#d1c5b3] opacity-70">{reg.real_name || '—'}</td>
+                    <td className="px-4 py-4 font-body text-sm text-[#d1c5b3] opacity-70">
+                      <div>{reg.real_name || '—'}</div>
+                      {reg.status === 'rejected' && reg.rejection_reason && (
+                        <div className="text-[10px] text-red-400 mt-1 uppercase tracking-tight italic opacity-60">
+                          REASON: {reg.rejection_reason}
+                        </div>
+                      )}
+                    </td>
                     <td className="px-4 py-4 font-body text-xs text-[#d1c5b3] opacity-70">{reg.whatsapp_number}</td>
                     <td className="px-4 py-4">
                       <span className="font-teko text-[13px] text-[#f9d07a] tracking-widest">
@@ -573,7 +624,7 @@ function TournamentRegsModal({ tournament, registrations, onClose, onApprove, on
                     </td>
                     <td className="px-4 py-4">
                       <div className="flex gap-2 opacity-20 group-hover:opacity-100 transition-opacity">
-                        {reg.status === 'pending' && (
+                        {(reg.status === 'pending' || reg.status === 'reapplied') && (
                           <>
                             <button onClick={() => onApprove(reg)} title="Approve" className="text-emerald-400 hover:text-emerald-300">
                               <CheckCircle2 size={16} />
@@ -1311,12 +1362,20 @@ function RegistrationModal({ isOpen, onClose, registration, tournament, onSave }
         form.player_1_id, form.player_2_id, form.player_3_id,
         form.player_4_id, form.player_5_id, form.player_6_id,
       ].filter(Boolean).map((x) => x.trim().toUpperCase());
+      
       const playerIgns = [
         form.player_1_ign, form.player_2_ign, form.player_3_ign,
         form.player_4_ign, form.player_5_ign, form.player_6_ign,
       ].filter(Boolean).map((x) => x.trim());
-      
-      await onSave({ ...form, player_ids: playerIds, player_igns: playerIgns }, file);
+
+      // Prepare clean data for the database (remove temporary UI fields)
+      const { 
+        player_1_id: _p1, player_2_id: _p2, player_3_id: _p3, player_4_id: _p4, player_5_id: _p5, player_6_id: _p6,
+        player_1_ign: _i1, player_2_ign: _i2, player_3_ign: _i3, player_4_ign: _i4, player_5_ign: _i5, player_6_ign: _i6,
+        ...dbData 
+      } = form;
+
+      await onSave({ ...dbData, player_ids: playerIds, player_igns: playerIgns }, file);
     } finally {
       setSaving(false);
     }

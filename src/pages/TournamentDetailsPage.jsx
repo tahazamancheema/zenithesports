@@ -6,6 +6,7 @@ import { computeTournamentStatus } from '../utils/tournamentStatus';
 import { useAuth } from '../hooks/useAuth';
 import StatusBadge from '../components/ui/StatusBadge';
 import RegistrationCountdown from '../components/RegistrationCountdown';
+import { useSupabaseDB } from '../hooks/useSupabaseDB';
 import { useTournamentCountdown } from '../hooks/useTournamentCountdown';
 
 const TABS = [
@@ -18,57 +19,24 @@ const TABS = [
 export default function TournamentDetailsPage() {
   const { id } = useParams();
   const { user } = useAuth();
-  const [tournament, setTournament] = useState(null);
-  const [registrations, setRegistrations] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
 
-  useEffect(() => {
-    let isMounted = true;
+  // Use the robust real-time hook for tournament data
+  const { 
+    data: tList, 
+    loading: tLoading, 
+    error: tError 
+  } = useSupabaseDB('tournaments', null, [['id', 'eq', id]]);
 
-    async function loadData() {
-      try {
-        const { data: tData } = await supabase
-          .from('tournaments')
-          .select('*')
-          .eq('id', id)
-          .single();
+  // Use the robust real-time hook for registrations
+  const { 
+    data: registrations, 
+    loading: rLoading, 
+    error: rError 
+  } = useSupabaseDB('registrations', null, [['tournament_id', 'eq', id]]);
 
-        const { data: rData } = await supabase
-          .from('registrations')
-          .select('*')
-          .eq('tournament_id', id)
-          .neq('status', 'rejected');
-
-        if (!isMounted) return;
-        setTournament(tData);
-        setRegistrations(rData || []);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        if (isMounted) setLoading(false);
-      }
-    }
-
-    loadData();
-    const timer = setTimeout(() => { if (isMounted) setLoading(false); }, 5000);
-
-    // Re-fetch silently when user returns to this tab
-    const handleVisibility = () => {
-      if (document.visibilityState === 'visible') loadData();
-    };
-    const handleFocus = () => loadData();
-
-    document.addEventListener('visibilitychange', handleVisibility);
-    window.addEventListener('focus', handleFocus);
-
-    return () => {
-      isMounted = false;
-      clearTimeout(timer);
-      document.removeEventListener('visibilitychange', handleVisibility);
-      window.removeEventListener('focus', handleFocus);
-    };
-  }, [id]);
+  const tournament = tList?.[0] || null;
+  const loading = tLoading;
 
   const { phase } = useTournamentCountdown(tournament?.registration_open_date, tournament?.registration_deadline);
 
@@ -372,6 +340,25 @@ export default function TournamentDetailsPage() {
                     {/* User is registered: Show Status */}
                     {isUserRegistered && (() => {
                       const userReg = registrations.find(r => r.user_id === user?.id);
+                      if (userReg?.status === 'rejected') {
+                        return (
+                          <div className="space-y-4">
+                            <StatusBadge status="rejected" className="w-full justify-center py-5" />
+                            <div className="bg-red-500/10 border border-red-500/20 p-4">
+                              <p className="font-teko text-[12px] text-red-400 uppercase tracking-widest mb-1">REJECTION REASON</p>
+                              <p className="font-body text-sm text-white/80 italic leading-relaxed">
+                                "{userReg.rejection_reason || 'No specific reason provided.'}"
+                              </p>
+                            </div>
+                            <Link
+                              to={`/register/${id}`}
+                              className="btn-obsidian-primary w-full py-5 font-bebas text-[22px] tracking-[0.2em] inline-flex items-center justify-center gap-3 uppercase group/cta"
+                            >
+                              RE-APPLY NOW <ArrowRight size={20} className="group-hover/cta:translate-x-1 transition-transform" />
+                            </Link>
+                          </div>
+                        );
+                      }
                       return <StatusBadge status={userReg?.status} className="w-full justify-center py-5" />;
                     })()}
 

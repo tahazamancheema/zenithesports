@@ -19,6 +19,12 @@ const STATUS_CONFIG = {
     textClass: 'text-red-400',
     bgClass: 'bg-red-500/10',
   },
+  reapplied: {
+    label: 'RE-APPLIED',
+    dotClass: 'bg-blue-500 animate-pulse',
+    textClass: 'text-blue-400',
+    bgClass: 'bg-blue-500/10',
+  },
   awaiting: {
     label: 'PENDING',
     dotClass: 'bg-yellow-500 animate-pulse',
