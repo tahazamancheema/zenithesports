@@ -174,6 +174,11 @@ export default function RegistrationPage() {
         return toast.error('You already have a pending registration. Please wait for it to be reviewed.', { id: 'reg' });
       }
 
+      const playerIgns = [
+        form.player_1_ign, form.player_2_ign, form.player_3_ign,
+        form.player_4_ign, form.player_5_ign, form.player_6_ign
+      ].filter((_, i) => !!form[`player_${i+1}_id`]);
+
       // Pre-Guard 2: Duplicate check
       const duplicate = await findDuplicates(cleanIDs, playerIgns, form.team_name.trim(), tournament.id);
       if (duplicate) {
@@ -249,11 +254,8 @@ export default function RegistrationPage() {
       
       toast.loading('Finalizing registration...', { id: 'reg' });
       
-      const playerIgns = [
-        form.player_1_ign, form.player_2_ign, form.player_3_ign,
-        form.player_4_ign, form.player_5_ign, form.player_6_ign
-      ].filter((_, i) => !!form[`player_${i+1}_id`]);
-
+      toast.loading('Finalizing registration...', { id: 'reg' });
+      
       const result = await submitRegistration({
         uid: user.id,
         tournamentID: tournament.id,
