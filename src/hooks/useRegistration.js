@@ -33,27 +33,30 @@ export function useRegistration() {
   }, []);
 
   /**
-   * Check if any player ID already exists in any registration.
+   * Check if any player ID already exists in any registration using efficient Postgres array operators.
    */
   const findDuplicatePlayerID = useCallback(async (playerIDs) => {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 15000);
     try {
+      // Use Postgres 'overlaps' operator (&&) to find if any of the provided IDs
+      // exist in the player_ids array column of ANY existing active registration.
       const { data, error } = await supabase
         .from('registrations')
         .select('player_ids')
         .neq('status', 'rejected')
+        .overlaps('player_ids', playerIDs)
+        .limit(1)
         .abortSignal(controller.signal);
 
       if (error) throw error;
       
-      for (const pid of playerIDs) {
-        if (!pid.trim()) continue;
-        const isDuplicate = data.some(reg => 
-          reg.player_ids && reg.player_ids.includes(pid.trim().toUpperCase())
-        );
-        if (isDuplicate) return pid;
+      // If we found a match, return the first one from the result set for feedback
+      if (data && data.length > 0) {
+        const matchedID = playerIDs.find(id => data[0].player_ids.includes(id));
+        return matchedID || playerIDs[0];
       }
+      
       return null;
     } finally {
       clearTimeout(timer);

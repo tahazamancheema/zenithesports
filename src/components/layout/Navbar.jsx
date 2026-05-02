@@ -46,8 +46,8 @@ export default function Navbar() {
   return (
     <header
       className={`fixed top-0 w-full z-50 transition-all duration-500 border-b ${scrolled
-          ? 'h-20 bg-[#0e0e0e]/95 backdrop-blur-xl border-white/10 shadow-2xl'
-          : 'h-24 bg-transparent border-white/5'
+          ? 'h-16 bg-[#0e0e0e]/95 backdrop-blur-xl border-white/10 shadow-2xl'
+          : 'h-20 bg-transparent border-white/5'
         }`}
     >
       <div className="container mx-auto h-full px-6 lg:px-12 flex justify-between items-center">
@@ -59,26 +59,26 @@ export default function Navbar() {
               <img
                 src="/logo.png"
                 alt="Zenith"
-                className="relative h-12 md:h-14 w-auto object-contain transition-transform duration-500 group-hover:scale-105"
+                className="relative h-10 md:h-12 w-auto object-contain transition-transform duration-500 group-hover:scale-105"
                 onError={(e) => { e.target.style.display = 'none'; }}
               />
             </div>
             <div className="flex flex-col justify-center">
-              <div className="font-rajdhani font-bold text-3xl md:text-4xl tracking-normal leading-none uppercase mt-1">
+              <div className="font-rajdhani font-bold text-xl md:text-2xl tracking-normal leading-none uppercase mt-1">
                 <span className="text-[#f2f2f2] group-hover:text-white transition-colors">ZENITH</span>
-                <span className="ml-1.5 text-[#dbb462] transition-colors">ESPORTS</span>
+                <span className="ml-1 text-[#dbb462] transition-colors">ESPORTS</span>
               </div>
             </div>
           </Link>
 
           {/* Navigation */}
-          <nav className="hidden lg:flex items-center gap-2">
+          <nav className="hidden lg:flex items-center gap-1">
             {NAV_LINKS.map(({ label, to }) => (
               <Link
                 key={label}
                 to={to}
                 className={`
-                  relative font-agency font-bold text-[22px] tracking-[0.1em] px-5 py-2 uppercase
+                  relative font-agency font-bold text-[18px] tracking-[0.05em] px-4 py-1 uppercase
                   transition-all duration-300
                   ${isActive(to)
                     ? 'text-[#dbb462]'
@@ -88,15 +88,15 @@ export default function Navbar() {
                 `}
               >
                 {label}
-                <div className={`absolute bottom-0 left-5 right-5 h-[2px] bg-[#dbb462] transition-all duration-500 origin-left ${isActive(to) ? 'scale-x-100' : 'scale-x-0 group-hover/nav:scale-x-100'}`} />
+                <div className={`absolute bottom-0 left-4 right-4 h-[1.5px] bg-[#dbb462] transition-all duration-500 origin-left ${isActive(to) ? 'scale-x-100' : 'scale-x-0 group-hover/nav:scale-x-100'}`} />
               </Link>
             ))}
             {isAdmin && (
               <Link
                 to="/admin"
-                className="ml-4 flex items-center gap-2 bg-white/5 border border-white/10 px-6 py-2 font-agency font-bold text-[20px] tracking-[0.1em] text-[#dbb462] hover:bg-white/10 transition-all uppercase"
+                className="ml-3 flex items-center gap-1.5 bg-white/5 border border-white/10 px-4 py-1 font-agency font-bold text-[18px] tracking-[0.05em] text-[#dbb462] hover:bg-white/10 transition-all uppercase"
               >
-                <ShieldCheck size={18} className="mb-0.5" />
+                <ShieldCheck size={16} className="mb-0.5" />
                 ADMIN
               </Link>
             )}
@@ -104,29 +104,29 @@ export default function Navbar() {
         </div>
 
         {/* User Actions */}
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-4">
           <div className="hidden md:block">
             {user ? (
-              <div className="flex items-center gap-6 group/user">
+              <div className="flex items-center gap-4 group/user">
                 <div className="text-right">
-                  <p className="font-agency font-bold text-[22px] text-white tracking-[0.1em] uppercase truncate max-w-[250px] transition-colors">
+                  <p className="font-agency font-bold text-[18px] text-white tracking-[0.05em] uppercase truncate max-w-[150px] transition-colors">
                     {displayName}
                   </p>
                 </div>
                 <div className="relative">
                   <button
                     onClick={handleSignOut}
-                    className="w-12 h-12 bg-[#1a1a1a] border border-white/10 flex items-center justify-center text-[#d1c5b3] hover:text-[#ffb4ab] hover:border-[#ffb4ab]/50 transition-all"
+                    className="w-10 h-10 bg-[#1a1a1a] border border-white/10 flex items-center justify-center text-[#d1c5b3] hover:text-[#ffb4ab] hover:border-[#ffb4ab]/50 transition-all"
                     title="Sign Out"
                   >
-                    <LogOut size={18} />
+                    <LogOut size={16} />
                   </button>
                 </div>
               </div>
             ) : (
               <Link
                 to="/auth"
-                className="btn-obsidian-primary font-agency font-bold text-[22px] px-10 py-3 tracking-[0.1em] uppercase"
+                className="btn-obsidian-primary font-agency font-bold text-[18px] px-8 py-2 tracking-[0.05em] uppercase"
               >
                 LOGIN
               </Link>
@@ -137,7 +137,7 @@ export default function Navbar() {
             className="lg:hidden text-[#f2f2f2] hover:text-[#dbb462] transition-all"
             onClick={() => setMobileOpen(!mobileOpen)}
           >
-            {mobileOpen ? <X size={36} /> : <Menu size={36} />}
+            {mobileOpen ? <X size={28} /> : <Menu size={28} />}
           </button>
         </div>
       </div>

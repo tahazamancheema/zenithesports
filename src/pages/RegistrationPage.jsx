@@ -108,33 +108,49 @@ export default function RegistrationPage() {
     setSaving(true);
     setFieldErrors({});
     try {
-      toast.loading('Saving your registration details...', { id: 'reg' });
+      toast.loading('Initializing secure registration uplink...', { id: 'reg' });
       
-      // Upload Team Logo (non-blocking — skip if storage fails)
-      let logoUrl = '';
+      // Prepare Upload Tasks
+      const uploadTasks = [];
+      
+      // Task 0: Logo (if exists)
       if (file) {
-        try {
-          logoUrl = await uploadFile('ze-logos', file, `logo_${user.id}_${Date.now()}`);
-        } catch (logoErr) {
-          console.warn('Logo upload skipped:', logoErr.message);
-          toast.loading('Logo upload skipped — continuing with registration...', { id: 'reg' });
-        }
+        uploadTasks.push(
+          uploadFile('ze-logos', file, `logo_${user.id}_${Date.now()}`)
+            .catch(err => {
+              console.warn('Logo upload failed, proceeding without logo:', err.message);
+              return null; // Return null so the registration can still proceed
+            })
+        );
+      } else {
+        uploadTasks.push(Promise.resolve(null));
       }
       
-      // Upload Screenshots
-      const screenshotURLs = [];
+      // Tasks 1-N: Screenshots
       const configSS = tournament.registration_config?.screenshots || [];
-      
-      for (let i = 0; i < configSS.length; i++) {
+      configSS.forEach((ss, i) => {
         const sFile = screenshotFiles[i];
         if (sFile) {
-          toast.loading(`Uploading proof: ${configSS[i].label}...`, { id: 'reg' });
-          const url = await uploadFile('ze-proofs', sFile, `proof_${i}_${user.id}_${Date.now()}`);
-          screenshotURLs.push(url);
+          uploadTasks.push(
+            uploadFile('ze-proofs', sFile, `proof_${i}_${user.id}_${Date.now()}`)
+              .catch(err => {
+                throw new Error(`Proof upload failed [${ss.label}]: ${err.message}`);
+              })
+          );
         } else {
-          screenshotURLs.push(null);
+          uploadTasks.push(Promise.resolve(null));
         }
-      }
+      });
+      
+      toast.loading('Syncing tactical data & screenshots...', { id: 'reg' });
+      
+      // Execute all uploads in parallel
+      const uploadResults = await Promise.all(uploadTasks);
+      
+      const logoUrl = uploadResults[0];
+      const screenshotURLs = uploadResults.slice(1);
+      
+      toast.loading('Pushing registration to Admin queue...', { id: 'reg' });
       
       const playerIds = [
         form.player_1_id, form.player_2_id, form.player_3_id,
