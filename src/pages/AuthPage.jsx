@@ -41,9 +41,9 @@ export default function AuthPage() {
   async function handleSubmit(e) {
     e.preventDefault();
     const errs = validate();
-    if (Object.keys(errs).length > 0) { 
-      setErrors(errs); 
-      return; 
+    if (Object.keys(errs).length > 0) {
+      setErrors(errs);
+      return;
     }
 
     setLoading(true);
@@ -72,7 +72,7 @@ export default function AuthPage() {
   return (
     <div className="min-h-screen flex items-center justify-center p-6 bg-[#0a0a0a] relative overflow-hidden">
       <StaticBackground variant="mesh" />
-      
+
       {/* Decorative Brand Text */}
       <div className="absolute top-10 left-10 hidden lg:block select-none pointer-events-none">
         <span className="font-bebas text-[10vh] text-white/[0.02] uppercase leading-none block">BEYOND ZENITH</span>
@@ -80,17 +80,17 @@ export default function AuthPage() {
       </div>
 
       <div className="relative w-full max-w-[1000px] flex flex-col md:flex-row bg-[#111] border border-white/5 shadow-2xl animate-page-enter">
-        
+
         {/* Left Side: Welcoming Visual */}
         <div className="w-full md:w-1/2 p-12 bg-gradient-to-br from-[#161616] to-[#0a0a0a] flex flex-col justify-between border-b md:border-b-0 md:border-r border-white/5 relative group">
           <div className="absolute inset-0 bg-[#dbb462]/[0.02] opacity-0 group-hover:opacity-100 transition-opacity" />
-          
+
           <Link to="/" className="relative z-10 hidden md:flex items-center gap-3 hover:opacity-80 transition-opacity">
             <img src="/logo.png" alt="Zenith" className="h-10 w-auto" />
           </Link>
 
           <div className="relative z-10 space-y-6 my-12">
-            <h1 className="font-bebas font-bold text-6xl lg:text-8xl leading-none uppercase tracking-tight">
+            <h1 className="font-bebas font-bold text-6xl lg:text-8xl leading-none uppercase tracking-[0.05em]">
               <span className="zenith-gradient-text pr-2">WELCOME</span>
               {mode === 'login' && (
                 <>
@@ -113,10 +113,10 @@ export default function AuthPage() {
         {/* Right Side: Simple Access Form */}
         <div className="w-full md:w-1/2 p-12 lg:p-16 flex flex-col justify-center bg-[#131313]">
           <div className="mb-12">
-            <h2 className="font-bebas font-bold text-5xl tracking-tight text-white mb-2 uppercase">
+            <h2 className="font-bebas font-bold text-5xl tracking-[0.05em] text-white mb-2 uppercase">
               {mode === 'login' ? 'ACCESS PORTAL' : 'ACCOUNT CREATION'}
             </h2>
-            <button 
+            <button
               onClick={() => { setMode(mode === 'login' ? 'register' : 'login'); setErrors({}); }}
               className="font-teko text-[18px] tracking-[0.2em] text-[#dbb462] uppercase hover:underline"
             >
@@ -162,8 +162,8 @@ export default function AuthPage() {
             <div className="space-y-2">
               <div className="flex justify-between items-center">
                 <label className="font-body text-[11px] font-bold tracking-wider text-white/60 uppercase block">Password</label>
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   onClick={() => setShowPass(!showPass)}
                   className="font-body text-[10px] font-bold tracking-widest text-[#dbb462]/60 hover:text-[#dbb462] transition-colors"
                 >

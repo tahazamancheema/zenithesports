@@ -22,6 +22,7 @@ const TermsPage = lazy(() => import('./pages/TermsPage'));
 const PrivacyPage = lazy(() => import('./pages/PrivacyPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 const RegistrationPage = lazy(() => import('./pages/RegistrationPage'));
+const DailyScrimsPage = lazy(() => import('./pages/DailyScrimsPage'));
 
 // Pages that don't show the main footer
 const NO_FOOTER_ROUTES = ['/admin', '/profile'];
@@ -29,18 +30,24 @@ const NO_FOOTER_ROUTES = ['/admin', '/profile'];
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { hasError: false };
+    this.state = { hasError: false, error: null };
   }
-  static getDerivedStateFromError() { return { hasError: true }; }
+  static getDerivedStateFromError(error) { return { hasError: true, error }; }
+  componentDidCatch(error, info) {
+    console.error("ErrorBoundary caught:", error, info);
+  }
   render() {
     if (this.state.hasError) {
       return (
         <div className="min-h-screen bg-[#131313] flex items-center justify-center p-8">
-          <div className="max-w-md w-full text-center space-y-6">
+          <div className="max-w-2xl w-full text-center space-y-6">
             <h1 className="font-bebas text-6xl font-black italic text-[#dbb462]">SYSTEM FAULT</h1>
             <p className="font-body text-[#d1c5b3] opacity-60">
               The Zenith engine encountered an unexpected exception. Protocol requires a tactical reset.
             </p>
+            <div className="bg-[#1a1a1a] p-4 text-left font-mono text-red-400 text-sm overflow-auto">
+              {this.state.error?.toString()}
+            </div>
             <button
               onClick={() => window.location.reload()}
               className="zenith-gradient text-[#402d00] font-bebas font-bold text-lg px-12 py-4 tracking-widest hover:brightness-110 active:scale-95 transition-all"
@@ -84,6 +91,7 @@ function AppLayout() {
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/tournaments" element={<TournamentsPage />} />
             <Route path="/tournaments/:id" element={<TournamentDetailsPage />} />
+            <Route path="/scrims" element={<DailyScrimsPage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/support" element={<SupportPage />} />

@@ -6,6 +6,11 @@ import { supabase } from '../supabase/config';
  * @param {string} tableName
  * @param {{ field, direction }?} orderByOption
  * @param {Array<[field, op, value]>?} filters (e.g. ['status', 'eq', 'active'])
+ *
+ * Includes three stale-data recovery mechanisms:
+ *  1. Re-fetches when the browser tab becomes visible again (visibilitychange)
+ *  2. Re-fetches when the window regains focus
+ *  3. Monitors the Supabase Realtime channel and reconnects if it drops
  */
 export function useSupabaseDB(tableName, orderByOption = null, filters = []) {
   const [data, setData] = useState([]);
@@ -15,6 +20,7 @@ export function useSupabaseDB(tableName, orderByOption = null, filters = []) {
   // Track whether we've completed at least one fetch.
   // Background realtime refetches should NOT re-show the loading spinner.
   const isFirstFetch = useRef(true);
+  const channelRef = useRef(null);
 
   const fetchData = useCallback(async () => {
     // Only show loading spinner on the very first fetch
@@ -38,6 +44,7 @@ export function useSupabaseDB(tableName, orderByOption = null, filters = []) {
       if (fetchErr) throw fetchErr;
 
       setData(result || []);
+      setError(null);
       isFirstFetch.current = false;
     } catch (err) {
       console.error(`useSupabaseDB [${tableName}]:`, err);
@@ -47,10 +54,14 @@ export function useSupabaseDB(tableName, orderByOption = null, filters = []) {
     }
   }, [tableName, JSON.stringify(orderByOption), JSON.stringify(filters)]); // eslint-disable-line
 
-  useEffect(() => {
-    fetchData();
+  // Subscribe to realtime changes and return a cleanup function
+  const subscribeRealtime = useCallback(() => {
+    // Remove any existing channel first
+    if (channelRef.current) {
+      supabase.removeChannel(channelRef.current);
+      channelRef.current = null;
+    }
 
-    // Subscribe to realtime changes (background, no spinner)
     const channel = supabase
       .channel(`public:${tableName}:${Math.random()}`)
       .on(
@@ -58,12 +69,47 @@ export function useSupabaseDB(tableName, orderByOption = null, filters = []) {
         { event: '*', schema: 'public', table: tableName },
         () => { fetchData(); }
       )
-      .subscribe();
+      .subscribe((status) => {
+        // If the channel closes or errors, log it — the visibility/focus
+        // listeners will trigger a re-fetch + re-subscribe on next tab focus.
+        if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
+          console.warn(`useSupabaseDB [${tableName}]: channel ${status}, will resync on next focus.`);
+        }
+      });
+
+    channelRef.current = channel;
+    return channel;
+  }, [tableName, fetchData]);
+
+  useEffect(() => {
+    fetchData();
+    subscribeRealtime();
+
+    // ── Recovery 1: Re-fetch when tab becomes visible again ──
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        fetchData();
+        subscribeRealtime(); // re-establish the channel in case it dropped
+      }
+    };
+
+    // ── Recovery 2: Re-fetch when window regains focus ──
+    const handleFocus = () => {
+      fetchData();
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleFocus);
 
     return () => {
-      supabase.removeChannel(channel);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleFocus);
+      if (channelRef.current) {
+        supabase.removeChannel(channelRef.current);
+        channelRef.current = null;
+      }
     };
-  }, [fetchData, tableName]);
+  }, [fetchData, subscribeRealtime]);
 
   const add = useCallback(
     async (docData) => {
@@ -108,3 +154,4 @@ export function useSupabaseDB(tableName, orderByOption = null, filters = []) {
 
   return { data, loading, error, add, update, remove, refetch: fetchData };
 }
+

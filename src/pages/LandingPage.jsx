@@ -19,23 +19,43 @@ export default function LandingPage() {
 
   useEffect(() => {
     if (!currentTournament?.id) return;
-    
-    supabase
-      .from('registrations')
-      .select('id', { count: 'exact', head: true })
-      .eq('tournament_id', currentTournament.id)
-      .eq('status', 'approved')
-      .then(({ count }) => setApprovedCount(count || 0));
 
-    if (user?.id) {
+    function fetchRegistrationData() {
       supabase
         .from('registrations')
-        .select('id')
+        .select('id', { count: 'exact', head: true })
         .eq('tournament_id', currentTournament.id)
-        .eq('user_id', user.id)
-        .single()
-        .then(({ data }) => setIsUserRegistered(!!data));
+        .eq('status', 'approved')
+        .then(({ count }) => setApprovedCount(count || 0));
+
+      if (user?.id) {
+        supabase
+          .from('registrations')
+          .select('id')
+          .eq('tournament_id', currentTournament.id)
+          .eq('user_id', user.id)
+          .single()
+          .then(({ data }) => setIsUserRegistered(!!data));
+      } else {
+        setIsUserRegistered(false);
+      }
     }
+
+    fetchRegistrationData();
+
+    // Re-fetch when user returns to this tab from another app/tab
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') fetchRegistrationData();
+    };
+    const handleFocus = () => fetchRegistrationData();
+
+    document.addEventListener('visibilitychange', handleVisibility);
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibility);
+      window.removeEventListener('focus', handleFocus);
+    };
   }, [currentTournament?.id, user?.id]);
 
   const maxTeams = currentTournament?.max_teams;
@@ -317,7 +337,7 @@ export default function LandingPage() {
                 <div className="mb-10">
                   <div className="flex justify-between font-teko text-[14px] tracking-[0.2em] uppercase mb-3">
                     <span className="text-[#dbb462]">{approvedCount} Teams Verified</span>
-                    <span className="text-[#d1c5b3] opacity-40">{isUnlimited ? 'OPEN ACCESS' : `${Math.round(fillPct)}% Capacity`}</span>
+                    <span className="text-[#d1c5b3] opacity-40">{isUnlimited ? 'UNLIMITED' : `${Math.round(fillPct)}% Capacity`}</span>
                   </div>
                   <div className="h-[3px] bg-white/[0.06] relative overflow-hidden">
                     <div 
@@ -344,7 +364,11 @@ export default function LandingPage() {
                     </div>
 
                     <div className="w-full md:w-auto space-y-3 shrink-0 min-w-[260px]">
-                      {isOpen && !isUserRegistered ? (
+                      {isUserRegistered ? (
+                        <div className="w-full text-center bg-[#dbb462]/10 border border-[#dbb462]/20 text-[#dbb462] font-bebas text-[22px] py-5 tracking-widest uppercase">
+                          ALREADY REGISTERED
+                        </div>
+                      ) : isOpen ? (
                         <Link
                           to={user ? `/register/${currentTournament.id}` : "/auth"}
                           className="btn-obsidian-primary w-full py-5 font-bebas text-[22px] tracking-[0.2em]"
@@ -353,7 +377,7 @@ export default function LandingPage() {
                         </Link>
                       ) : (
                         <div className="w-full text-center bg-white/[0.04] text-[#d1c5b3]/30 font-bebas text-[22px] py-5 tracking-widest uppercase">
-                          {isUserRegistered ? 'ALREADY REGISTERED' : 'REGISTRATION CLOSED'}
+                          REGISTRATION CLOSED
                         </div>
                       )}
                       

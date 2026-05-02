@@ -8,6 +8,7 @@ import toast from 'react-hot-toast';
 const NAV_LINKS = [
   { label: 'HOME', to: '/' },
   { label: 'TOURNAMENTS', to: '/tournaments' },
+  { label: 'DAILY SCRIMS', to: '/scrims' },
   { label: 'ABOUT US', to: '/about' },
   { label: 'MY PROFILE', to: '/profile' },
 ];
@@ -63,9 +64,9 @@ export default function Navbar() {
               />
             </div>
             <div className="flex flex-col justify-center">
-              <div className="font-bebas font-bold text-3xl md:text-4xl tracking-[0.02em] leading-none uppercase">
+              <div className="font-rajdhani font-bold text-3xl md:text-4xl tracking-normal leading-none uppercase mt-1">
                 <span className="text-[#f2f2f2] group-hover:text-white transition-colors">ZENITH</span>
-                <span className="ml-2 text-[#dbb462] transition-colors">ESPORTS</span>
+                <span className="ml-1.5 text-[#dbb462] transition-colors">ESPORTS</span>
               </div>
             </div>
           </Link>
@@ -77,11 +78,11 @@ export default function Navbar() {
                 key={label}
                 to={to}
                 className={`
-                  relative font-teko text-[18px] tracking-widest px-5 py-2 uppercase
+                  relative font-agency font-bold text-[22px] tracking-[0.1em] px-5 py-2 uppercase
                   transition-all duration-300
                   ${isActive(to)
                     ? 'text-[#dbb462]'
-                    : 'text-[#d1c5b3] opacity-40 hover:opacity-100 hover:text-white'
+                    : 'text-[#d1c5b3] opacity-50 hover:opacity-100 hover:text-white'
                   }
                   group/nav
                 `}
@@ -93,9 +94,9 @@ export default function Navbar() {
             {isAdmin && (
               <Link
                 to="/admin"
-                className="ml-4 flex items-center gap-2 bg-white/5 border border-white/10 px-6 py-2 font-teko text-[16px] tracking-widest text-[#dbb462] hover:bg-white/10 transition-all uppercase"
+                className="ml-4 flex items-center gap-2 bg-white/5 border border-white/10 px-6 py-2 font-agency font-bold text-[20px] tracking-[0.1em] text-[#dbb462] hover:bg-white/10 transition-all uppercase"
               >
-                <ShieldCheck size={16} />
+                <ShieldCheck size={18} className="mb-0.5" />
                 ADMIN
               </Link>
             )}
@@ -108,7 +109,7 @@ export default function Navbar() {
             {user ? (
               <div className="flex items-center gap-6 group/user">
                 <div className="text-right">
-                  <p className="font-bebas text-2xl text-white tracking-widest uppercase truncate max-w-[250px] transition-colors">
+                  <p className="font-agency font-bold text-[22px] text-white tracking-[0.1em] uppercase truncate max-w-[250px] transition-colors">
                     {displayName}
                   </p>
                 </div>
@@ -125,7 +126,7 @@ export default function Navbar() {
             ) : (
               <Link
                 to="/auth"
-                className="btn-obsidian-primary font-bebas text-[20px] px-10 py-4 tracking-widest uppercase"
+                className="btn-obsidian-primary font-agency font-bold text-[22px] px-10 py-3 tracking-[0.1em] uppercase"
               >
                 LOGIN
               </Link>
@@ -150,7 +151,7 @@ export default function Navbar() {
                 key={label}
                 to={to}
                 onClick={() => setMobileOpen(false)}
-                className={`font-bebas text-4xl tracking-widest uppercase ${isActive(to) ? 'text-[#dbb462]' : 'text-[#d1c5b3] opacity-40'}`}
+                className={`font-agency font-bold text-4xl tracking-[0.1em] uppercase ${isActive(to) ? 'text-[#dbb462]' : 'text-[#d1c5b3] opacity-40'}`}
               >
                 {label}
               </Link>
@@ -159,7 +160,7 @@ export default function Navbar() {
               <Link
                 to="/admin"
                 onClick={() => setMobileOpen(false)}
-                className="font-teko text-2xl tracking-[0.2em] text-[#dbb462] py-4 border-t border-white/5 flex items-center gap-3 uppercase"
+                className="font-agency font-bold text-3xl tracking-[0.1em] text-[#dbb462] py-4 border-t border-white/5 flex items-center gap-3 uppercase"
               >
                 <ShieldCheck size={24} /> ADMIN DASHBOARD
               </Link>
@@ -169,14 +170,14 @@ export default function Navbar() {
                 <Link
                   to="/auth"
                   onClick={() => setMobileOpen(false)}
-                  className="block w-full text-center zenith-gradient text-[#402d00] font-bebas text-2xl py-6 tracking-[0.2em] uppercase"
+                  className="block w-full text-center zenith-gradient text-[#402d00] font-agency font-bold text-3xl py-4 tracking-[0.1em] uppercase"
                 >
                   LOGIN / REGISTER
                 </Link>
               ) : (
                 <button
                   onClick={handleSignOut}
-                  className="w-full text-center border border-[#ffb4ab]/30 text-[#ffb4ab] font-bebas text-2xl py-6 tracking-[0.2em] uppercase"
+                  className="w-full text-center border border-[#ffb4ab]/30 text-[#ffb4ab] font-agency font-bold text-3xl py-4 tracking-[0.1em] uppercase"
                 >
                   SIGN OUT
                 </button>

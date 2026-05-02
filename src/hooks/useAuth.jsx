@@ -50,18 +50,18 @@ export function AuthProvider({ children }) {
     }, 4000);
 
     // ── Phase 1: read persisted session from localStorage immediately ─────────
-    (async () => {
+    async function initSession() {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
         if (error) console.warn('[auth] getSession error:', error.message);
 
-        if (!mountedRef.current) return;         // unmounted during await
+        if (!mountedRef.current) return;
 
         const currentUser = session?.user ?? null;
         profileUidRef.current = currentUser?.id ?? null;
 
         if (currentUser) {
-          setUser(currentUser); // Immediately show logged in state!
+          setUser(currentUser);
           const doc = await fetchProfile(currentUser.id);
           if (mountedRef.current) setUserDoc(doc);
         } else {
@@ -71,11 +71,12 @@ export function AuthProvider({ children }) {
       } catch (err) {
         console.warn('[auth] init error:', err.message);
       } finally {
-        // Always clear loading, even on error
         clearTimeout(safetyTimer);
         if (mountedRef.current) setLoading(false);
       }
-    })();
+    }
+
+    initSession();
 
     // ── Phase 2: subscribe to future changes ──────────────────────────────────
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -93,7 +94,7 @@ export function AuthProvider({ children }) {
         profileUidRef.current = incomingUid;
 
         if (incomingUid) {
-          setUser(session.user); // Immediately show logged in state!
+          setUser(session.user);
           const doc = await fetchProfile(incomingUid);
           if (mountedRef.current) setUserDoc(doc);
         } else {
@@ -101,16 +102,32 @@ export function AuthProvider({ children }) {
           setUserDoc(null);
         }
 
-        // Ensure loading is cleared even if getSession() hasn't finished
         clearTimeout(safetyTimer);
         if (mountedRef.current) setLoading(false);
       }
     );
 
+    // ── Phase 3: Re-validate session when tab becomes visible ─────────────────
+    // This prevents the Register button from disappearing after switching apps,
+    // since browsers can suspend the auth WebSocket when the tab is inactive.
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible' && mountedRef.current) {
+        initSession();
+      }
+    };
+    const handleFocus = () => {
+      if (mountedRef.current) initSession();
+    };
+
+    document.addEventListener('visibilitychange', handleVisibility);
+    window.addEventListener('focus', handleFocus);
+
     return () => {
       mountedRef.current = false;
       clearTimeout(safetyTimer);
       subscription.unsubscribe();
+      document.removeEventListener('visibilitychange', handleVisibility);
+      window.removeEventListener('focus', handleFocus);
     };
   }, []);
 

@@ -24,6 +24,8 @@ export default function TournamentDetailsPage() {
   const [activeTab, setActiveTab] = useState('overview');
 
   useEffect(() => {
+    let isMounted = true;
+
     async function loadData() {
       try {
         const { data: tData } = await supabase
@@ -38,17 +40,34 @@ export default function TournamentDetailsPage() {
           .eq('tournament_id', id)
           .neq('status', 'rejected');
 
+        if (!isMounted) return;
         setTournament(tData);
         setRegistrations(rData || []);
       } catch (err) {
         console.error(err);
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     }
+
     loadData();
-    const timer = setTimeout(() => setLoading(false), 5000);
-    return () => clearTimeout(timer);
+    const timer = setTimeout(() => { if (isMounted) setLoading(false); }, 5000);
+
+    // Re-fetch silently when user returns to this tab
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') loadData();
+    };
+    const handleFocus = () => loadData();
+
+    document.addEventListener('visibilitychange', handleVisibility);
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      isMounted = false;
+      clearTimeout(timer);
+      document.removeEventListener('visibilitychange', handleVisibility);
+      window.removeEventListener('focus', handleFocus);
+    };
   }, [id]);
 
   const { phase } = useTournamentCountdown(tournament?.registration_open_date, tournament?.registration_deadline);
