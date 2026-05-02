@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import TournamentCard from '../components/TournamentCard';
 import { useTournaments } from '../hooks/useTournaments';
-import { supabase } from '../supabase/config';
+import { useSupabaseDB } from '../hooks/useSupabaseDB';
 import { AlertTriangle, RefreshCw, Trophy } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 
@@ -14,39 +14,45 @@ const FILTERS = [
 
 export default function TournamentsPage() {
   const { user } = useAuth();
-  const { tournaments, loading, error, refetch } = useTournaments();
-  const [regCounts, setRegCounts] = useState({});
-  const [userRegs, setUserRegs] = useState([]);
+  
+  // 1. Real-time Tournaments
+  const { 
+    tournaments, 
+    loading: tLoading, 
+    error: tError, 
+    refetch: tRefetch 
+  } = useTournaments();
+
+  // 2. Real-time Registrations (to sync slot counts and user registration status)
+  const { 
+    data: allRegistrations, 
+    loading: rLoading,
+    refetch: rRefetch
+  } = useSupabaseDB('registrations');
+
   const [filter, setFilter] = useState('all');
 
-  useEffect(() => {
-    supabase
-      .from('registrations')
-      .select('tournament_id, status')
-      .neq('status', 'rejected')
-      .then(({ data }) => {
-        if (!data) return;
-        const counts = {};
-        data.forEach((r) => {
-          if (r.status === 'approved') {
-            counts[r.tournament_id] = (counts[r.tournament_id] || 0) + 1;
-          }
-        });
-        setRegCounts(counts);
-      });
-
-    if (user?.id) {
-      supabase
-        .from('registrations')
-        .select('tournament_id')
-        .eq('user_id', user.id)
-        .then(({ data }) => {
-          if (data) setUserRegs(data.map(r => r.tournament_id));
-        });
-    }
-  }, [user?.id]);
+  // Compute registration counts and user registration status from real-time data
+  const { regCounts, userRegs } = useMemo(() => {
+    const counts = {};
+    const userJoined = [];
+    
+    allRegistrations.forEach((r) => {
+      // Slot counts only include approved teams
+      if (r.status === 'approved') {
+        counts[r.tournament_id] = (counts[r.tournament_id] || 0) + 1;
+      }
+      // Track which tournaments the current user has joined (not rejected)
+      if (user?.id && r.user_id === user.id && r.status !== 'rejected') {
+        userJoined.push(r.tournament_id);
+      }
+    });
+    
+    return { regCounts: counts, userRegs: userJoined };
+  }, [allRegistrations, user?.id]);
 
   const filtered = tournaments.filter((t) => filter === 'all' || t.status === filter);
+  
   const getRegCount = (id) => regCounts[id] || 0;
 
   // Count by status for filter badges
@@ -57,12 +63,19 @@ export default function TournamentsPage() {
     completed: tournaments.filter(t => t.status === 'completed').length,
   };
 
+  const isLoading = tLoading || rLoading;
+  const isError = tError;
+
+  const handleFullRefetch = () => {
+    tRefetch();
+    rRefetch();
+  };
+
   return (
     <div className="min-h-screen bg-[#0a0a0a] pt-20 animate-page-enter">
 
       {/* ── Hero ── */}
       <section className="relative py-28 md:py-40 px-6 lg:px-16 bg-[#0e0e0e] overflow-hidden border-b border-white/[0.04]">
-        {/* Subtle grid texture */}
         <div className="absolute inset-0 opacity-[0.02]" style={{
           backgroundImage: 'linear-gradient(rgba(219,180,98,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(219,180,98,0.5) 1px, transparent 1px)',
           backgroundSize: '60px 60px'
@@ -120,18 +133,18 @@ export default function TournamentsPage() {
 
       {/* ── Grid ── */}
       <section className="container mx-auto max-w-7xl px-6 lg:px-16 py-16 pb-32">
-        {loading ? (
+        {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-[#0e0e0e] aspect-[3/4] animate-pulse border border-white/[0.04]" />
+              <div key={i} className="bg-[#0e0e0e] aspect-[3/4] animate-pulse border border-white/5" />
             ))}
           </div>
-        ) : error ? (
+        ) : isError ? (
           <div className="flex flex-col items-center justify-center py-40 text-center">
             <AlertTriangle className="text-red-500 mb-6" size={48} />
             <p className="font-bebas text-5xl text-white mb-4">FAILED TO SYNC</p>
-            <p className="font-body text-[#d1c5b3] opacity-40 mb-12 max-w-sm">{error}</p>
-            <button onClick={refetch} className="btn-obsidian-ghost px-12 py-4 font-bebas text-xl tracking-widest">
+            <p className="font-body text-[#d1c5b3] opacity-40 mb-12 max-w-sm">{tError}</p>
+            <button onClick={handleFullRefetch} className="btn-obsidian-ghost px-12 py-4 font-bebas text-xl tracking-widest">
               <RefreshCw size={18} className="mr-3" /> RETRY
             </button>
           </div>

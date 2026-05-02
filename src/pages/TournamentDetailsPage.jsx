@@ -241,37 +241,40 @@ export default function TournamentDetailsPage() {
           )}
 
           {/* TEAMS */}
-          {activeTab === 'teams' && (
-            <section key="teams" style={{ animation: 'fadeIn 0.4s ease-out both' }}>
-              <SectionHeader title="REGISTERED TEAMS" count={registrations.length} />
-              {registrations.length === 0 ? (
-                <p className="font-teko text-[18px] text-white/20 tracking-[0.2em] uppercase">No teams registered yet.</p>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-[1px] bg-white/[0.04]">
-                  {registrations.map((r, i) => (
-                    <div key={r.id} className="bg-[#0e0e0e] p-5 flex items-center gap-5 group hover:bg-[#111] transition-all duration-300 relative overflow-hidden">
-                      <div className="absolute top-0 left-0 w-full h-[2px] bg-[#dbb462] scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
-                      <span className="font-bebas text-3xl text-[#dbb462] opacity-10 w-8 flex-shrink-0 group-hover:opacity-30 transition-opacity">
-                        {String(i + 1).padStart(2, '0')}
-                      </span>
-                      {r.logo_url ? (
-                        <img src={r.logo_url} alt="" className="w-10 h-10 object-cover border border-white/[0.06]" />
-                      ) : (
-                        <div className="w-10 h-10 bg-[#1a1a1a] flex items-center justify-center font-bebas text-xl text-[#dbb462] border border-white/[0.06]">
-                          {r.team_name?.[0]}
+          {activeTab === 'teams' && (() => {
+            const approvedTeams = registrations.filter(r => r.status === 'approved');
+            return (
+              <section key="teams" style={{ animation: 'fadeIn 0.4s ease-out both' }}>
+                <SectionHeader title="REGISTERED TEAMS" count={approvedTeams.length} />
+                {approvedTeams.length === 0 ? (
+                  <p className="font-teko text-[18px] text-white/20 tracking-[0.2em] uppercase">No verified teams yet.</p>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-[1px] bg-white/[0.04]">
+                    {approvedTeams.map((r, i) => (
+                      <div key={r.id} className="bg-[#0e0e0e] p-5 flex items-center gap-5 group hover:bg-[#111] transition-all duration-300 relative overflow-hidden">
+                        <div className="absolute top-0 left-0 w-full h-[2px] bg-[#dbb462] scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
+                        <span className="font-bebas text-3xl text-[#dbb462] opacity-10 w-8 flex-shrink-0 group-hover:opacity-30 transition-opacity">
+                          {String(i + 1).padStart(2, '0')}
+                        </span>
+                        {r.logo_url ? (
+                          <img src={r.logo_url} alt="" className="w-10 h-10 object-cover border border-white/[0.06]" />
+                        ) : (
+                          <div className="w-10 h-10 bg-[#1a1a1a] flex items-center justify-center font-bebas text-xl text-[#dbb462] border border-white/[0.06]">
+                            {r.team_name?.[0]}
+                          </div>
+                        )}
+                        <div className="min-w-0 flex-1">
+                          <p className="font-bebas text-2xl truncate leading-none mb-1 text-white/80 group-hover:text-white transition-colors uppercase">{r.team_name}</p>
+                          {r.city && <p className="font-teko text-[13px] tracking-[0.15em] text-[#d1c5b3] opacity-60 uppercase truncate leading-none">{r.city}</p>}
                         </div>
-                      )}
-                      <div className="min-w-0 flex-1">
-                        <p className="font-bebas text-2xl truncate leading-none mb-1 text-white/80 group-hover:text-white transition-colors uppercase">{r.team_name}</p>
-                        {r.city && <p className="font-teko text-[13px] tracking-[0.15em] text-[#d1c5b3] opacity-60 uppercase truncate leading-none">{r.city}</p>}
+                        <StatusBadge status={r.status} />
                       </div>
-                      <StatusBadge status={r.status} />
-                    </div>
-                  ))}
-                </div>
-              )}
-            </section>
-          )}
+                    ))}
+                  </div>
+                )}
+              </section>
+            );
+          })()}
         </div>
 
         {/* ── Right: Sidebar ── */}

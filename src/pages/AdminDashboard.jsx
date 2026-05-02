@@ -63,7 +63,11 @@ export default function AdminDashboard() {
     if (reason === null) return;
     if (!reason.trim()) return toast.error('Rejection reason is required');
 
-    await updateReg(reg.id, { status: 'rejected', rejection_reason: reason.trim() });
+    await updateReg(reg.id, { 
+      status: 'rejected', 
+      rejection_reason: reason.trim(),
+      group_id: null // Automatically remove from group
+    });
     toast.success(`${reg.team_name} rejected with reason`);
   }
   async function handleDelete(reg) {
