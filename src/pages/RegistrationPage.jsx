@@ -98,51 +98,99 @@ export default function RegistrationPage() {
       return toast.error('WhatsApp number must be exactly 11 digits.', { id: 'reg' });
     }
 
-    // Validate Player IDs (Basic check)
-    const p1Clean = form.player_1_id.trim();
-    if (p1Clean.length < 10) {
-      setFieldErrors(prev => ({ ...prev, player_1_id: 'ID too short' }));
-      return toast.error('Character IDs must be 10-14 digits.', { id: 'reg' });
+    // Validate Player IDs (All required and optional if provided)
+    const idRegex = /^\d{10,14}$/;
+    let firstErrorField = null;
+    
+    for (let i = 1; i <= 6; i++) {
+      const pid = form[`player_${i}_id`]?.trim();
+      // Required for 1-4, or if provided for 5-6
+      if (i <= 4 || pid) {
+        if (!pid) {
+          if (!firstErrorField) firstErrorField = `player_${i}_id`;
+          setFieldErrors(prev => ({ ...prev, [`player_${i}_id`]: 'Required' }));
+        } else if (!idRegex.test(pid)) {
+          if (!firstErrorField) firstErrorField = `player_${i}_id`;
+          setFieldErrors(prev => ({ ...prev, [`player_${i}_id`]: 'Invalid ID' }));
+        }
+      }
+    }
+
+    if (firstErrorField) {
+      return toast.error('Please fix Character ID errors (10-14 digits required).', { id: 'reg' });
     }
     
     setSaving(true);
     setFieldErrors({});
     try {
-      toast.loading('Initializing secure registration uplink...', { id: 'reg' });
+      toast.loading('Verifying competitive eligibility...', { id: 'reg' });
+      
+      const { hasPendingRegistration, findDuplicatePlayerID } = resultHook; // I need to make sure I have access to these
+      
+      const cleanIDs = [
+        form.player_1_id, form.player_2_id, form.player_3_id,
+        form.player_4_id, form.player_5_id, form.player_6_id
+      ].filter(Boolean).map(id => id.trim());
+
+      // Pre-Guard 1: Pending check
+      const pending = await hasPendingRegistration(user.id);
+      if (pending) {
+        setSaving(false);
+        return toast.error('You already have a pending registration. Please wait for it to be reviewed.', { id: 'reg' });
+      }
+
+      // Pre-Guard 2: Duplicate check
+      const duplicate = await findDuplicatePlayerID(cleanIDs);
+      if (duplicate) {
+        setSaving(false);
+        // Map to correct field
+        for (let i = 1; i <= 6; i++) {
+          if (form[`player_${i}_id`]?.trim() === duplicate) {
+            setFieldErrors(prev => ({ ...prev, [`player_${i}_id`]: 'Already Registered' }));
+            break;
+          }
+        }
+        return toast.error(`Player ID "${duplicate}" is already registered in this tournament.`, { id: 'reg' });
+      }
+
+      toast.loading('Optimizing tactical assets...', { id: 'reg' });
+      const { compressImage } = await import('../utils/image');
       
       // Prepare Upload Tasks
       const uploadTasks = [];
       
       // Task 0: Logo (if exists)
       if (file) {
+        const compressedLogo = await compressImage(file, { maxWidth: 400, maxHeight: 400, quality: 0.7 });
         uploadTasks.push(
-          uploadFile('ze-logos', file, `logo_${user.id}_${Date.now()}`)
+          uploadFile('ze-logos', compressedLogo, `logo_${user.id}_${Date.now()}`)
             .catch(err => {
               console.warn('Logo upload failed, proceeding without logo:', err.message);
-              return null; // Return null so the registration can still proceed
+              return null;
             })
         );
       } else {
         uploadTasks.push(Promise.resolve(null));
       }
       
-      // Tasks 1-N: Screenshots
+      // Tasks 1-N: Screenshots (Aggressive compression for faster sync and storage saving)
       const configSS = tournament.registration_config?.screenshots || [];
-      configSS.forEach((ss, i) => {
+      for (let i = 0; i < configSS.length; i++) {
         const sFile = screenshotFiles[i];
         if (sFile) {
+          const compressedSS = await compressImage(sFile, { maxWidth: 1000, maxHeight: 1000, quality: 0.5 });
           uploadTasks.push(
-            uploadFile('ze-proofs', sFile, `proof_${i}_${user.id}_${Date.now()}`)
+            uploadFile('ze-proofs', compressedSS, `proof_${i}_${user.id}_${Date.now()}`)
               .catch(err => {
-                throw new Error(`Proof upload failed [${ss.label}]: ${err.message}`);
+                throw new Error(`Proof upload failed [${configSS[i].label}]: ${err.message}`);
               })
           );
         } else {
           uploadTasks.push(Promise.resolve(null));
         }
-      });
+      }
       
-      toast.loading('Syncing tactical data & screenshots...', { id: 'reg' });
+      toast.loading('Syncing tactical data...', { id: 'reg' });
       
       // Execute all uploads in parallel
       const uploadResults = await Promise.all(uploadTasks);
@@ -150,17 +198,12 @@ export default function RegistrationPage() {
       const logoUrl = uploadResults[0];
       const screenshotURLs = uploadResults.slice(1);
       
-      toast.loading('Pushing registration to Admin queue...', { id: 'reg' });
-      
-      const playerIds = [
-        form.player_1_id, form.player_2_id, form.player_3_id,
-        form.player_4_id, form.player_5_id, form.player_6_id
-      ];
+      toast.loading('Finalizing registration...', { id: 'reg' });
       
       const playerIgns = [
         form.player_1_ign, form.player_2_ign, form.player_3_ign,
         form.player_4_ign, form.player_5_ign, form.player_6_ign
-      ];
+      ].filter((_, i) => !!form[`player_${i+1}_id`]);
 
       const result = await submitRegistration({
         uid: user.id,
@@ -170,24 +213,19 @@ export default function RegistrationPage() {
         teamLogoURL: logoUrl,
         whatsapp: form.whatsapp_number,
         captainDiscord: form.captain_discord,
-        playerIDs: playerIds,
+        playerIDs: cleanIDs,
         playerIgns: playerIgns,
         screenshotURLs: screenshotURLs
       });
 
       if (result.success) {
-        toast.success('Registration finalized and pushed to Admin queue!', { id: 'reg' });
+        toast.success('Registration finalized successfully!', { id: 'reg' });
         navigate('/tournaments');
       } else {
         toast.error(result.error || 'Registration failed', { id: 'reg' });
-        // Try to map error to field if possible
-        if (result.error && typeof result.error === 'string') {
-          if (result.error.includes('Character ID')) setFieldErrors(prev => ({ ...prev, player_1_id: 'Invalid ID' }));
-          if (result.error.includes('WhatsApp')) setFieldErrors(prev => ({ ...prev, whatsapp_number: '11 digits required' }));
-        }
       }
     } catch (err) {
-      toast.error(`Registration uplink failed: ${err.message}`, { id: 'reg' });
+      toast.error(`Registration failed: ${err.message}`, { id: 'reg' });
     } finally {
       setSaving(false);
     }

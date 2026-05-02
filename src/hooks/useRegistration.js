@@ -151,5 +151,12 @@ export function useRegistration() {
     [hasPendingRegistration, findDuplicatePlayerID]
   );
 
-  return { submitRegistration, submitting, error, setError };
+  return { 
+    submitRegistration, 
+    hasPendingRegistration, 
+    findDuplicatePlayerID, 
+    submitting, 
+    error, 
+    setError 
+  };
 }

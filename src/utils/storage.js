@@ -15,21 +15,14 @@ export async function uploadFile(bucket, file, path = null, retries = 3) {
   const filePath = fileName;
 
   for (let attempt = 1; attempt <= retries; attempt++) {
-    const uploadPromise = supabase.storage.from(bucket).upload(filePath, file, {
-      cacheControl: '3600',
-      upsert: false
-    });
-
-    // 60 second timeout per attempt (increased for stability on slower networks)
-    const timeoutPromise = new Promise((_, rej) => 
-      setTimeout(() => rej(new Error('UPLINK_TIMEOUT')), 60000)
-    );
-
     try {
-      const { data, error } = await Promise.race([uploadPromise, timeoutPromise]);
+      const { data, error } = await supabase.storage.from(bucket).upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: false
+      });
 
       if (error) {
-        console.error(`Upload error attempt ${attempt} in [${bucket}]:`, error);
+        console.error(`Upload error attempt ${attempt} in [${bucket}]:`, error.message);
         if (attempt === retries) throw error;
         // Exponential backoff before retry
         await new Promise(r => setTimeout(r, 1000 * attempt));
@@ -39,14 +32,8 @@ export async function uploadFile(bucket, file, path = null, retries = 3) {
       // Success
       break;
     } catch (err) {
-      console.error(`Attempt ${attempt} failed:`, err);
-      if (attempt === retries) {
-        if (err.message === 'UPLINK_TIMEOUT') {
-          throw new Error('Registration Uplink Failed: The server took too long to respond. This usually happens with large files or slow internet. Please try a smaller image or a better connection.');
-        } else {
-          throw err;
-        }
-      }
+      console.error(`Attempt ${attempt} failed:`, err.message);
+      if (attempt === retries) throw err;
       // Delay before retry
       await new Promise(r => setTimeout(r, 1000 * attempt));
     }
