@@ -178,7 +178,7 @@ export function useRegistration() {
         setSubmitting(false);
       }
     },
-    [findDuplicatePlayerID]
+    [findDuplicates]
   );
 
   return { 
