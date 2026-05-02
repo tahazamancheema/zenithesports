@@ -168,7 +168,7 @@ export default function RegistrationPage() {
       ].filter(Boolean).map(id => id.trim());
 
       // Pre-Guard 1: Pending check
-      const pending = await hasPendingRegistration(user.id);
+      const pending = await hasPendingRegistration(user.id, tournament.id);
       if (pending) {
         setSaving(false);
         return toast.error('You already have a pending registration. Please wait for it to be reviewed.', { id: 'reg' });
@@ -251,8 +251,6 @@ export default function RegistrationPage() {
       
       const logoUrl = uploadResults[0];
       const screenshotURLs = uploadResults.slice(1);
-      
-      toast.loading('Finalizing registration...', { id: 'reg' });
       
       toast.loading('Finalizing registration...', { id: 'reg' });
       

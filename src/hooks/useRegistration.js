@@ -17,7 +17,7 @@ export function useRegistration() {
    */
   const hasPendingRegistration = useCallback(async (uid, tournamentID) => {
     try {
-      const { data, error } = await supabase
+      const query = supabase
         .from('registrations')
         .select('id, status')
         .eq('user_id', uid)
@@ -25,10 +25,19 @@ export function useRegistration() {
         .in('status', ['pending', 'approved', 'reapplied'])
         .limit(1);
 
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('QUERY_TIMEOUT')), 10000)
+      );
+
+      const { data, error } = await Promise.race([query, timeoutPromise]);
+
       if (error) throw error;
       return data && data.length > 0;
     } catch (err) {
       console.error('Pending check error:', err);
+      if (err.message === 'QUERY_TIMEOUT') {
+        throw new Error('Connection timed out during eligibility verification. Please check your network and try again.');
+      }
       return false;
     }
   }, []);
@@ -39,8 +48,12 @@ export function useRegistration() {
    */
   const findDuplicates = useCallback(async (playerIDs, playerIGNs, teamName, tournamentID, excludeRegId = null) => {
     try {
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('QUERY_TIMEOUT')), 10000)
+      );
+
       // 1. Check for Duplicate Team Name (Case-insensitive)
-      const { data: teamCheck } = await supabase
+      const teamQuery = supabase
         .from('registrations')
         .select('id, team_name')
         .eq('tournament_id', tournamentID)
@@ -49,6 +62,8 @@ export function useRegistration() {
         .neq('id', excludeRegId || '00000000-0000-0000-0000-000000000000') // Handle null
         .limit(1);
 
+      const { data: teamCheck, error: teamError } = await Promise.race([teamQuery, timeoutPromise]);
+      if (teamError) throw teamError;
       if (teamCheck?.length > 0) return { type: 'team', value: teamName };
 
       // 2. Check for Duplicate Player IDs
@@ -60,8 +75,9 @@ export function useRegistration() {
         .overlaps('player_ids', playerIDs);
 
       if (excludeRegId) idQuery = idQuery.neq('id', excludeRegId);
-      const { data: idData } = await idQuery.limit(1);
+      const { data: idData, error: idError } = await Promise.race([idQuery.limit(1), timeoutPromise]);
       
+      if (idError) throw idError;
       if (idData?.length > 0) {
         const matched = playerIDs.find(id => idData[0].player_ids.includes(id));
         return { type: 'id', value: matched };
@@ -76,8 +92,9 @@ export function useRegistration() {
         .overlaps('player_igns', playerIGNs.map(n => n.toLowerCase()));
 
       if (excludeRegId) ignQuery = ignQuery.neq('id', excludeRegId);
-      const { data: ignData } = await ignQuery.limit(1);
+      const { data: ignData, error: ignError } = await Promise.race([ignQuery.limit(1), timeoutPromise]);
 
+      if (ignError) throw ignError;
       if (ignData?.length > 0) {
         // Find which IGN matched
         const matched = playerIGNs.find(n => 
@@ -89,6 +106,9 @@ export function useRegistration() {
       return null;
     } catch (err) {
       console.error('Duplicate check error:', err);
+      if (err.message === 'QUERY_TIMEOUT') {
+        throw new Error('Connection timed out during duplicate verification. Please try again.');
+      }
       return null;
     }
   }, []);
