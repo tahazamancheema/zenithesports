@@ -148,7 +148,7 @@ export default function TournamentsPage() {
               <RefreshCw size={18} className="mr-3" /> RETRY
             </button>
           </div>
-        ) : filtered.length === 0 ? (
+        ) : (filtered.length === 0 && !tLoading) ? (
           <div className="text-center py-40 flex flex-col items-center">
             <Trophy className="text-[#dbb462] opacity-[0.06] mb-8" size={80} />
             <p className="font-bebas text-6xl text-white opacity-10 mb-3 uppercase">NO RECORDS</p>

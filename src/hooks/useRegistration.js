@@ -34,28 +34,56 @@ export function useRegistration() {
   }, []);
 
   /**
-   * Check if any player ID already exists in any registration using efficient Postgres array operators.
-   * Excludes 'rejected' records so those IDs are freed up (unless the same user is re-applying).
+   * Check if any player ID or IGN already exists in any registration.
+   * Excludes 'rejected' records.
    */
-  const findDuplicatePlayerID = useCallback(async (playerIDs, excludeRegId = null) => {
+  const findDuplicates = useCallback(async (playerIDs, playerIGNs, teamName, tournamentID, excludeRegId = null) => {
     try {
-      let query = supabase
+      // 1. Check for Duplicate Team Name (Case-insensitive)
+      const { data: teamCheck } = await supabase
+        .from('registrations')
+        .select('id, team_name')
+        .eq('tournament_id', tournamentID)
+        .neq('status', 'rejected')
+        .ilike('team_name', teamName)
+        .neq('id', excludeRegId || '00000000-0000-0000-0000-000000000000') // Handle null
+        .limit(1);
+
+      if (teamCheck?.length > 0) return { type: 'team', value: teamName };
+
+      // 2. Check for Duplicate Player IDs
+      let idQuery = supabase
         .from('registrations')
         .select('id, player_ids')
+        .eq('tournament_id', tournamentID)
         .neq('status', 'rejected')
         .overlaps('player_ids', playerIDs);
 
-      if (excludeRegId) {
-        query = query.neq('id', excludeRegId);
+      if (excludeRegId) idQuery = idQuery.neq('id', excludeRegId);
+      const { data: idData } = await idQuery.limit(1);
+      
+      if (idData?.length > 0) {
+        const matched = playerIDs.find(id => idData[0].player_ids.includes(id));
+        return { type: 'id', value: matched };
       }
 
-      const { data, error } = await query.limit(1);
+      // 3. Check for Duplicate Player IGNs (Case-insensitive)
+      let ignQuery = supabase
+        .from('registrations')
+        .select('id, player_igns')
+        .eq('tournament_id', tournamentID)
+        .neq('status', 'rejected')
+        .overlaps('player_igns', playerIGNs.map(n => n.toLowerCase()));
 
-      if (error) throw error;
-      
-      if (data && data.length > 0) {
-        const matchedID = playerIDs.find(id => data[0].player_ids.includes(id));
-        return matchedID || playerIDs[0];
+      if (excludeRegId) ignQuery = ignQuery.neq('id', excludeRegId);
+      const { data: ignData } = await ignQuery.limit(1);
+
+      if (ignData?.length > 0) {
+        // Find which IGN matched
+        const matched = playerIGNs.find(n => 
+          ignData[0].player_igns.some(existing => existing.toLowerCase() === n.toLowerCase())
+        );
+        return { type: 'ign', value: matched };
       }
       
       return null;
@@ -86,12 +114,16 @@ export function useRegistration() {
           .eq('tournament_id', tournamentID)
           .maybeSingle();
 
-        // 2. Global Duplicate character ID check (exclude current record if updating)
-        const duplicate = await findDuplicatePlayerID(cleanIDs, existing?.id);
+        // 2. Global Duplicate check (exclude current record if updating)
+        const duplicate = await findDuplicates(cleanIDs, playerIgns, teamName.trim(), tournamentID, existing?.id);
         if (duplicate) {
-          throw new Error(
-            `Player ID "${duplicate}" پہلے سے ڈیٹابیس میں موجود ہے۔\n(Player ID "${duplicate}" is already registered in the database.)`
-          );
+          if (duplicate.type === 'team') {
+            throw new Error(`Team name "${duplicate.value}" is already taken in this tournament.`);
+          }
+          if (duplicate.type === 'ign') {
+            throw new Error(`Player name "${duplicate.value}" is already registered in another squad.`);
+          }
+          throw new Error(`Player ID "${duplicate.value}" is already registered in another squad.`);
         }
 
         // 3. Validation
@@ -152,7 +184,7 @@ export function useRegistration() {
   return { 
     submitRegistration, 
     hasPendingRegistration, 
-    findDuplicatePlayerID, 
+    findDuplicates, 
     submitting, 
     error, 
     setError 

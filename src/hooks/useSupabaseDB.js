@@ -29,6 +29,11 @@ export function useSupabaseDB(tableName, orderByOption = null, filters = []) {
     try {
       let query = supabase.from(tableName).select('*');
 
+      // ── Cache Busting for Tournaments ──
+      if (tableName === 'tournaments') {
+        query = query.neq('id', '00000000-0000-0000-0000-000000000000'); // Dummy filter to force fresh fetch
+      }
+
       if (filters.length > 0) {
         filters.forEach(([field, op, value]) => {
           if (op === 'eq') query = query.eq(field, value);
@@ -40,26 +45,37 @@ export function useSupabaseDB(tableName, orderByOption = null, filters = []) {
         query = query.order(orderByOption.field, { ascending });
       }
 
-      const { data: result, error: fetchErr } = await query;
+      // ── Anti-Stall: Wrap query in a timeout race ──
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('QUERY_TIMEOUT')), 8000)
+      );
+
+      const { data: result, error: fetchErr } = await Promise.race([query, timeoutPromise]);
+      
       if (fetchErr) throw fetchErr;
 
       // ── Resiliency: Retry once if empty (to handle intermittent sync flickers) ──
       if (isFirstFetch.current && (!result || result.length === 0) && tableName === 'tournaments') {
-         console.warn(`useSupabaseDB [${tableName}]: Empty result on first fetch, retrying in 1.5s...`);
-         setTimeout(() => fetchData(), 1500);
-         return; // Let the timeout handle it
+         console.warn(`useSupabaseDB [${tableName}]: Empty result on first fetch, retrying in 0.5s...`);
+         isFirstFetch.current = false; 
+         setTimeout(() => {
+            isFirstFetch.current = true;
+            fetchData();
+         }, 500);
+         return; 
       }
 
       setData(result || []);
       setError(null);
       isFirstFetch.current = false;
+      setLoading(false);
     } catch (err) {
       console.error(`useSupabaseDB [${tableName}]:`, err);
-      setError(err.message);
-    } finally {
+      setError(err.message === 'QUERY_TIMEOUT' ? 'Connection stalled. Please try again.' : err.message);
       setLoading(false);
+      isFirstFetch.current = false; // Ensure we don't get stuck in first-fetch mode
     }
-  }, [tableName, JSON.stringify(orderByOption), JSON.stringify(filters)]); // eslint-disable-line
+  }, [tableName, JSON.stringify(orderByOption), JSON.stringify(filters)]);
 
   // Subscribe to realtime changes and return a cleanup function
   const subscribeRealtime = useCallback(() => {
@@ -92,6 +108,17 @@ export function useSupabaseDB(tableName, orderByOption = null, filters = []) {
     fetchData();
     subscribeRealtime();
 
+    // ── Resiliency Heartbeat: If tournaments are 0, re-check every 3s ──
+    let heartbeat = null;
+    if (tableName === 'tournaments') {
+      heartbeat = setInterval(() => {
+        if (!loading && data.length === 0) {
+          console.log('useSupabaseDB: Heartbeat re-syncing tournaments...');
+          fetchData();
+        }
+      }, 3000);
+    }
+
     // ── Recovery 1: Re-fetch when tab becomes visible again ──
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
@@ -109,6 +136,7 @@ export function useSupabaseDB(tableName, orderByOption = null, filters = []) {
     window.addEventListener('focus', handleFocus);
 
     return () => {
+      if (heartbeat) clearInterval(heartbeat);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('focus', handleFocus);
       if (channelRef.current) {
@@ -116,7 +144,7 @@ export function useSupabaseDB(tableName, orderByOption = null, filters = []) {
         channelRef.current = null;
       }
     };
-  }, [fetchData, subscribeRealtime]);
+  }, [fetchData, subscribeRealtime, tableName, data.length, loading]);
 
   const add = useCallback(
     async (docData) => {

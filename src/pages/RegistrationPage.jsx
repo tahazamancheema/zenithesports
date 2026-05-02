@@ -175,17 +175,31 @@ export default function RegistrationPage() {
       }
 
       // Pre-Guard 2: Duplicate check
-      const duplicate = await findDuplicatePlayerID(cleanIDs);
+      const duplicate = await findDuplicates(cleanIDs, playerIgns, form.team_name.trim(), tournament.id);
       if (duplicate) {
         setSaving(false);
-        // Map to correct field
+        if (duplicate.type === 'team') {
+          setFieldErrors(prev => ({ ...prev, team_name: 'Name Taken' }));
+          return toast.error(`Team name "${duplicate.value}" is already taken in this tournament.`, { id: 'reg' });
+        }
+        if (duplicate.type === 'ign') {
+          // Find which field it is
+          for (let i = 1; i <= 6; i++) {
+            if (form[`player_${i}_ign`]?.trim().toLowerCase() === duplicate.value.toLowerCase()) {
+              setFieldErrors(prev => ({ ...prev, [`player_${i}_ign`]: 'Already Registered' }));
+              break;
+            }
+          }
+          return toast.error(`Player name "${duplicate.value}" is already registered in another squad.`, { id: 'reg' });
+        }
+        // ID Check
         for (let i = 1; i <= 6; i++) {
-          if (form[`player_${i}_id`]?.trim() === duplicate) {
+          if (form[`player_${i}_id`]?.trim() === duplicate.value) {
             setFieldErrors(prev => ({ ...prev, [`player_${i}_id`]: 'Already Registered' }));
             break;
           }
         }
-        return toast.error(`Player ID "${duplicate}" is already registered in this tournament.`, { id: 'reg' });
+        return toast.error(`Player ID "${duplicate.value}" is already registered in another squad.`, { id: 'reg' });
       }
 
       toast.loading('Optimizing tactical assets...', { id: 'reg' });
