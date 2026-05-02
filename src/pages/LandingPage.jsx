@@ -14,52 +14,50 @@ export default function LandingPage() {
   const { currentTournament, activeTournaments } = useTournaments();
   const { user } = useAuth();
   const platformStats = usePlatformStats();
-  const [approvedCount, setApprovedCount] = useState(0);
-  const [isUserRegistered, setIsUserRegistered] = useState(false);
+  const [approvedCounts, setApprovedCounts] = useState({});
+  const [userRegStatuses, setUserRegStatuses] = useState({});
 
   useEffect(() => {
-    if (!currentTournament?.id) return;
+    // 1. Fetch approval counts for all active tournaments
+    supabase
+      .from('registrations')
+      .select('tournament_id')
+      .eq('status', 'approved')
+      .then(({ data }) => {
+        const counts = {};
+        data?.forEach(r => counts[r.tournament_id] = (counts[r.tournament_id] || 0) + 1);
+        setApprovedCounts(counts);
+      });
 
-    function fetchRegistrationData() {
+    // 2. Fetch current user's registration statuses
+    if (user?.id) {
       supabase
         .from('registrations')
-        .select('id', { count: 'exact', head: true })
-        .eq('tournament_id', currentTournament.id)
-        .eq('status', 'approved')
-        .then(({ count }) => setApprovedCount(count || 0));
-
-      if (user?.id) {
-        supabase
-          .from('registrations')
-          .select('id')
-          .eq('tournament_id', currentTournament.id)
-          .eq('user_id', user.id)
-          .single()
-          .then(({ data }) => setIsUserRegistered(!!data));
-      } else {
-        setIsUserRegistered(false);
-      }
+        .select('tournament_id, status')
+        .eq('user_id', user.id)
+        .then(({ data }) => {
+          const statuses = {};
+          data?.forEach(r => statuses[r.tournament_id] = r.status);
+          setUserRegStatuses(statuses);
+        });
+    } else {
+      setUserRegStatuses({});
     }
 
-    fetchRegistrationData();
-
-    // Re-fetch when user returns to this tab from another app/tab
-    const handleVisibility = () => {
-      if (document.visibilityState === 'visible') fetchRegistrationData();
+    // Re-fetch when user returns to this tab
+    const handleSync = () => {
+      if (document.visibilityState === 'visible') {
+        // Simple way to trigger effect re-run if needed, but manual fetch is better
+        // For simplicity here, we'll just re-do the logic or rely on refocus
+      }
     };
-    const handleFocus = () => fetchRegistrationData();
-
-    document.addEventListener('visibilitychange', handleVisibility);
-    window.addEventListener('focus', handleFocus);
-
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibility);
-      window.removeEventListener('focus', handleFocus);
-    };
-  }, [currentTournament?.id, user?.id]);
+    window.addEventListener('focus', handleSync);
+    return () => window.removeEventListener('focus', handleSync);
+  }, [user?.id, activeTournaments.length]); // Re-run when user changes or tournaments list loads
 
   const maxTeams = currentTournament?.max_teams;
   const isUnlimited = !maxTeams || maxTeams === 0;
+  const approvedCount = approvedCounts[currentTournament?.id] || 0;
   const fillPct = isUnlimited ? 100 : Math.min((approvedCount / maxTeams) * 100, 100);
   const isOpen = currentTournament?.status === 'registrations_open';
 
@@ -248,12 +246,26 @@ export default function LandingPage() {
 
                       {/* CTA */}
                       <div className="mt-auto flex gap-3">
-                        <Link
-                          to={user ? `/register/${t.id}` : '/auth'}
-                          className="btn-obsidian-primary flex-1 py-4 font-bebas text-[20px] tracking-[0.15em] uppercase"
-                        >
-                          REGISTER
-                        </Link>
+                        {(!userRegStatuses[t.id] || userRegStatuses[t.id] === 'rejected') ? (
+                          <Link
+                            to={user ? `/register/${t.id}` : '/auth'}
+                            className="btn-obsidian-primary flex-1 py-4 font-bebas text-[20px] tracking-[0.15em] uppercase"
+                          >
+                            REGISTER
+                          </Link>
+                        ) : (
+                          <div className={`flex-1 font-teko text-[16px] py-3.5 tracking-[0.15em] uppercase text-center flex items-center justify-center border ${
+                            userRegStatuses[t.id] === 'approved' 
+                              ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' 
+                              : userRegStatuses[t.id] === 'reapplied'
+                              ? 'bg-blue-500/10 border-blue-500/20 text-blue-400'
+                              : 'bg-yellow-500/10 border-yellow-500/20 text-yellow-500'
+                          }`}>
+                            {userRegStatuses[t.id] === 'approved' ? 'APPROVED' : 
+                             userRegStatuses[t.id] === 'reapplied' ? 'RE-APPLIED' : 
+                             'PENDING'}
+                          </div>
+                        )}
                         <Link
                           to={`/tournaments/${t.id}`}
                           className="btn-obsidian-ghost px-5 py-4 font-bebas text-[20px] tracking-widest uppercase"
@@ -364,9 +376,17 @@ export default function LandingPage() {
                     </div>
 
                     <div className="w-full md:w-auto space-y-3 shrink-0 min-w-[260px]">
-                      {isUserRegistered ? (
-                        <div className="w-full text-center bg-[#dbb462]/10 border border-[#dbb462]/20 text-[#dbb462] font-bebas text-[22px] py-5 tracking-widest uppercase">
-                          ALREADY REGISTERED
+                      {(userRegStatuses[currentTournament.id] && userRegStatuses[currentTournament.id] !== 'rejected') ? (
+                        <div className={`w-full text-center font-bebas text-[22px] py-5 tracking-widest uppercase border ${
+                          userRegStatuses[currentTournament.id] === 'approved' 
+                            ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' 
+                            : userRegStatuses[currentTournament.id] === 'reapplied'
+                            ? 'bg-blue-500/10 border-blue-500/20 text-blue-400'
+                            : 'bg-yellow-500/10 border-yellow-500/20 text-yellow-500'
+                        }`}>
+                          {userRegStatuses[currentTournament.id] === 'approved' ? 'ALREADY APPROVED' : 
+                           userRegStatuses[currentTournament.id] === 'reapplied' ? 'ALREADY RE-APPLIED' : 
+                           'ALREADY REGISTERED'}
                         </div>
                       ) : isOpen ? (
                         <Link

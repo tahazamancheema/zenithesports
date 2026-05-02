@@ -97,16 +97,24 @@ export default function TournamentCard({ tournament, registrationCount = 0, isUs
         {/* CTA */}
         <div className="mt-auto space-y-3">
           <div className="flex gap-3">
-            {isOpen && !isUserRegistered ? (
+            {isOpen && (!userRegistrationStatus || userRegistrationStatus === 'rejected') ? (
               <Link
                 to={`/register/${id}`}
                 className="btn-obsidian-primary flex-1 py-4 font-bebas text-[20px] tracking-[0.15em] uppercase"
               >
                 REGISTER SQUAD
               </Link>
-            ) : isUserRegistered ? (
-              <div className="flex-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-teko text-[18px] py-3.5 tracking-[0.15em] uppercase text-center flex items-center justify-center">
-                SQUAD REGISTERED
+            ) : userRegistrationStatus ? (
+              <div className={`flex-1 font-teko text-[18px] py-3.5 tracking-[0.15em] uppercase text-center flex items-center justify-center border ${
+                userRegistrationStatus === 'approved' 
+                  ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' 
+                  : userRegistrationStatus === 'reapplied'
+                  ? 'bg-blue-500/10 border-blue-500/20 text-blue-400'
+                  : 'bg-yellow-500/10 border-yellow-500/20 text-yellow-500'
+              }`}>
+                {userRegistrationStatus === 'approved' ? 'SQUAD APPROVED' : 
+                 userRegistrationStatus === 'reapplied' ? 'SQUAD RE-APPLIED' : 
+                 'SQUAD PENDING'}
               </div>
             ) : null}
 

@@ -43,6 +43,13 @@ export function useSupabaseDB(tableName, orderByOption = null, filters = []) {
       const { data: result, error: fetchErr } = await query;
       if (fetchErr) throw fetchErr;
 
+      // ── Resiliency: Retry once if empty (to handle intermittent sync flickers) ──
+      if (isFirstFetch.current && (!result || result.length === 0) && tableName === 'tournaments') {
+         console.warn(`useSupabaseDB [${tableName}]: Empty result on first fetch, retrying in 1.5s...`);
+         setTimeout(() => fetchData(), 1500);
+         return; // Let the timeout handle it
+      }
+
       setData(result || []);
       setError(null);
       isFirstFetch.current = false;

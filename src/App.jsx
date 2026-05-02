@@ -35,6 +35,12 @@ class ErrorBoundary extends React.Component {
   static getDerivedStateFromError(error) { return { hasError: true, error }; }
   componentDidCatch(error, info) {
     console.error("ErrorBoundary caught:", error, info);
+    // ── Deployment Recovery ──
+    // If a chunk fails to load (usually after a new deployment), force a reload to get fresh assets
+    if (error?.message?.includes('Failed to fetch dynamically imported module') || 
+        error?.message?.includes('loading chunk')) {
+      window.location.reload();
+    }
   }
   render() {
     if (this.state.hasError) {

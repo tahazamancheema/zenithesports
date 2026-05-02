@@ -33,22 +33,22 @@ export default function TournamentsPage() {
   const [filter, setFilter] = useState('all');
 
   // Compute registration counts and user registration status from real-time data
-  const { regCounts, userRegs } = useMemo(() => {
+  const { regCounts, userRegStatuses } = useMemo(() => {
     const counts = {};
-    const userJoined = [];
+    const statuses = {};
     
     allRegistrations.forEach((r) => {
       // Slot counts only include approved teams
       if (r.status === 'approved') {
         counts[r.tournament_id] = (counts[r.tournament_id] || 0) + 1;
       }
-      // Track which tournaments the current user has joined (not rejected)
-      if (user?.id && r.user_id === user.id && r.status !== 'rejected') {
-        userJoined.push(r.tournament_id);
+      // Track which tournaments the current user has joined
+      if (user?.id && r.user_id === user.id) {
+        statuses[r.tournament_id] = r.status;
       }
     });
     
-    return { regCounts: counts, userRegs: userJoined };
+    return { regCounts: counts, userRegStatuses: statuses };
   }, [allRegistrations, user?.id]);
 
   const filtered = tournaments.filter((t) => filter === 'all' || t.status === filter);
@@ -163,7 +163,7 @@ export default function TournamentsPage() {
                 key={t.id}
                 tournament={t}
                 registrationCount={getRegCount(t.id)}
-                isUserRegistered={userRegs.includes(t.id)}
+                userRegistrationStatus={userRegStatuses[t.id]}
               />
             ))}
           </div>
