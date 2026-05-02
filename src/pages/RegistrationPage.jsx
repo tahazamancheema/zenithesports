@@ -14,7 +14,7 @@ export default function RegistrationPage() {
   const { tournamentId } = useParams();
   const navigate = useNavigate();
   const { tournaments, loading: tLoading } = useTournaments();
-  const { submitRegistration, hasPendingRegistration, findDuplicatePlayerID, submitting } = useRegistration();
+  const { submitRegistration, hasPendingRegistration, findDuplicates, submitting } = useRegistration();
   const { user, userDoc, loading: aLoading } = useAuth();
   
   const [form, setForm] = useState({
