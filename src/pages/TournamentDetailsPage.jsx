@@ -350,43 +350,42 @@ export default function TournamentDetailsPage() {
 
                   {/* CTA Buttons */}
                   <div className="space-y-3">
-                    {/* Show Register button: for logged-in users it goes to register, for logged-out it goes to auth */}
-                    {isOpen && !isUserRegistered && (
-                      <Link
-                        to={user ? `/register/${id}` : '/auth'}
-                        className="btn-obsidian-primary w-full py-5 font-bebas text-[22px] tracking-[0.2em] inline-flex items-center justify-center gap-3 uppercase group/cta"
-                      >
-                        {user ? 'REGISTER TEAM' : 'LOGIN TO REGISTER'} <ArrowRight size={20} className="group-hover/cta:translate-x-1 transition-transform" />
-                      </Link>
-                    )}
-
-                    {/* Also show Register CTA for non-logged-in users when status is active but not phase closing yet */}
-                    {!user && status === 'registrations_open' && phase !== 'closed' && (
-                      <Link
-                        to="/auth"
-                        className="btn-obsidian-primary w-full py-5 font-bebas text-[22px] tracking-[0.2em] inline-flex items-center justify-center gap-3 uppercase group/cta"
-                      >
-                        LOGIN TO REGISTER <ArrowRight size={20} className="group-hover/cta:translate-x-1 transition-transform" />
-                      </Link>
-                    )}
-
+                    {/* User is registered: Show Status */}
                     {isUserRegistered && (() => {
                       const userReg = registrations.find(r => r.user_id === user?.id);
-                      const cfg = {
-                        approved: { bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', text: 'text-emerald-400', label: 'APPROVED ✓' },
-                        pending:  { bg: 'bg-[#dbb462]/10',   border: 'border-[#dbb462]/20',   text: 'text-[#dbb462]',   label: 'PENDING REVIEW' },
-                        rejected: { bg: 'bg-red-500/10',     border: 'border-red-500/20',     text: 'text-red-400',     label: 'REJECTED' },
-                      }[userReg?.status] || { bg: 'bg-[#dbb462]/10', border: 'border-[#dbb462]/20', text: 'text-[#dbb462]', label: 'PENDING REVIEW' };
                       return <StatusBadge status={userReg?.status} className="w-full justify-center py-5" />;
                     })()}
 
-                    {!isOpen && !isUserRegistered && !user && status !== 'registrations_open' && (
-                      <Link
-                        to="/auth"
-                        className="btn-obsidian-ghost w-full py-4 font-bebas text-[20px] tracking-[0.15em] uppercase"
-                      >
-                        LOGIN TO REGISTER
-                      </Link>
+                    {/* User is NOT registered: Show appropriate CTA */}
+                    {!isUserRegistered && (
+                      <>
+                        {status === 'registrations_open' && phase !== 'closed' ? (
+                          // Registrations are open: check capacity
+                          (!max_teams || totalCount < max_teams) ? (
+                            <Link
+                              to={user ? `/register/${id}` : '/auth'}
+                              className="btn-obsidian-primary w-full py-5 font-bebas text-[22px] tracking-[0.2em] inline-flex items-center justify-center gap-3 uppercase group/cta"
+                            >
+                              {user ? 'REGISTER TEAM' : 'LOGIN TO REGISTER'} <ArrowRight size={20} className="group-hover/cta:translate-x-1 transition-transform" />
+                            </Link>
+                          ) : (
+                            // Full
+                            <div className="w-full py-5 border border-white/10 bg-white/5 text-center flex items-center justify-center">
+                              <span className="font-bebas text-2xl text-white/30 tracking-widest uppercase">REGISTRATIONS FULL</span>
+                            </div>
+                          )
+                        ) : (
+                          // Registrations not open yet or already closed (if not handled by phase banner)
+                          !user && phase !== 'closed' && (
+                            <Link
+                              to="/auth"
+                              className="btn-obsidian-ghost w-full py-4 font-bebas text-[20px] tracking-[0.15em] uppercase"
+                            >
+                              LOGIN TO REGISTER
+                            </Link>
+                          )
+                        )}
+                      </>
                     )}
                   </div>
                 </div>

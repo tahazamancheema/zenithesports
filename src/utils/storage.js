@@ -20,9 +20,9 @@ export async function uploadFile(bucket, file, path = null, retries = 3) {
       upsert: false
     });
 
-    // 120 second timeout for large files on slow connections
+    // 30 second timeout per attempt
     const timeoutPromise = new Promise((_, rej) => 
-      setTimeout(() => rej(new Error('UPLINK_TIMEOUT')), 120000)
+      setTimeout(() => rej(new Error('UPLINK_TIMEOUT')), 30000)
     );
 
     try {

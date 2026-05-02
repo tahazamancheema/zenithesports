@@ -15,38 +15,49 @@ export function useRegistration() {
    * Check if the current user already has a pending registration.
    */
   const hasPendingRegistration = useCallback(async (uid) => {
-    const { data, error } = await supabase
-      .from('registrations')
-      .select('id')
-      .eq('user_id', uid)
-      .eq('status', 'pending');
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 15000);
+    try {
+      const { data, error } = await supabase
+        .from('registrations')
+        .select('id')
+        .eq('user_id', uid)
+        .eq('status', 'pending')
+        .abortSignal(controller.signal);
 
-    if (error) throw error;
-    return data && data.length > 0;
+      if (error) throw error;
+      return data && data.length > 0;
+    } finally {
+      clearTimeout(timer);
+    }
   }, []);
 
   /**
    * Check if any player ID already exists in any registration.
    */
   const findDuplicatePlayerID = useCallback(async (playerIDs) => {
-    // Because player_ids is a JSONB array, we can use the Contains operator or query all and check in JS.
-    // simpler to query all pending/approved and check in JS.
-    const { data, error } = await supabase
-      .from('registrations')
-      .select('player_ids')
-      .neq('status', 'rejected'); // Only check active/pending
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 15000);
+    try {
+      const { data, error } = await supabase
+        .from('registrations')
+        .select('player_ids')
+        .neq('status', 'rejected')
+        .abortSignal(controller.signal);
 
-    if (error) throw error;
-    
-    for (const pid of playerIDs) {
-      if (!pid.trim()) continue;
-      // Check if this pid exists in any registration's player_ids array
-      const isDuplicate = data.some(reg => 
-        reg.player_ids && reg.player_ids.includes(pid.trim().toUpperCase())
-      );
-      if (isDuplicate) return pid;
+      if (error) throw error;
+      
+      for (const pid of playerIDs) {
+        if (!pid.trim()) continue;
+        const isDuplicate = data.some(reg => 
+          reg.player_ids && reg.player_ids.includes(pid.trim().toUpperCase())
+        );
+        if (isDuplicate) return pid;
+      }
+      return null;
+    } finally {
+      clearTimeout(timer);
     }
-    return null;
   }, []);
 
   /**
@@ -97,23 +108,33 @@ export function useRegistration() {
         }
 
         // All guards passed — submit
-        const { data, error: insertErr } = await supabase
-          .from('registrations')
-          .insert([{
-            user_id: uid,
-            tournament_id: tournamentID,
-            team_name: teamName.trim(),
-            real_name: realName.trim(),
-            logo_url: teamLogoURL || null,
-            whatsapp_number: whatsapp.trim(),
-            captain_discord: captainDiscord?.trim() || null,
-            player_ids: cleanIDs,
-            player_igns: playerIgns || [],
-            screenshot_urls: screenshotURLs || [],
-            status: 'pending',
-          }])
-          .select()
-          .single();
+        const insertController = new AbortController();
+        const insertTimer = setTimeout(() => insertController.abort(), 20000);
+        let data, insertErr;
+        try {
+          const result = await supabase
+            .from('registrations')
+            .insert([{
+              user_id: uid,
+              tournament_id: tournamentID,
+              team_name: teamName.trim(),
+              real_name: realName.trim(),
+              logo_url: teamLogoURL || null,
+              whatsapp_number: whatsapp.trim(),
+              captain_discord: captainDiscord?.trim() || null,
+              player_ids: cleanIDs,
+              player_igns: playerIgns || [],
+              screenshot_urls: screenshotURLs || [],
+              status: 'pending',
+            }])
+            .select()
+            .single()
+            .abortSignal(insertController.signal);
+          data = result.data;
+          insertErr = result.error;
+        } finally {
+          clearTimeout(insertTimer);
+        }
 
         if (insertErr) throw insertErr;
         return { success: true, id: data.id };

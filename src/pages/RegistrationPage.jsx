@@ -110,10 +110,15 @@ export default function RegistrationPage() {
     try {
       toast.loading('Saving your registration details...', { id: 'reg' });
       
-      // Upload Team Logo
+      // Upload Team Logo (non-blocking — skip if storage fails)
       let logoUrl = '';
       if (file) {
-        logoUrl = await uploadFile('ze-logos', file, `logo_${user.id}_${Date.now()}`);
+        try {
+          logoUrl = await uploadFile('ze-logos', file, `logo_${user.id}_${Date.now()}`);
+        } catch (logoErr) {
+          console.warn('Logo upload skipped:', logoErr.message);
+          toast.loading('Logo upload skipped — continuing with registration...', { id: 'reg' });
+        }
       }
       
       // Upload Screenshots
