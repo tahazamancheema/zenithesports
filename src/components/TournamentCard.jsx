@@ -4,7 +4,7 @@ import { Trophy, ChevronRight, MessageCircle } from 'lucide-react';
 import { useTournamentCountdown } from '../hooks/useTournamentCountdown';
 import StatusBadge from './ui/StatusBadge';
 
-export default function TournamentCard({ tournament, registrationCount = 0, isUserRegistered = false }) {
+export default function TournamentCard({ tournament, registrationCount = 0, userRegistrationStatus = null }) {
   const {
     id, title, start_date, registration_open_date,
     registration_deadline, status, max_teams, prize_pool,
