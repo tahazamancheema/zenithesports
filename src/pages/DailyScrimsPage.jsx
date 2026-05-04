@@ -71,7 +71,7 @@ export default function DailyScrimsPage() {
               DAILY <span className="zenith-gradient-text italic block md:inline pr-8">SCRIMS</span>
             </h1>
             
-            <p className="font-body text-[#d1c5b3] text-xl opacity-60 max-w-xl leading-relaxed italic border-l-2 border-[#dbb462]/30 pl-6">
+            <p className="font-body text-[#d1c5b3] text-xl opacity-80 max-w-xl leading-relaxed italic border-l-2 border-[#dbb462]/40 pl-6">
               Dominate the landscape. Join Pakistan's most prestigious daily competitive protocol and prove your squad's dominance in the server.
             </p>
 
@@ -96,10 +96,10 @@ export default function DailyScrimsPage() {
                   <Zap size={40} />
                 </div>
                 <div className="relative z-10">
-                  <p className="font-agency text-white/30 text-xs tracking-[0.4em] uppercase mb-2">ENTRY FEE</p>
+                  <p className="font-agency text-white/50 text-xs tracking-[0.4em] uppercase mb-2">ENTRY FEE</p>
                   <div className="flex items-baseline gap-2">
                     <p className="font-bebas text-6xl md:text-7xl text-white leading-none tracking-tighter">300</p>
-                    <p className="font-bebas text-2xl text-white/40 tracking-widest">PKR</p>
+                    <p className="font-bebas text-2xl text-white/60 tracking-widest">PKR</p>
                   </div>
                 </div>
               </div>
@@ -127,7 +127,7 @@ export default function DailyScrimsPage() {
                 <p className="font-agency font-bold text-[#dbb462] tracking-[0.3em] text-[10px] uppercase mb-2">{session.tag}</p>
                 <div className="flex justify-between items-center">
                   <h3 className="font-bebas text-5xl text-white tracking-widest leading-none">{session.time}</h3>
-                  <Clock className="text-white/10 group-hover:text-[#dbb462]/40 transition-colors" size={32} />
+                  <Clock className="text-white/20 group-hover:text-[#dbb462] transition-colors" size={32} />
                 </div>
               </div>
             ))}
@@ -165,8 +165,8 @@ export default function DailyScrimsPage() {
                   <div key={idx} className="group/map p-6 bg-white/[0.02] border border-white/5 hover:border-[#dbb462]/30 transition-all relative overflow-hidden">
                     <div className="relative z-10 flex flex-col justify-between h-full">
                       <div className="flex items-center gap-2 mb-4">
-                        <span className="w-1 h-1 bg-[#dbb462] rounded-full" />
-                        <span className="font-agency text-[10px] text-white/30 tracking-widest">MATCH 0{idx + 1}</span>
+                        <span className="w-1.5 h-1.5 bg-[#dbb462] rounded-full" />
+                        <span className="font-agency text-[11px] text-white/50 tracking-[0.3em]">MATCH 0{idx + 1}</span>
                       </div>
                       <h4 className="font-bebas text-3xl text-white tracking-widest uppercase group-hover/map:text-[#dbb462] transition-colors">{map}</h4>
                     </div>
@@ -203,7 +203,7 @@ export default function DailyScrimsPage() {
                       {p.icon === 'chicken' ? <ChickenIcon size={20} /> : <Trophy size={18} />}
                     </div>
                     <div>
-                      <p className="font-agency text-[10px] text-white/30 tracking-widest uppercase mb-0.5">{p.sub}</p>
+                      <p className="font-agency text-[11px] text-white/50 tracking-[0.2em] uppercase mb-0.5">{p.sub}</p>
                       <h4 className="font-bebas text-2xl text-white tracking-widest uppercase">{p.rank}</h4>
                     </div>
                   </div>
@@ -220,12 +220,22 @@ export default function DailyScrimsPage() {
           <div className="space-y-8">
             <div className="flex items-center gap-4">
               <div className="h-[2px] w-12 bg-[#dbb462]" />
-              <h2 className="font-agency font-bold text-3xl text-[#dbb462] tracking-[0.2em] uppercase">BOOK SLOTS</h2>
+              <h2 className="font-agency font-bold text-3xl text-white tracking-[0.2em] uppercase">BOOK SLOTS</h2>
             </div>
             
-            <div className="bg-[#111] border border-[#dbb462]/20 p-8 relative overflow-hidden">
-              <p className="font-body text-[#d1c5b3] text-lg opacity-70 leading-relaxed mb-10 italic">
-                To book your slots, you can reach out to us on WhatsApp on the following contacts. Our admins are active 24/7 for support.
+            <div className="bg-[#111] border border-white/5 p-8 relative overflow-hidden group/box">
+              {/* Decorative side accent */}
+              <div className="absolute top-0 left-0 w-1 h-full bg-[#dbb462] opacity-50" />
+              
+              <div className="flex items-center gap-4 mb-6">
+                 <div className="w-10 h-10 rounded-full bg-[#dbb462]/10 border border-[#dbb462]/20 flex items-center justify-center">
+                    <MessageCircle className="text-[#dbb462]" size={20} />
+                 </div>
+                 <span className="font-agency text-[12px] tracking-[0.4em] text-[#dbb462] uppercase font-bold">Official Protocol</span>
+              </div>
+
+              <p className="font-body text-[#d1c5b3] text-lg opacity-80 leading-relaxed mb-10 italic">
+                Secure your squad's presence. Contact our official admins directly on WhatsApp to verify slot availability and complete your registration.
               </p>
               
               <div className="grid grid-cols-1 gap-4">
@@ -234,19 +244,32 @@ export default function DailyScrimsPage() {
                     key={idx}
                     href={`https://wa.me/${admin.phone}?text=Hi,%20I%20want%20to%20book%20a%20slot%20for%20Daily%20Scrims.`}
                     target="_blank" rel="noreferrer"
-                    className="group flex items-center justify-between p-6 bg-white/[0.03] border border-white/5 hover:border-[#dbb462] hover:bg-[#dbb462] transition-all duration-500 relative overflow-hidden"
+                    className="group flex items-center justify-between p-6 bg-[#0e0e0e] border border-white/5 hover:border-[#dbb462] transition-all duration-500 relative overflow-hidden"
                   >
                     <div className="relative z-10">
-                      <p className="font-agency text-[10px] text-white/40 group-hover:text-black/60 tracking-widest uppercase mb-1">{admin.name}</p>
-                      <p className="font-bebas text-2xl text-white group-hover:text-black tracking-widest transition-colors">{admin.phone}</p>
+                      <div className="flex items-center gap-3 mb-1">
+                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+                        <p className="font-agency text-[11px] text-white/50 group-hover:text-[#dbb462] tracking-widest uppercase transition-colors">Admin {idx + 1}</p>
+                      </div>
+                      <p className="font-bebas text-3xl text-white tracking-widest">{admin.phone}</p>
                     </div>
-                    <div className="relative z-10 w-12 h-12 flex items-center justify-center bg-white/5 rounded-full group-hover:bg-black/10 transition-colors">
-                      <MessageCircle className="text-[#dbb462] group-hover:text-black transition-colors" size={24} />
+
+                    <div className="relative z-10 flex flex-col items-end">
+                      <span className="font-agency text-[10px] text-[#dbb462] tracking-[0.2em] uppercase mb-1 opacity-0 group-hover:opacity-100 transition-opacity translate-x-4 group-hover:translate-x-0 transition-transform">Click to message →</span>
+                      <div className="w-14 h-14 flex items-center justify-center bg-white/5 rounded-sm border border-white/5 group-hover:bg-[#dbb462] group-hover:border-[#dbb462] transition-all duration-500">
+                        <MessageCircle className="text-[#dbb462] group-hover:text-black transition-colors" size={28} />
+                      </div>
                     </div>
-                    {/* Animated background slide */}
-                    <div className="absolute inset-0 bg-[#dbb462] translate-x-[-101%] group-hover:translate-x-0 transition-transform duration-500 ease-out z-0" />
+
+                    {/* Subtle background glow on hover */}
+                    <div className="absolute inset-0 bg-[#dbb462]/[0.02] opacity-0 group-hover:opacity-100 transition-opacity" />
                   </a>
                 ))}
+              </div>
+
+              <div className="mt-8 p-4 bg-[#dbb462]/5 border border-[#dbb462]/10 flex items-center gap-4">
+                <div className="w-2 h-2 rounded-full bg-[#dbb462] animate-pulse" />
+                <p className="font-agency text-[11px] tracking-[0.2em] text-[#dbb462] uppercase">Support active 24/7 for booking verification</p>
               </div>
             </div>
           </div>

@@ -160,7 +160,9 @@ export default function RegistrationPage() {
     setSaving(true);
     setFieldErrors({});
     try {
-      toast.loading('Verifying competitive eligibility...', { id: 'reg' });
+      if (!tournament?.id) throw new Error('Tournament data missing. Please refresh.');
+
+      toast.loading('Stage 1: Verifying squad status...', { id: 'reg' });
       
       const cleanIDs = [
         form.player_1_id, form.player_2_id, form.player_3_id,
@@ -180,7 +182,7 @@ export default function RegistrationPage() {
       ].filter((_, i) => !!form[`player_${i+1}_id`]);
 
       // Pre-Guard 2: Duplicate check
-      toast.loading('Checking for duplicate registrations...', { id: 'reg' });
+      toast.loading('Stage 2: Scanning for duplicates...', { id: 'reg' });
       const duplicate = await findDuplicates(cleanIDs, playerIgns, form.team_name.trim(), tournament.id);
       if (duplicate) {
         setSaving(false);

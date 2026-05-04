@@ -13,11 +13,19 @@ import { supabase } from '../supabase/config';
  * @param {number} timeoutMs - Timeout in milliseconds.
  */
 async function runTimedQuery(query, timeoutMs = 10000) {
-  const timeoutPromise = new Promise((_, reject) =>
-    setTimeout(() => reject(new Error('QUERY_TIMEOUT')), timeoutMs)
-  );
-  // Ensure the query is treated as a real promise
-  return Promise.race([Promise.resolve(query), timeoutPromise]);
+  let timer;
+  const timeoutPromise = new Promise((_, reject) => {
+    timer = setTimeout(() => reject(new Error('QUERY_TIMEOUT')), timeoutMs);
+  });
+
+  try {
+    const result = await Promise.race([Promise.resolve(query), timeoutPromise]);
+    clearTimeout(timer);
+    return result;
+  } catch (err) {
+    clearTimeout(timer);
+    throw err;
+  }
 }
 
 /**
@@ -35,6 +43,11 @@ export function useRegistration() {
    * If they are rejected, this returns false to allow re-applying.
    */
   const hasPendingRegistration = useCallback(async (uid, tournamentID) => {
+    if (!uid || !tournamentID) {
+      console.warn('hasPendingRegistration: Missing uid or tournamentID');
+      return false;
+    }
+
     try {
       const query = supabase
         .from('registrations')
@@ -51,7 +64,7 @@ export function useRegistration() {
     } catch (err) {
       console.error('Pending check error:', err);
       if (err.message === 'QUERY_TIMEOUT') {
-        throw new Error('Connection timed out while checking eligibility. Please check your network.');
+        throw new Error('Verification timed out (Stage 1). Please check your connection.');
       }
       return false;
     }
@@ -62,6 +75,8 @@ export function useRegistration() {
    * Excludes 'rejected' records.
    */
   const findDuplicates = useCallback(async (playerIDs, playerIGNs, teamName, tournamentID, excludeRegId = null) => {
+    if (!tournamentID) return null;
+
     try {
       // 1. Check for Duplicate Team Name (Case-insensitive)
       if (teamName) {
@@ -123,9 +138,9 @@ export function useRegistration() {
     } catch (err) {
       console.error('Duplicate check error:', err);
       if (err.message === 'QUERY_TIMEOUT') {
-        throw new Error('Connection timed out during duplicate verification. Please try again.');
+        throw new Error('Verification timed out (Stage 2). Please try again.');
       }
-      throw err; // Propagate real errors so the UI knows something went wrong
+      throw err; // Propagate real errors
     }
   }, []);
 
