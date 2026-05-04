@@ -23,6 +23,7 @@ export function useTournaments() {
   }));
 
   const activeTournaments = tournaments.filter((t) => t.status === 'registrations_open' || t.status === 'in_progress');
+  const openRegistrations = tournaments.filter((t) => t.status === 'registrations_open');
   const upcomingTournaments = tournaments.filter((t) => t.status === 'upcoming');
   const completedTournaments = tournaments.filter((t) => t.status === 'completed' || t.status === 'registrations_closed');
 
@@ -32,6 +33,7 @@ export function useTournaments() {
   return {
     tournaments,
     activeTournaments,
+    openRegistrations,
     upcomingTournaments,
     completedTournaments,
     currentTournament,

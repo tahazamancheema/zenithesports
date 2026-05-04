@@ -11,7 +11,7 @@ import RegistrationCountdown from '../components/RegistrationCountdown';
 import heroBg from '../assets/images/hero-bg.png';
 
 export default function LandingPage() {
-  const { currentTournament, activeTournaments } = useTournaments();
+  const { currentTournament, openRegistrations } = useTournaments();
   const { user } = useAuth();
   const platformStats = usePlatformStats();
   const [approvedCounts, setApprovedCounts] = useState({});
@@ -53,7 +53,7 @@ export default function LandingPage() {
     };
     window.addEventListener('focus', handleSync);
     return () => window.removeEventListener('focus', handleSync);
-  }, [user?.id, activeTournaments.length]); // Re-run when user changes or tournaments list loads
+  }, [user?.id, openRegistrations.length]); // Re-run when user changes or tournaments list loads
 
   const maxTeams = currentTournament?.max_teams;
   const isUnlimited = !maxTeams || maxTeams === 0;
@@ -158,7 +158,7 @@ export default function LandingPage() {
       {/* ═══════════════════════════════════════════
           OPEN REGISTRATIONS
           ═══════════════════════════════════════════ */}
-      {activeTournaments.length > 0 && (
+      {openRegistrations.length > 0 && (
         <section className="relative bg-[#0a0a0a] border-t border-white/[0.04] overflow-hidden">
           <div className="container mx-auto max-w-7xl px-6 lg:px-16 py-24 lg:py-32 relative z-10">
             {/* Section Header */}
@@ -183,7 +183,7 @@ export default function LandingPage() {
 
             {/* Tournament Cards Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[1px] bg-white/[0.04]">
-              {activeTournaments.map((t) => {
+              {openRegistrations.map((t) => {
                 const prize = t.prize_pool ? `PKR ${Number(t.prize_pool).toLocaleString('en-PK')}` : 'TBA';
                 const deadline = t.registration_deadline
                   ? new Date(t.registration_deadline).toLocaleDateString('en-PK', { day: 'numeric', month: 'short', year: 'numeric' })
@@ -208,10 +208,18 @@ export default function LandingPage() {
                         </div>
                       )}
                       <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[#0e0e0e] to-transparent" />
-                      {/* Live badge */}
-                      <div className="absolute top-4 left-4 flex items-center gap-2 bg-[#0e0e0e]/90 backdrop-blur-md px-3 py-1.5 border border-emerald-500/30 z-20">
-                        <span className="w-1.5 h-1.5 bg-emerald-400 animate-pulse" />
-                        <span className="font-teko text-[13px] tracking-[0.2em] text-emerald-400 uppercase">Registrations Open</span>
+                      {/* Status badge */}
+                      <div className={`absolute top-4 left-4 flex items-center gap-2 bg-[#0e0e0e]/90 backdrop-blur-md px-3 py-1.5 border z-20 ${
+                        t.status === 'registrations_open' ? 'border-emerald-500/30' : 'border-[#dbb462]/20'
+                      }`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${
+                          t.status === 'registrations_open' ? 'bg-emerald-400 animate-pulse' : 'bg-[#dbb462]'
+                        }`} />
+                        <span className={`font-teko text-[13px] tracking-[0.2em] uppercase ${
+                          t.status === 'registrations_open' ? 'text-emerald-400' : 'text-[#dbb462]'
+                        }`}>
+                          {t.status === 'registrations_open' ? 'Registrations Open' : t.status.replace('_', ' ')}
+                        </span>
                       </div>
                     </Link>
 
