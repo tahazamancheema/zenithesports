@@ -217,3 +217,14 @@ security definer
 as $$
   select count(*)::integer from public.users;
 $$;
+-- ─────────────────────────────────────────
+-- PERFORMANCE INDEXES (Crucial for Registration Checks)
+-- ─────────────────────────────────────────
+create index if not exists idx_registrations_user_id on public.registrations(user_id);
+create index if not exists idx_registrations_tournament_id on public.registrations(tournament_id);
+create index if not exists idx_registrations_team_name on public.registrations(team_name);
+create index if not exists idx_registrations_status on public.registrations(status);
+
+-- GIN Indexes for array overlap checks (Duplicate ID/IGN checks)
+create index if not exists idx_registrations_player_ids on public.registrations using gin (player_ids);
+create index if not exists idx_registrations_player_igns on public.registrations using gin (player_igns);

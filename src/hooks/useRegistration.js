@@ -57,7 +57,7 @@ export function useRegistration() {
         .in('status', ['pending', 'approved', 'reapplied'])
         .limit(1);
 
-      const { data, error } = await runTimedQuery(query, 10000);
+      const { data, error } = await runTimedQuery(query, 15000);
 
       if (error) throw error;
       return data && data.length > 0;
