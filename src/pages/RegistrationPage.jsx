@@ -180,6 +180,7 @@ export default function RegistrationPage() {
       ].filter((_, i) => !!form[`player_${i+1}_id`]);
 
       // Pre-Guard 2: Duplicate check
+      toast.loading('Checking for duplicate registrations...', { id: 'reg' });
       const duplicate = await findDuplicates(cleanIDs, playerIgns, form.team_name.trim(), tournament.id);
       if (duplicate) {
         setSaving(false);
