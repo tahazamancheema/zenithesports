@@ -139,7 +139,7 @@ export default function TournamentsPage() {
               <div key={i} className="bg-[#0e0e0e] aspect-[3/4] animate-pulse border border-white/5" />
             ))}
           </div>
-        ) : isError ? (
+        ) : (isError && tournaments.length === 0) ? (
           <div className="flex flex-col items-center justify-center py-40 text-center">
             <AlertTriangle className="text-red-500 mb-6" size={48} />
             <p className="font-bebas text-5xl text-white mb-4">FAILED TO SYNC</p>

@@ -22,7 +22,7 @@ export function useSupabaseDB(tableName, orderByOption = null, filters = []) {
   const isFirstFetch = useRef(true);
   const channelRef = useRef(null);
 
-  const fetchData = useCallback(async () => {
+  const fetchData = useCallback(async (isRetry = false) => {
     // Only show loading spinner on the very first fetch
     if (isFirstFetch.current) setLoading(true);
 
@@ -47,7 +47,7 @@ export function useSupabaseDB(tableName, orderByOption = null, filters = []) {
 
       // ── Anti-Stall: Wrap query in a timeout race ──
       const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('QUERY_TIMEOUT')), 8000)
+        setTimeout(() => reject(new Error('QUERY_TIMEOUT')), 15000) // Increased to 15s
       );
 
       const { data: result, error: fetchErr } = await Promise.race([query, timeoutPromise]);
@@ -55,13 +55,9 @@ export function useSupabaseDB(tableName, orderByOption = null, filters = []) {
       if (fetchErr) throw fetchErr;
 
       // ── Resiliency: Retry once if empty (to handle intermittent sync flickers) ──
-      if (isFirstFetch.current && (!result || result.length === 0) && tableName === 'tournaments') {
+      if (isFirstFetch.current && (!result || result.length === 0) && tableName === 'tournaments' && !isRetry) {
          console.warn(`useSupabaseDB [${tableName}]: Empty result on first fetch, retrying in 0.5s...`);
-         isFirstFetch.current = false; 
-         setTimeout(() => {
-            isFirstFetch.current = true;
-            fetchData();
-         }, 500);
+         setTimeout(() => fetchData(true), 500);
          return; 
       }
 
@@ -71,6 +67,14 @@ export function useSupabaseDB(tableName, orderByOption = null, filters = []) {
       setLoading(false);
     } catch (err) {
       console.error(`useSupabaseDB [${tableName}]:`, err);
+      
+      // Internal Retry for Timeout
+      if (err.message === 'QUERY_TIMEOUT' && !isRetry) {
+        console.warn(`useSupabaseDB [${tableName}]: Connection stalled, retrying once...`);
+        fetchData(true);
+        return;
+      }
+
       setError(err.message === 'QUERY_TIMEOUT' ? 'Connection stalled. Please try again.' : err.message);
       setLoading(false);
       isFirstFetch.current = false; // Ensure we don't get stuck in first-fetch mode
@@ -93,10 +97,12 @@ export function useSupabaseDB(tableName, orderByOption = null, filters = []) {
         () => { fetchData(); }
       )
       .subscribe((status) => {
-        // If the channel closes or errors, log it — the visibility/focus
-        // listeners will trigger a re-fetch + re-subscribe on next tab focus.
+        // If the channel closes or errors, log it — and attempt auto-recovery
         if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
-          console.warn(`useSupabaseDB [${tableName}]: channel ${status}, will resync on next focus.`);
+          console.warn(`useSupabaseDB [${tableName}]: channel ${status}, attempting auto-recovery in 5s...`);
+          setTimeout(() => {
+             if (document.visibilityState === 'visible') subscribeRealtime();
+          }, 5000);
         }
       });
 
@@ -108,11 +114,12 @@ export function useSupabaseDB(tableName, orderByOption = null, filters = []) {
     fetchData();
     subscribeRealtime();
 
-    // ── Resiliency Heartbeat: If tournaments are 0, re-check every 3s ──
+    // ── Resiliency Heartbeat: Recover from 0 results OR Error states every 3s ──
     let heartbeat = null;
     if (tableName === 'tournaments') {
       heartbeat = setInterval(() => {
-        if (!loading && data.length === 0) {
+        // If we have an error OR no data (and we aren't already loading), try to recover
+        if (!loading && (data.length === 0 || error)) {
           console.log('useSupabaseDB: Heartbeat re-syncing tournaments...');
           fetchData();
         }
@@ -144,7 +151,7 @@ export function useSupabaseDB(tableName, orderByOption = null, filters = []) {
         channelRef.current = null;
       }
     };
-  }, [fetchData, subscribeRealtime, tableName, data.length, loading]);
+  }, [fetchData, subscribeRealtime, tableName, data.length, loading, error]);
 
   const add = useCallback(
     async (docData) => {
