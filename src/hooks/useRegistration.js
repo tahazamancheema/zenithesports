@@ -12,7 +12,7 @@ import { supabase } from '../supabase/config';
  * @param {Object} query - The Supabase query object (thenable).
  * @param {number} timeoutMs - Timeout in milliseconds.
  */
-async function runTimedQuery(query, timeoutMs = 10000) {
+async function runTimedQuery(query, timeoutMs = 7000) {
   let timer;
   const timeoutPromise = new Promise((_, reject) => {
     timer = setTimeout(() => reject(new Error('QUERY_TIMEOUT')), timeoutMs);
@@ -57,7 +57,7 @@ export function useRegistration() {
         .in('status', ['pending', 'approved', 'reapplied'])
         .limit(1);
 
-      const { data, error } = await runTimedQuery(query, 15000);
+      const { data, error } = await runTimedQuery(query, 10000);
 
       if (error) throw error;
       return data && data.length > 0;
@@ -165,7 +165,7 @@ export function useRegistration() {
             .eq('user_id', uid)
             .eq('tournament_id', tournamentID)
             .maybeSingle(),
-          10000
+          8000
         );
 
         if (checkErr) throw checkErr;
@@ -227,7 +227,7 @@ export function useRegistration() {
               .insert([payload])
               .select()
               .single(),
-            15000
+            10000
           );
         }
 

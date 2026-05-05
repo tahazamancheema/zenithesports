@@ -36,7 +36,7 @@ export default function TournamentDetailsPage() {
   } = useSupabaseDB('registrations', null, [['tournament_id', 'eq', id]]);
 
   const tournament = tList?.[0] || null;
-  const loading = tLoading;
+  const loading = tLoading && !tournament;
 
   const { phase } = useTournamentCountdown(tournament?.registration_open_date, tournament?.registration_deadline);
 

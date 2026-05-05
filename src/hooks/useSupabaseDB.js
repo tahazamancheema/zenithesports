@@ -13,9 +13,13 @@ import { supabase } from '../supabase/config';
  *  3. Monitors the Supabase Realtime channel and reconnects if it drops
  */
 export function useSupabaseDB(tableName, orderByOption = null, filters = []) {
-  const cacheKey = `zenith_cache_${tableName}`;
+  // ── Scoped Cache Key ──
+  // Include filters and order in the key to prevent data collisions between pages
+  const filtersKey = JSON.stringify(filters);
+  const orderKey = JSON.stringify(orderByOption);
+  const cacheKey = `zenith_cache_${tableName}_${filtersKey}_${orderKey}`;
 
-  // Initialize data from localStorage if available to prevent "0 Tournaments" on reload/inactivity
+  // 1. SWR Pattern: Load from cache immediately
   const [data, setData] = useState(() => {
     try {
       const cached = localStorage.getItem(cacheKey);
@@ -25,10 +29,10 @@ export function useSupabaseDB(tableName, orderByOption = null, filters = []) {
     }
   });
 
-  const [loading, setLoading] = useState(true);
+  // 2. Optimized Loading State: Only true if we have NO data at all
+  const [loading, setLoading] = useState(data.length === 0);
   const [error, setError] = useState(null);
 
-  // Track state in refs for the heartbeat to avoid dependency churn
   const stateRef = useRef({ data, error, loading });
   useEffect(() => {
     stateRef.current = { data, error, loading };
@@ -38,13 +42,12 @@ export function useSupabaseDB(tableName, orderByOption = null, filters = []) {
   const channelRef = useRef(null);
 
   const fetchData = useCallback(async (isRetry = false) => {
-    // Only show loading spinner on the very first fetch if we have no data
-    if (isFirstFetch.current && stateRef.current.data.length === 0) setLoading(true);
+    // Only show loading if we have nothing to show
+    if (stateRef.current.data.length === 0) setLoading(true);
 
     try {
       let query = supabase.from(tableName).select('*');
 
-      // ── Cache Busting for Tournaments ──
       if (tableName === 'tournaments') {
         query = query.neq('id', '00000000-0000-0000-0000-000000000000');
       }
@@ -60,17 +63,20 @@ export function useSupabaseDB(tableName, orderByOption = null, filters = []) {
         query = query.order(orderByOption.field, { ascending });
       }
 
+      // ── Aggressive Timeout ──
+      // Reduce to 7s for faster failover/feedback
       const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('QUERY_TIMEOUT')), 15000)
+        setTimeout(() => reject(new Error('QUERY_TIMEOUT')), 7000)
       );
 
       const { data: result, error: fetchErr } = await Promise.race([query, timeoutPromise]);
       if (fetchErr) throw fetchErr;
 
-      // ── Resiliency: Retry once if empty (to handle intermittent sync flickers) ──
-      if (isFirstFetch.current && (!result || result.length === 0) && tableName === 'tournaments' && !isRetry) {
-         console.warn(`useSupabaseDB [${tableName}]: Empty result on first fetch, retrying in 0.5s...`);
-         setTimeout(() => fetchData(true), 500);
+      // ── Resiliency: Only retry "0 results" for the broad tournaments list ──
+      const isBroadTournamentQuery = tableName === 'tournaments' && filters.length === 0;
+      if (isFirstFetch.current && (!result || result.length === 0) && isBroadTournamentQuery && !isRetry) {
+         console.warn(`useSupabaseDB [${tableName}]: Empty result on first fetch, retrying...`);
+         setTimeout(() => fetchData(true), 1000);
          return; 
       }
 
@@ -80,26 +86,23 @@ export function useSupabaseDB(tableName, orderByOption = null, filters = []) {
       isFirstFetch.current = false;
       setLoading(false);
 
-      // Persist to cache
+      // Persist to scoped cache
       try {
         localStorage.setItem(cacheKey, JSON.stringify(newData));
-      } catch (e) {
-        console.warn('useSupabaseDB: Failed to save to localStorage', e);
-      }
+      } catch (e) {}
     } catch (err) {
       console.error(`useSupabaseDB [${tableName}]:`, err);
       
       if (err.message === 'QUERY_TIMEOUT' && !isRetry) {
-        console.warn(`useSupabaseDB [${tableName}]: Connection stalled, retrying once...`);
         fetchData(true);
         return;
       }
 
-      setError(err.message === 'QUERY_TIMEOUT' ? 'Connection stalled. Please try again.' : err.message);
+      setError(err.message === 'QUERY_TIMEOUT' ? 'Connection slow. Retrying...' : err.message);
       setLoading(false);
       isFirstFetch.current = false;
     }
-  }, [tableName, JSON.stringify(orderByOption), JSON.stringify(filters), cacheKey]);
+  }, [tableName, orderKey, filtersKey, cacheKey]);
 
   const subscribeRealtime = useCallback(() => {
     if (channelRef.current) {
@@ -116,10 +119,9 @@ export function useSupabaseDB(tableName, orderByOption = null, filters = []) {
       )
       .subscribe((status) => {
         if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
-          console.warn(`useSupabaseDB [${tableName}]: channel ${status}, attempting auto-recovery in 5s...`);
           setTimeout(() => {
              if (document.visibilityState === 'visible') subscribeRealtime();
-          }, 5000);
+          }, 10000); // 10s wait before resetting channel
         }
       });
 
@@ -133,34 +135,27 @@ export function useSupabaseDB(tableName, orderByOption = null, filters = []) {
 
     const heartbeat = setInterval(() => {
       const { data: curData, error: curError, loading: curLoading } = stateRef.current;
-      // Heartbeat: Recover from 0 results OR Error states
+      // Heartbeat: Only sync if not already loading and we have no data or an error
       if (!curLoading && (curData.length === 0 || curError)) {
-        console.log('useSupabaseDB: Heartbeat re-syncing...');
         fetchData();
       }
-    }, 5000); // 5s heartbeat is enough
+    }, 20000); // 20s heartbeat is plenty for mobile efficiency
 
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
         fetchData();
-        subscribeRealtime();
       }
     };
 
-    const handleFocus = () => {
-      fetchData();
-    };
-
     document.addEventListener('visibilitychange', handleVisibilityChange);
-    window.addEventListener('focus', handleFocus);
+    window.addEventListener('focus', fetchData);
 
     return () => {
       clearInterval(heartbeat);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('focus', handleFocus);
+      window.removeEventListener('focus', fetchData);
       if (channelRef.current) {
         supabase.removeChannel(channelRef.current);
-        channelRef.current = null;
       }
     };
   }, [fetchData, subscribeRealtime, tableName]);

@@ -235,3 +235,8 @@ create index if not exists idx_registrations_status on public.registrations(stat
 -- GIN Indexes for array overlap checks (Duplicate ID/IGN checks)
 create index if not exists idx_registrations_player_ids on public.registrations using gin (player_ids);
 create index if not exists idx_registrations_player_igns on public.registrations using gin (player_igns);
+
+-- ── ADDITIONAL PERFORMANCE INDEXES ──
+create index if not exists idx_tournaments_created_at on public.tournaments(created_at desc);
+create index if not exists idx_tournaments_status on public.tournaments(status);
+create index if not exists idx_registrations_created_at on public.registrations(created_at desc);
