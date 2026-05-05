@@ -133,7 +133,7 @@ export default function TournamentsPage() {
 
       {/* ── Grid ── */}
       <section className="container mx-auto max-w-7xl px-6 lg:px-16 py-16 pb-32">
-        {isLoading ? (
+        {(isLoading && tournaments.length === 0) ? (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {[1, 2, 3].map((i) => (
               <div key={i} className="bg-[#0e0e0e] aspect-[3/4] animate-pulse border border-white/5" />

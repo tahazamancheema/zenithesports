@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ChevronRight, Shield, Tv, GitBranch, Banknote, ArrowRight, Trophy, Calendar } from 'lucide-react';
 import LiveStatus from '../components/LiveStatus';
 import { useTournaments } from '../hooks/useTournaments';
+import { useSupabaseDB } from '../hooks/useSupabaseDB';
 import { usePlatformStats } from '../hooks/usePlatformStats';
 import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../supabase/config';
@@ -14,50 +15,30 @@ export default function LandingPage() {
   const { currentTournament, openRegistrations } = useTournaments();
   const { user } = useAuth();
   const platformStats = usePlatformStats();
-  const [approvedCounts, setApprovedCounts] = useState({});
-  const [userRegStatuses, setUserRegStatuses] = useState({});
+  const { data: allRegistrations, loading: rLoading } = useSupabaseDB('registrations');
 
-  useEffect(() => {
-    // 1. Fetch approval counts for all active tournaments
-    supabase
-      .from('registrations')
-      .select('tournament_id')
-      .eq('status', 'approved')
-      .then(({ data }) => {
-        const counts = {};
-        data?.forEach(r => counts[r.tournament_id] = (counts[r.tournament_id] || 0) + 1);
-        setApprovedCounts(counts);
-      });
-
-    // 2. Fetch current user's registration statuses
-    if (user?.id) {
-      supabase
-        .from('registrations')
-        .select('tournament_id, status')
-        .eq('user_id', user.id)
-        .then(({ data }) => {
-          const statuses = {};
-          data?.forEach(r => statuses[r.tournament_id] = r.status);
-          setUserRegStatuses(statuses);
-        });
-    } else {
-      setUserRegStatuses({});
-    }
-
-    // Re-fetch when user returns to this tab
-    const handleSync = () => {
-      if (document.visibilityState === 'visible') {
-        // Simple way to trigger effect re-run if needed, but manual fetch is better
-        // For simplicity here, we'll just re-do the logic or rely on refocus
+  // Compute registration counts and user registration status from real-time data
+  const { regCounts, userRegStatuses } = React.useMemo(() => {
+    const counts = {};
+    const statuses = {};
+    
+    allRegistrations.forEach((r) => {
+      // Slot counts only include approved teams
+      if (r.status === 'approved') {
+        counts[r.tournament_id] = (counts[r.tournament_id] || 0) + 1;
       }
-    };
-    window.addEventListener('focus', handleSync);
-    return () => window.removeEventListener('focus', handleSync);
-  }, [user?.id, openRegistrations.length]); // Re-run when user changes or tournaments list loads
+      // Track which tournaments the current user has joined
+      if (user?.id && r.user_id === user.id) {
+        statuses[r.tournament_id] = r.status;
+      }
+    });
+    
+    return { regCounts: counts, userRegStatuses: statuses };
+  }, [allRegistrations, user?.id]);
 
   const maxTeams = currentTournament?.max_teams;
   const isUnlimited = !maxTeams || maxTeams === 0;
-  const approvedCount = approvedCounts[currentTournament?.id] || 0;
+  const approvedCount = regCounts[currentTournament?.id] || 0;
   const fillPct = isUnlimited ? 100 : Math.min((approvedCount / maxTeams) * 100, 100);
   const isOpen = currentTournament?.status === 'registrations_open';
 
@@ -248,7 +229,10 @@ export default function LandingPage() {
                           <span className="text-[#dbb462]">{t.max_teams ? `${t.max_teams} TEAMS` : 'UNLIMITED'}</span>
                         </div>
                         <div className="h-[2px] bg-white/[0.06] relative overflow-hidden">
-                          <div className="absolute left-0 inset-y-0 zenith-gradient w-[30%]" />
+                          <div 
+                            className="absolute left-0 inset-y-0 zenith-gradient transition-all duration-1000" 
+                            style={{ width: `${t.max_teams ? Math.min(((regCounts[t.id] || 0) / t.max_teams) * 100, 100) : 0}%` }} 
+                          />
                         </div>
                       </div>
 

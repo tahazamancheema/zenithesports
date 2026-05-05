@@ -23,6 +23,13 @@ create table if not exists public.users (
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
+-- Add missing columns to users if they don't exist
+alter table public.users add column if not exists whatsapp_number text;
+alter table public.users add column if not exists city text;
+alter table public.users add column if not exists player_ids text[] default '{}';
+alter table public.users add column if not exists player_igns text[] default '{}';
+alter table public.users add column if not exists captain_discord text;
+
 -- 2. TOURNAMENTS TABLE
 create table if not exists public.tournaments (
   id uuid default uuid_generate_v4() primary key,

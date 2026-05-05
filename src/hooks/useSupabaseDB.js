@@ -13,25 +13,40 @@ import { supabase } from '../supabase/config';
  *  3. Monitors the Supabase Realtime channel and reconnects if it drops
  */
 export function useSupabaseDB(tableName, orderByOption = null, filters = []) {
-  const [data, setData] = useState([]);
+  const cacheKey = `zenith_cache_${tableName}`;
+
+  // Initialize data from localStorage if available to prevent "0 Tournaments" on reload/inactivity
+  const [data, setData] = useState(() => {
+    try {
+      const cached = localStorage.getItem(cacheKey);
+      return cached ? JSON.parse(cached) : [];
+    } catch {
+      return [];
+    }
+  });
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Track whether we've completed at least one fetch.
-  // Background realtime refetches should NOT re-show the loading spinner.
+  // Track state in refs for the heartbeat to avoid dependency churn
+  const stateRef = useRef({ data, error, loading });
+  useEffect(() => {
+    stateRef.current = { data, error, loading };
+  }, [data, error, loading]);
+
   const isFirstFetch = useRef(true);
   const channelRef = useRef(null);
 
   const fetchData = useCallback(async (isRetry = false) => {
-    // Only show loading spinner on the very first fetch
-    if (isFirstFetch.current) setLoading(true);
+    // Only show loading spinner on the very first fetch if we have no data
+    if (isFirstFetch.current && stateRef.current.data.length === 0) setLoading(true);
 
     try {
       let query = supabase.from(tableName).select('*');
 
       // ── Cache Busting for Tournaments ──
       if (tableName === 'tournaments') {
-        query = query.neq('id', '00000000-0000-0000-0000-000000000000'); // Dummy filter to force fresh fetch
+        query = query.neq('id', '00000000-0000-0000-0000-000000000000');
       }
 
       if (filters.length > 0) {
@@ -45,13 +60,11 @@ export function useSupabaseDB(tableName, orderByOption = null, filters = []) {
         query = query.order(orderByOption.field, { ascending });
       }
 
-      // ── Anti-Stall: Wrap query in a timeout race ──
       const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('QUERY_TIMEOUT')), 15000) // Increased to 15s
+        setTimeout(() => reject(new Error('QUERY_TIMEOUT')), 15000)
       );
 
       const { data: result, error: fetchErr } = await Promise.race([query, timeoutPromise]);
-      
       if (fetchErr) throw fetchErr;
 
       // ── Resiliency: Retry once if empty (to handle intermittent sync flickers) ──
@@ -61,14 +74,21 @@ export function useSupabaseDB(tableName, orderByOption = null, filters = []) {
          return; 
       }
 
-      setData(result || []);
+      const newData = result || [];
+      setData(newData);
       setError(null);
       isFirstFetch.current = false;
       setLoading(false);
+
+      // Persist to cache
+      try {
+        localStorage.setItem(cacheKey, JSON.stringify(newData));
+      } catch (e) {
+        console.warn('useSupabaseDB: Failed to save to localStorage', e);
+      }
     } catch (err) {
       console.error(`useSupabaseDB [${tableName}]:`, err);
       
-      // Internal Retry for Timeout
       if (err.message === 'QUERY_TIMEOUT' && !isRetry) {
         console.warn(`useSupabaseDB [${tableName}]: Connection stalled, retrying once...`);
         fetchData(true);
@@ -77,13 +97,11 @@ export function useSupabaseDB(tableName, orderByOption = null, filters = []) {
 
       setError(err.message === 'QUERY_TIMEOUT' ? 'Connection stalled. Please try again.' : err.message);
       setLoading(false);
-      isFirstFetch.current = false; // Ensure we don't get stuck in first-fetch mode
+      isFirstFetch.current = false;
     }
-  }, [tableName, JSON.stringify(orderByOption), JSON.stringify(filters)]);
+  }, [tableName, JSON.stringify(orderByOption), JSON.stringify(filters), cacheKey]);
 
-  // Subscribe to realtime changes and return a cleanup function
   const subscribeRealtime = useCallback(() => {
-    // Remove any existing channel first
     if (channelRef.current) {
       supabase.removeChannel(channelRef.current);
       channelRef.current = null;
@@ -97,7 +115,6 @@ export function useSupabaseDB(tableName, orderByOption = null, filters = []) {
         () => { fetchData(); }
       )
       .subscribe((status) => {
-        // If the channel closes or errors, log it — and attempt auto-recovery
         if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
           console.warn(`useSupabaseDB [${tableName}]: channel ${status}, attempting auto-recovery in 5s...`);
           setTimeout(() => {
@@ -114,27 +131,22 @@ export function useSupabaseDB(tableName, orderByOption = null, filters = []) {
     fetchData();
     subscribeRealtime();
 
-    // ── Resiliency Heartbeat: Recover from 0 results OR Error states every 3s ──
-    let heartbeat = null;
-    if (tableName === 'tournaments') {
-      heartbeat = setInterval(() => {
-        // If we have an error OR no data (and we aren't already loading), try to recover
-        if (!loading && (data.length === 0 || error)) {
-          console.log('useSupabaseDB: Heartbeat re-syncing tournaments...');
-          fetchData();
-        }
-      }, 3000);
-    }
+    const heartbeat = setInterval(() => {
+      const { data: curData, error: curError, loading: curLoading } = stateRef.current;
+      // Heartbeat: Recover from 0 results OR Error states
+      if (!curLoading && (curData.length === 0 || curError)) {
+        console.log('useSupabaseDB: Heartbeat re-syncing...');
+        fetchData();
+      }
+    }, 5000); // 5s heartbeat is enough
 
-    // ── Recovery 1: Re-fetch when tab becomes visible again ──
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
         fetchData();
-        subscribeRealtime(); // re-establish the channel in case it dropped
+        subscribeRealtime();
       }
     };
 
-    // ── Recovery 2: Re-fetch when window regains focus ──
     const handleFocus = () => {
       fetchData();
     };
@@ -143,7 +155,7 @@ export function useSupabaseDB(tableName, orderByOption = null, filters = []) {
     window.addEventListener('focus', handleFocus);
 
     return () => {
-      if (heartbeat) clearInterval(heartbeat);
+      clearInterval(heartbeat);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('focus', handleFocus);
       if (channelRef.current) {
@@ -151,7 +163,7 @@ export function useSupabaseDB(tableName, orderByOption = null, filters = []) {
         channelRef.current = null;
       }
     };
-  }, [fetchData, subscribeRealtime, tableName, data.length, loading, error]);
+  }, [fetchData, subscribeRealtime, tableName]);
 
   const add = useCallback(
     async (docData) => {
