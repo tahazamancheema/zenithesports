@@ -9,9 +9,9 @@ import { AuthProvider } from './hooks/useAuth';
 import ScrollToTop from './components/ScrollToTop';
 
 // Lazy-load all pages for code splitting
-import TournamentsPage from './pages/TournamentsPage';
-import TournamentDetailsPage from './pages/TournamentDetailsPage';
 const LandingPage = lazy(() => import('./pages/LandingPage'));
+const TournamentsPage = lazy(() => import('./pages/TournamentsPage'));
+const TournamentDetailsPage = lazy(() => import('./pages/TournamentDetailsPage'));
 const AuthPage = lazy(() => import('./pages/AuthPage'));
 const ProfilePage = lazy(() => import('./pages/ProfilePage'));
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
@@ -45,7 +45,7 @@ class ErrorBoundary extends React.Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen bg-[#131313] flex items-center justify-center p-8">
+        <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-8">
           <div className="max-w-2xl w-full text-center space-y-6">
             <h1 className="font-bebas text-6xl font-black italic text-[#dbb462]">SYSTEM FAULT</h1>
             <p className="font-body text-[#d1c5b3] opacity-60">
@@ -70,7 +70,7 @@ class ErrorBoundary extends React.Component {
 
 function PageLoader() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#131313]">
+    <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a]">
       <div className="flex flex-col items-center gap-4">
         <div className="w-12 h-1 zenith-gradient animate-pulse" />
         <span className="font-bebas text-3xl font-bold italic text-[#dbb462] animate-pulse">
@@ -87,7 +87,7 @@ function AppLayout() {
   const showFooter = !NO_FOOTER_ROUTES.some((r) => location.pathname.startsWith(r));
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#131313]">
+    <div className="min-h-screen flex flex-col bg-[#0a0a0a]">
       <Navbar />
       <main className="flex-1">
         <Suspense fallback={<PageLoader />}>

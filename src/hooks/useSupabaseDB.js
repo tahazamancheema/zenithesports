@@ -52,7 +52,7 @@ export function useSupabaseDB(tableName, orderByOption = null, filters = []) {
         query = query.neq('id', '00000000-0000-0000-0000-000000000000');
       }
 
-      if (filters.length > 0) {
+      if (filters && filters.length > 0) {
         filters.forEach(([field, op, value]) => {
           if (op === 'eq') query = query.eq(field, value);
         });
@@ -73,7 +73,7 @@ export function useSupabaseDB(tableName, orderByOption = null, filters = []) {
       if (fetchErr) throw fetchErr;
 
       // ── Resiliency: Only retry "0 results" for the broad tournaments list ──
-      const isBroadTournamentQuery = tableName === 'tournaments' && filters.length === 0;
+      const isBroadTournamentQuery = tableName === 'tournaments' && (!filters || filters.length === 0);
       if (isFirstFetch.current && (!result || result.length === 0) && isBroadTournamentQuery && !isRetry) {
          console.warn(`useSupabaseDB [${tableName}]: Empty result on first fetch, retrying...`);
          setTimeout(() => fetchData(true), 1000);

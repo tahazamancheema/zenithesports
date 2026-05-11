@@ -6,10 +6,7 @@ import { useTournaments } from '../hooks/useTournaments';
 import { useSupabaseDB } from '../hooks/useSupabaseDB';
 import { usePlatformStats } from '../hooks/usePlatformStats';
 import { useAuth } from '../hooks/useAuth';
-import { supabase } from '../supabase/config';
-
 import RegistrationCountdown from '../components/RegistrationCountdown';
-import heroBg from '../assets/images/hero-character.png';
 
 export default function LandingPage() {
   const { currentTournament, openRegistrations } = useTournaments();
@@ -57,9 +54,9 @@ export default function LandingPage() {
         {/* ── Layer 1: Hero Image ── */}
         <div className="absolute inset-0 z-0">
           <img
-            src={heroBg}
-            className="w-full h-full object-cover object-center opacity-35 scale-105"
-            style={{ filter: 'saturate(0.7) contrast(1.1)' }}
+            src="/image-3.webp"
+            className="w-full h-full object-cover object-center opacity-40 scale-105"
+            style={{ filter: 'saturate(0.6) contrast(1.05) brightness(0.85)' }}
             alt=""
           />
           {/* Multi-stop gradient: heavy bottom, moderate left, light top */}
