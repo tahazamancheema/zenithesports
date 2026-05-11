@@ -20,9 +20,15 @@ export default function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="bg-[#0e0e0e] border-t border-white/5 relative overflow-hidden">
-      {/* Background branding */}
-      <div className="absolute -bottom-10 -left-10 font-bebas text-[20vw] text-white/[0.02] pointer-events-none select-none uppercase leading-none">
+    <footer className="bg-[#0a0a0a] border-t border-[rgba(219,180,98,0.08)] relative overflow-hidden">
+      {/* Gradient top border */}
+      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#dbb462]/25 to-transparent" />
+
+      {/* Ambient glow */}
+      <div className="absolute top-0 left-1/4 w-[600px] h-[300px] bg-[#dbb462]/[0.03] blur-[120px] pointer-events-none rounded-full" />
+
+      {/* Background branding watermark */}
+      <div className="absolute -bottom-10 -left-10 font-bebas text-[20vw] text-white/[0.015] pointer-events-none select-none uppercase leading-none">
         Zenith
       </div>
 
@@ -110,10 +116,12 @@ export default function Footer() {
       </div>
 
       {/* Bottom bar */}
-      <div className="border-t border-white/5 bg-[#0a0a0a] py-10">
+      <div className="border-t border-[rgba(219,180,98,0.06)] bg-[#0a0a0a] py-8">
+        <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#dbb462]/10 to-transparent" />
         <div className="container mx-auto px-6 lg:px-12 flex flex-col md:flex-row justify-center items-center gap-4 text-center">
-          <span className="font-teko text-[16px] tracking-widest text-[#d1c5b3] opacity-40 uppercase">
-            © 2021 - {year} Zenith Esports Pakistan &nbsp;&bull;&nbsp; A Project By <span className="text-[#dbb462] opacity-100 font-bold">Beyond Zenith</span>
+          <span className="font-teko text-[15px] tracking-widest text-[#d1c5b3] opacity-30 uppercase">
+            © 2021 – {year} Zenith Esports Pakistan &nbsp;&bull;&nbsp; A Project By{' '}
+            <span className="zenith-gradient-text opacity-100 font-bold">Beyond Zenith</span>
           </span>
         </div>
       </div>

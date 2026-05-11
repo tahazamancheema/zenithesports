@@ -46,10 +46,12 @@ export default function Navbar() {
   return (
     <header
       className={`fixed top-0 w-full z-50 transition-all duration-500 border-b ${scrolled
-          ? 'h-16 bg-[#0e0e0e]/95 backdrop-blur-xl border-white/10 shadow-2xl'
-          : 'h-20 bg-transparent border-white/5'
+          ? 'h-16 bg-[#0a0a0a]/96 backdrop-blur-xl border-[rgba(219,180,98,0.1)] shadow-[0_4px_40px_rgba(0,0,0,0.6)]'
+          : 'h-20 bg-transparent border-white/[0.04]'
         }`}
     >
+      {/* Gradient underline that appears on scroll */}
+      <div className={`absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#dbb462]/30 to-transparent transition-opacity duration-500 ${scrolled ? 'opacity-100' : 'opacity-0'}`} />
       <div className="container mx-auto h-full px-6 lg:px-12 flex justify-between items-center">
 
         {/* Brand Area */}
@@ -144,7 +146,9 @@ export default function Navbar() {
 
       {/* Mobile Menu Overlay */}
       {mobileOpen && (
-        <div className="lg:hidden fixed inset-x-0 top-20 bg-[#0e0e0e] border-b border-[#dbb462]/20 animate-in slide-in-from-top-10 duration-500 z-50">
+        <div className="lg:hidden fixed inset-x-0 top-20 bg-[#0a0a0a]/98 backdrop-blur-xl border-b border-[#dbb462]/15 animate-in slide-in-from-top-10 duration-500 z-50">
+          {/* Subtle gradient at top */}
+          <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#dbb462]/30 to-transparent" />
           <nav className="flex flex-col p-10 gap-8">
             {NAV_LINKS.map(({ label, to }) => (
               <Link

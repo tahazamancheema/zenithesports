@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronRight, Shield, Tv, GitBranch, Banknote, ArrowRight, Trophy, Calendar } from 'lucide-react';
+import { ChevronRight, Shield, Tv, GitBranch, Banknote, ArrowRight, Trophy, Calendar, Youtube, Instagram, MessageCircle, Zap, Target, Flame, ChevronDown } from 'lucide-react';
 import LiveStatus from '../components/LiveStatus';
 import { useTournaments } from '../hooks/useTournaments';
 import { useSupabaseDB } from '../hooks/useSupabaseDB';
@@ -9,7 +9,7 @@ import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../supabase/config';
 
 import RegistrationCountdown from '../components/RegistrationCountdown';
-import heroBg from '../assets/images/hero-bg.png';
+import heroBg from '../assets/images/hero-character.png';
 
 export default function LandingPage() {
   const { currentTournament, openRegistrations } = useTournaments();
@@ -48,87 +48,185 @@ export default function LandingPage() {
 
   return (
     <div className="animate-page-enter bg-[#0a0a0a] overflow-x-hidden">
-      
+
       {/* ═══════════════════════════════════════════
-          HERO — Full Bleed Cinematic 
+          HERO — Cinematic Full-Bleed
           ═══════════════════════════════════════════ */}
-      <section className="relative min-h-[100dvh] flex items-end pb-20 lg:pb-32 pt-28 overflow-hidden">
-        {/* BG Layers */}
+      <section className="relative min-h-[100dvh] flex flex-col justify-between overflow-hidden">
+
+        {/* ── Layer 1: Hero Image ── */}
         <div className="absolute inset-0 z-0">
-          <img src={heroBg} className="w-full h-full object-cover opacity-50 scale-110" alt="Hero Background" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/60 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/40 to-transparent" />
+          <img
+            src={heroBg}
+            className="w-full h-full object-cover object-center opacity-35 scale-105"
+            style={{ filter: 'saturate(0.7) contrast(1.1)' }}
+            alt=""
+          />
+          {/* Multi-stop gradient: heavy bottom, moderate left, light top */}
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/80 to-[#0a0a0a]/30" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a]/90 via-[#0a0a0a]/40 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-[#0a0a0a]/60" />
         </div>
 
-        {/* Grid overlay */}
-        <div className="absolute inset-0 z-[1] opacity-[0.03]" style={{
-          backgroundImage: 'linear-gradient(rgba(219,180,98,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(219,180,98,0.5) 1px, transparent 1px)',
-          backgroundSize: '80px 80px'
+        {/* ── Layer 2: Atmospheric Glows ── */}
+        {/* Primary gold orb — top center */}
+        <div className="absolute top-[-80px] left-1/2 -translate-x-1/2 w-[900px] h-[600px] bg-[#dbb462]/[0.07] blur-[180px] pointer-events-none z-[1] rounded-full" />
+        {/* Secondary orb — mid right */}
+        <div className="absolute top-1/3 right-0 w-[500px] h-[500px] bg-[#c49a3a]/[0.06] blur-[130px] pointer-events-none z-[1] rounded-full" />
+        {/* Low glow — bottom left */}
+        <div className="absolute bottom-0 left-0 w-[400px] h-[300px] bg-[#dbb462]/[0.04] blur-[100px] pointer-events-none z-[1]" />
+
+        {/* ── Layer 3: Fine Grid ── */}
+        <div className="absolute inset-0 z-[2] pointer-events-none" style={{
+          backgroundImage:
+            'linear-gradient(rgba(219,180,98,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(219,180,98,0.07) 1px, transparent 1px)',
+          backgroundSize: '60px 60px',
+          maskImage: 'linear-gradient(to bottom, transparent 0%, black 20%, black 70%, transparent 100%)',
+          WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 20%, black 70%, transparent 100%)',
         }} />
 
-        {/* Scanline */}
-        <div className="absolute inset-0 scanline opacity-[0.06] pointer-events-none z-[2]" />
+        {/* ── Layer 4: Diagonal Accent Strip ── */}
+        <div className="absolute inset-0 z-[2] pointer-events-none overflow-hidden">
+          <div className="absolute top-0 right-[18%] w-[1px] h-full bg-gradient-to-b from-[#dbb462]/25 via-[#dbb462]/08 to-transparent" />
+          <div className="absolute top-0 right-[35%] w-[1px] h-full bg-gradient-to-b from-transparent via-[#dbb462]/06 to-transparent" />
+          <div className="absolute top-0 left-[8%] w-[1px] h-full bg-gradient-to-b from-transparent via-[#dbb462]/15 to-transparent" />
+        </div>
 
-        {/* Gold accent lines */}
-        <div className="hidden lg:block absolute top-0 left-0 w-[1px] h-full bg-gradient-to-b from-transparent via-[#dbb462]/20 to-transparent z-[3]" style={{left: '8%'}} />
-        <div className="hidden lg:block absolute top-0 left-0 w-[1px] h-full bg-gradient-to-b from-transparent via-[#dbb462]/10 to-transparent z-[3]" style={{left: '50%'}} />
+        {/* ── Layer 5: Scanline ── */}
+        <div className="absolute inset-0 scanline opacity-[0.04] pointer-events-none z-[3]" />
 
-        {/* Main Content */}
-        <div className="relative z-10 w-full px-6 lg:px-16 container mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-0 items-end">
-            
-            {/* Left Column — Text */}
-            <div className="lg:col-span-7 xl:col-span-6">
-              {/* Eyebrow Tag */}
-              <div className="flex items-center gap-4 mb-8">
-                <div className="w-3 h-3 bg-[#dbb462] animate-pulse" />
-                <span className="font-teko text-[#dbb462] text-[16px] tracking-[0.3em] font-medium uppercase">
-                  PAKISTAN'S COMPETITIVE ECOSYSTEM
-                </span>
+        {/* ── Main Content: Top Section ── */}
+        <div className="relative z-10 flex-1 flex flex-col justify-center pt-28 lg:pt-32 pb-10">
+          <div className="container mx-auto max-w-7xl px-6 lg:px-16">
+
+            {/* Top row: badge + season indicator */}
+            <div className="flex items-center justify-between mb-12 lg:mb-16">
+              {/* Left badge */}
+              <div className="flex items-center gap-3">
+                <div className="relative flex items-center gap-2 bg-[#dbb462]/10 border border-[#dbb462]/25 px-4 py-2 backdrop-blur-sm">
+                  <span className="relative w-2 h-2 rounded-full bg-[#dbb462]">
+                    <span className="absolute inset-0 rounded-full bg-[#dbb462] animate-ping opacity-60" />
+                  </span>
+                  <span className="font-teko text-[#dbb462] text-[13px] tracking-[0.3em] uppercase">
+                    Pakistan · PUBG Mobile · Est. 2021
+                  </span>
+                </div>
               </div>
-
-              {/* Headline */}
-              <h1 className="font-bebas text-[clamp(4rem,14vw,11rem)] leading-[0.82] mb-8 select-none uppercase tracking-tight">
-                <span className="text-[#f2f2f2] block">LEVEL UP</span>
-                <span className="text-[#f2f2f2] block">YOUR <span className="zenith-gradient-text">GAME</span></span>
-              </h1>
-
-              {/* Sub-copy */}
-              <p className="font-rajdhani text-[#d1c5b3] text-lg md:text-xl max-w-lg mb-10 leading-relaxed opacity-70 font-medium">
-                Join the most technical and reliable tournament circuit in Pakistan. We provide the infrastructure for professional PUBG Mobile squads to shine.
-              </p>
-
-              {/* CTAs */}
-              <div className="flex flex-wrap gap-4 mb-12 lg:mb-0">
-                <Link 
-                  to={user ? "/profile" : "/auth"} 
-                  className="btn-obsidian-primary font-bebas text-[22px] px-10 py-5 tracking-[0.15em] inline-flex items-center gap-3 uppercase"
-                >
-                  {user ? 'MY DASHBOARD' : 'JOIN THE CIRCUIT'} <ArrowRight size={22} strokeWidth={2.5} />
-                </Link>
-                <Link 
-                  to="/tournaments" 
-                  className="btn-obsidian-ghost font-bebas text-[22px] px-10 py-5 tracking-[0.15em] uppercase"
-                >
-                  BROWSE EVENTS
-                </Link>
+              {/* Right: scroll hint (desktop) */}
+              <div className="hidden lg:flex items-center gap-2 text-[#d1c5b3]/30">
+                <span className="font-teko text-[11px] tracking-[0.3em] uppercase">Scroll</span>
+                <ChevronDown size={12} className="animate-bounce" />
               </div>
             </div>
 
-            {/* Right Column — Floating Stats Panel */}
-            <div className="lg:col-span-5 xl:col-span-6 flex justify-end w-full mt-16 lg:mt-0">
-              <div className="w-full grid grid-cols-2 lg:grid-cols-1 gap-2 lg:gap-[2px] max-w-full lg:max-w-md">
-                <FloatingStat label="ACTIVE PLAYERS" value={platformStats.activePlayers} delay={100} />
-                <FloatingStat label="PRIZES PAID" value={platformStats.prizePools} delay={200} />
-                <FloatingStat label="EVENTS DONE" value={platformStats.tournamentsRun} delay={300} />
-                <FloatingStat label="REGION" value="PAKISTAN" accent delay={400} />
+            {/* Headline */}
+            <div className="mb-10 lg:mb-12">
+              {/* Decorative top-left corner bracket */}
+              <div className="hidden lg:block absolute -translate-x-6 -translate-y-4 w-6 h-6 border-t-2 border-l-2 border-[#dbb462]/40" />
+
+              <h1 className="font-bebas uppercase select-none leading-[0.82] tracking-tight">
+                {/* Line 1 — smaller accent line */}
+                <span
+                  className="block text-[clamp(2rem,5vw,4rem)] text-[#d1c5b3]/50 tracking-[0.1em] mb-2"
+                  style={{ letterSpacing: '0.12em' }}
+                >
+                  FORGE YOUR
+                </span>
+                {/* Line 2 — massive hero word */}
+                <span className="block text-[clamp(5.5rem,17vw,13.5rem)] zenith-gradient-text leading-[0.85]"
+                  style={{ textShadow: '0 0 120px rgba(219,180,98,0.25)' }}>
+                  LEGACY.
+                </span>
+                {/* Line 3 — supporting line */}
+                <span className="block text-[clamp(2rem,5.5vw,4.5rem)] text-[#f2f2f2]/80 tracking-wide mt-2">
+                  DOMINATE THE COMPETITION
+                </span>
+              </h1>
+            </div>
+
+            {/* Body copy + CTAs row */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-end">
+              {/* Body */}
+              <div>
+                <p className="font-rajdhani text-[#d1c5b3] text-xl leading-relaxed opacity-60 font-medium max-w-xl mb-10">
+                  Pakistan's most rigorous PUBG Mobile tournament platform. Every squad is verified. Every match is tracked. Only the best rise to the top.
+                </p>
+                <div className="flex flex-wrap gap-4">
+                  <Link
+                    to={user ? "/tournaments" : "/auth"}
+                    className="btn-obsidian-primary font-bebas text-[22px] px-12 py-5 tracking-[0.15em] inline-flex items-center gap-3 uppercase"
+                  >
+                    {user ? 'ENTER THE ARENA' : 'CLAIM YOUR SPOT'}{' '}
+                    <ArrowRight size={22} strokeWidth={2.5} />
+                  </Link>
+                  <Link
+                    to="/tournaments"
+                    className="btn-obsidian-ghost font-bebas text-[22px] px-10 py-5 tracking-[0.15em] uppercase"
+                  >
+                    VIEW EVENTS
+                  </Link>
+                </div>
+              </div>
+
+              {/* Trust indicators */}
+              <div className="flex flex-col gap-4 lg:items-end">
+                {[
+                  { icon: Shield,  text: 'Every player manually ID-verified' },
+                  { icon: Target,  text: 'Tournament-grade bracket system' },
+                  { icon: Flame,   text: 'Fast prize settlements guaranteed' },
+                ].map(({ icon: Icon, text }) => (
+                  <div key={text} className="flex items-center gap-3 group">
+                    <div className="w-8 h-8 bg-[#dbb462]/10 border border-[#dbb462]/20 flex items-center justify-center flex-shrink-0 group-hover:bg-[#dbb462]/20 transition-colors">
+                      <Icon size={14} className="text-[#dbb462]" />
+                    </div>
+                    <span className="font-teko text-[15px] tracking-[0.12em] text-[#d1c5b3] opacity-50 group-hover:opacity-80 transition-opacity uppercase">
+                      {text}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
         </div>
 
-        {/* Bottom edge line */}
-        <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#dbb462]/30 to-transparent z-10" />
+        {/* ── Stats HUD Strip ── */}
+        <div className="relative z-10 border-t border-[#dbb462]/15 bg-[#0a0a0a]/60 backdrop-blur-xl">
+          {/* Top gradient line */}
+          <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#dbb462]/40 to-transparent" />
+
+          <div className="container mx-auto max-w-7xl px-6 lg:px-16">
+            <div className="grid grid-cols-2 lg:grid-cols-4 divide-x divide-[#dbb462]/10">
+              <HeroStat
+                value={platformStats.activePlayers}
+                label="Players Reached"
+                sub="Across all platforms"
+                delay={0}
+              />
+              <HeroStat
+                value={platformStats.prizePools}
+                label="Prize Money Paid"
+                sub="Distributed to winners"
+                delay={80}
+              />
+              <HeroStat
+                value={platformStats.tournamentsRun}
+                label="Tournaments Run"
+                sub="Since 2021"
+                delay={160}
+              />
+              <HeroStat
+                value="PAKISTAN"
+                label="Region of Operation"
+                sub="Nationwide circuit"
+                accent
+                delay={240}
+              />
+            </div>
+          </div>
+
+          {/* Bottom gradient line */}
+          <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#dbb462]/15 to-transparent" />
+        </div>
       </section>
 
       {/* ═══════════════════════════════════════════
@@ -411,9 +509,12 @@ export default function LandingPage() {
       {/* ═══════════════════════════════════════════
           WHY COMPETE — Feature Pillars
           ═══════════════════════════════════════════ */}
-      <section className="relative bg-[#0a0a0a] overflow-hidden">
+      <section className="relative bg-[#0a0a0a] overflow-hidden section-glow">
+        {/* Ambient orbs */}
+        <div className="absolute top-1/2 -translate-y-1/2 left-0 w-[400px] h-[400px] bg-[#dbb462]/[0.04] blur-[120px] pointer-events-none rounded-full" />
+        <div className="absolute top-1/2 -translate-y-1/2 right-0 w-[300px] h-[300px] bg-[#dbb462]/[0.03] blur-[100px] pointer-events-none rounded-full" />
         {/* Background texture */}
-        <div className="absolute inset-0 opacity-[0.02]" style={{
+        <div className="absolute inset-0 opacity-[0.015]" style={{
           backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(219,180,98,1) 1px, transparent 0)',
           backgroundSize: '32px 32px'
         }} />
@@ -468,14 +569,95 @@ export default function LandingPage() {
       </section>
 
       {/* ═══════════════════════════════════════════
-          CTA BANNER — Final Push 
+          COMMUNITY — Social Channels
           ═══════════════════════════════════════════ */}
-      <section className="relative bg-[#0e0e0e] border-t border-b border-white/[0.04] overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-[#dbb462]/[0.03] via-transparent to-transparent" />
-        
+      <section className="relative bg-[#0a0a0a] border-t border-white/[0.04] overflow-hidden section-glow">
+        <div className="absolute inset-0">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] bg-[#dbb462]/[0.04] blur-[120px] pointer-events-none rounded-full" />
+        </div>
+
+        <div className="container mx-auto max-w-7xl px-6 lg:px-16 py-20 lg:py-28 relative z-10">
+          <div className="text-center mb-14">
+            <div className="flex items-center justify-center gap-4 mb-4">
+              <div className="w-8 h-[2px] bg-[#dbb462]" />
+              <span className="font-teko text-[16px] tracking-[0.25em] text-[#dbb462] uppercase font-medium">Stay Connected</span>
+              <div className="w-8 h-[2px] bg-[#dbb462]" />
+            </div>
+            <h2 className="font-bebas text-5xl md:text-7xl tracking-tight leading-[0.85] uppercase">
+              <span className="text-[#f2f2f2]">JOIN THE </span>
+              <span className="zenith-gradient-text glow-gold-text">COMMUNITY</span>
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-[1px] bg-white/[0.04]">
+            {[
+              {
+                icon: Youtube,
+                platform: 'YouTube',
+                handle: '@zenithesports.pakistan',
+                desc: 'Watch live tournaments, match highlights and professional PUBG Mobile content.',
+                href: 'https://youtube.com/@zenithesports.pakistan',
+                color: 'text-red-400',
+                borderColor: 'border-red-500/20',
+                bgHover: 'hover:bg-red-500/[0.03]',
+              },
+              {
+                icon: Instagram,
+                platform: 'Instagram',
+                handle: '@zenithesports.pk',
+                desc: 'Follow for tournament announcements, team spotlights and behind-the-scenes content.',
+                href: 'https://instagram.com/zenithesports.pk',
+                color: 'text-pink-400',
+                borderColor: 'border-pink-500/20',
+                bgHover: 'hover:bg-pink-500/[0.03]',
+              },
+              {
+                icon: MessageCircle,
+                platform: 'WhatsApp',
+                handle: '+92 339 0715753',
+                desc: 'Direct support for registrations, disputes, and all tournament related queries.',
+                href: 'https://wa.me/923390715753',
+                color: 'text-emerald-400',
+                borderColor: 'border-emerald-500/20',
+                bgHover: 'hover:bg-emerald-500/[0.03]',
+              },
+            ].map(({ icon: Icon, platform, handle, desc, href, color, borderColor, bgHover }) => (
+              <a
+                key={platform}
+                href={href}
+                target="_blank"
+                rel="noreferrer"
+                className={`bg-[#0e0e0e] p-8 lg:p-10 group ${bgHover} transition-all duration-500 relative overflow-hidden flex flex-col`}
+              >
+                <div className={`absolute top-0 left-0 w-full h-[2px] ${color.replace('text-', 'bg-')} opacity-0 group-hover:opacity-60 transition-opacity duration-500`} />
+                <Icon size={32} className={`${color} mb-6 opacity-50 group-hover:opacity-100 transition-opacity`} strokeWidth={1.5} />
+                <p className="font-teko text-[13px] tracking-[0.25em] text-[#d1c5b3] opacity-40 uppercase mb-1">{platform}</p>
+                <p className={`font-bebas text-2xl ${color} mb-4`}>{handle}</p>
+                <p className="font-rajdhani text-[#d1c5b3] text-sm opacity-40 group-hover:opacity-70 transition-opacity leading-relaxed flex-1 font-medium">{desc}</p>
+                <div className={`mt-6 flex items-center gap-2 ${color} opacity-0 group-hover:opacity-80 transition-all duration-300 translate-y-2 group-hover:translate-y-0 font-teko text-[13px] tracking-widest uppercase`}>
+                  Follow <ChevronRight size={14} />
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════
+          CTA BANNER — Final Push
+          ═══════════════════════════════════════════ */}
+      <section className="relative bg-[#0e0e0e] border-t border-white/[0.04] overflow-hidden">
+        {/* Diagonal gradient accent */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#dbb462]/[0.05] via-transparent to-transparent pointer-events-none" />
+        <div className="absolute bottom-0 right-0 w-[500px] h-[200px] bg-[#dbb462]/[0.04] blur-[80px] pointer-events-none" />
+
         <div className="container mx-auto max-w-7xl px-6 lg:px-16 py-20 lg:py-28 relative z-10">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-10">
             <div>
+              <div className="flex items-center gap-4 mb-4">
+                <Zap size={20} className="text-[#dbb462]" />
+                <span className="font-teko text-[16px] tracking-[0.25em] text-[#dbb462] uppercase">Time to Deploy</span>
+              </div>
               <h3 className="font-bebas text-5xl md:text-7xl tracking-tight uppercase leading-[0.85] mb-4">
                 READY TO <span className="zenith-gradient-text">COMPETE?</span>
               </h3>
@@ -483,13 +665,21 @@ export default function LandingPage() {
                 Register your squad, gear up, and join Pakistan's most competitive PUBG Mobile circuit today.
               </p>
             </div>
-            <div className="flex flex-wrap gap-4">
-              <Link 
-                to={user ? "/tournaments" : "/auth"} 
-                className="btn-obsidian-primary font-bebas text-[24px] px-12 py-6 tracking-[0.2em] inline-flex items-center gap-4 uppercase"
+            <div className="flex flex-col sm:flex-row gap-4 shrink-0">
+              <Link
+                to={user ? "/tournaments" : "/auth"}
+                className="btn-obsidian-primary font-bebas text-[22px] px-12 py-6 tracking-[0.2em] inline-flex items-center gap-4 uppercase"
               >
-                {user ? 'VIEW TOURNAMENTS' : 'GET STARTED'} <ArrowRight size={24} strokeWidth={2.5} />
+                {user ? 'VIEW TOURNAMENTS' : 'GET STARTED'} <ArrowRight size={22} strokeWidth={2.5} />
               </Link>
+              {!user && (
+                <Link
+                  to="/tournaments"
+                  className="btn-obsidian-ghost font-bebas text-[22px] px-10 py-6 tracking-[0.15em] uppercase"
+                >
+                  BROWSE FIRST
+                </Link>
+              )}
             </div>
           </div>
         </div>
@@ -499,26 +689,24 @@ export default function LandingPage() {
   );
 }
 
-/* ── Floating Stat Block (Hero) ── */
-function FloatingStat({ label, value, accent, delay = 0 }) {
+/* ── Hero Stats HUD Cell ── */
+function HeroStat({ value, label, sub, accent, delay = 0 }) {
   return (
-    <div 
-      className="relative overflow-hidden bg-[#0e0e0e]/60 backdrop-blur-md border border-white/[0.05] p-4 md:p-6 group hover:border-[#dbb462]/30 hover:bg-[#111]/80 transition-all duration-500 flex flex-col justify-center animate-stat-enter opacity-0"
+    <div
+      className="px-6 lg:px-10 py-6 lg:py-8 group relative overflow-hidden animate-stat-enter opacity-0"
       style={{ animationDelay: `${delay}ms`, animationFillMode: 'forwards' }}
     >
-      {/* Decorative gradient glow */}
-      <div className={`absolute -top-12 -right-12 w-24 h-24 ${accent ? 'bg-emerald-500/10' : 'bg-[#dbb462]/10'} blur-2xl rounded-full group-hover:scale-150 transition-transform duration-700 pointer-events-none`} />
-      
-      {/* Accent corner */}
-      <div className={`absolute top-0 right-0 w-4 h-4 border-t border-r ${accent ? 'border-emerald-500/50' : 'border-[#dbb462]/50'} opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`} />
+      {/* Top accent line slides in on hover */}
+      <div className={`absolute top-0 left-0 right-0 h-[2px] scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left ${accent ? 'bg-emerald-400' : 'zenith-gradient'}`} />
 
-      <div className="relative z-10 flex flex-col gap-1.5">
-        <span className="font-teko text-[12px] md:text-[14px] tracking-[0.2em] text-[#d1c5b3] opacity-50 uppercase group-hover:opacity-90 transition-opacity">{label}</span>
-        <span className={`font-bebas text-[28px] md:text-4xl tracking-tight leading-none flex items-center gap-2 ${accent ? 'text-emerald-400' : 'text-[#f2f2f2]'}`}>
-          {accent && <span className="inline-block w-2 h-2 bg-emerald-400 shrink-0 rounded-full animate-pulse shadow-[0_0_10px_rgba(52,211,153,0.5)]" />}
-          {value}
-        </span>
-      </div>
+      {/* Ambient glow blob */}
+      <div className={`absolute -top-6 -left-6 w-32 h-32 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none rounded-full ${accent ? 'bg-emerald-500/10' : 'bg-[#dbb462]/08'}`} />
+
+      <p className="font-teko text-[11px] md:text-[12px] tracking-[0.25em] text-[#d1c5b3] opacity-40 uppercase mb-1 group-hover:opacity-70 transition-opacity">{label}</p>
+      <p className={`font-bebas text-[2rem] md:text-[2.5rem] leading-none tracking-tight mb-1 ${accent ? 'text-emerald-400' : 'zenith-gradient-text'}`}>
+        {value}
+      </p>
+      <p className="font-teko text-[11px] tracking-[0.2em] text-[#d1c5b3] opacity-25 uppercase group-hover:opacity-50 transition-opacity">{sub}</p>
     </div>
   );
 }

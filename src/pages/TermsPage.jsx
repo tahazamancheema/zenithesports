@@ -8,11 +8,11 @@ export default function TermsPage() {
 
       {/* Hero */}
       <section className="py-20 px-6 md:px-12 bg-[#1b1b1b]">
-        <span className="font-stretch text-[#f9d07a] text-[10px] tracking-[0.4em] block mb-4">LEGAL</span>
+        <span className="font-teko text-[#f9d07a] text-[10px] tracking-[0.4em] block mb-4">LEGAL</span>
         <h1 className="font-bebas text-6xl md:text-7xl font-black italic tracking-tighter leading-tight mb-4">
           TERMS OF SERVICE
         </h1>
-        <p className="font-stretch text-[9px] tracking-widest text-[#d1c5b3] opacity-30">
+        <p className="font-teko text-[9px] tracking-widest text-[#d1c5b3] opacity-30">
           LAST UPDATED: {LAST_UPDATED.toUpperCase()}
         </p>
       </section>

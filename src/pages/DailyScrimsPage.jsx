@@ -1,281 +1,331 @@
-import React, { useState } from 'react';
-import { Trophy, Clock, Map as MapIcon, MessageCircle, ArrowRight, ShieldCheck, Gamepad2, Zap } from 'lucide-react';
-import StaticBackground from '../components/ui/StaticBackground';
-
-const ChickenIcon = ({ size = 18 }) => (
-  <svg 
-    width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-  >
-    <path d="M12 2c0 1.1-.9 2-2 2s-2-.9-2-2" />
-    <path d="M18 13c0-3.3-2.7-6-6-6s-6 2.7-6 6c0 1.7.7 3.2 1.8 4.2L6 22h12l-1.8-4.8c1.1-1 1.8-2.5 1.8-4.2z" />
-    <path d="M12 7v2" />
-    <circle cx="10" cy="11" r="1" />
-    <circle cx="14" cy="11" r="1" />
-  </svg>
-);
+import React from 'react';
+import { Clock, MessageCircle } from 'lucide-react';
 
 const PRIZE_DISTRIBUTION = [
-  { rank: '1st Place', amount: '2,100 PKR', sub: 'Winner', icon: 'trophy' },
-  { rank: '2nd Place', amount: '1,000 PKR', sub: 'Runner Up', icon: 'trophy' },
-  { rank: '3rd Place', amount: '700 PKR', sub: 'Top 3', icon: 'trophy' },
-  { rank: '4th - 5th', amount: 'Retention', sub: 'Top 4-5', icon: 'trophy' },
-  { rank: 'Per Chicken', amount: '150 PKR', sub: 'Bonus', icon: 'chicken' },
+  { rank: '1ST PLACE',   amount: '2,100 PKR', label: 'Champion'   },
+  { rank: '2ND PLACE',   amount: '1,000 PKR', label: 'Runner-Up'  },
+  { rank: '3RD PLACE',   amount: '700 PKR',   label: 'Top 3'      },
+  { rank: '4TH – 5TH',  amount: 'Retention', label: 'Top 5'      },
+  { rank: 'PER CHICKEN', amount: '150 PKR',   label: 'Kill Bonus' },
 ];
 
 const SESSIONS = [
-  {
-    id: 's1',
-    name: 'SESSION 1',
-    tag: 'EVENING',
-    time: '8:05 PM',
-    maps: ['Erangel', 'Miramar', 'Erangel', 'Rondo']
-  },
-  {
-    id: 's2',
-    name: 'SESSION 2',
-    tag: 'NIGHT',
-    time: '10:30 PM',
-    maps: ['Erangel', 'Miramar', 'Erangel', 'Rondo']
-  },
-  {
-    id: 's3',
-    name: 'SESSION 3',
-    tag: 'LATE NIGHT',
-    time: '12:45 AM',
-    maps: ['Erangel', 'Miramar', 'Erangel', 'Rondo']
-  }
+  { id: 's1', name: 'SESSION 01', tag: 'EVENING',    time: '8:05',  ampm: 'PM', maps: ['Erangel', 'Miramar', 'Erangel', 'Rondo'] },
+  { id: 's2', name: 'SESSION 02', tag: 'NIGHT',      time: '10:30', ampm: 'PM', maps: ['Erangel', 'Miramar', 'Erangel', 'Rondo'] },
+  { id: 's3', name: 'SESSION 03', tag: 'LATE NIGHT', time: '12:45', ampm: 'AM', maps: ['Erangel', 'Miramar', 'Erangel', 'Rondo'] },
 ];
 
 const ADMINS = [
-  { name: 'Admin 1', phone: '03390715753' },
-  { name: 'Admin 2', phone: '03140679418' },
-  { name: 'Admin 3', phone: '03163126525' },
+  { name: 'ADMIN 01', phone: '03390715753', wa: '923390715753' },
+  { name: 'ADMIN 02', phone: '03140679418', wa: '923140679418' },
+  { name: 'ADMIN 03', phone: '03163126525', wa: '923163126525' },
 ];
+
+const MAPS = ['Erangel', 'Miramar', 'Erangel', 'Rondo'];
 
 export default function DailyScrimsPage() {
   return (
-    <div className="min-h-screen bg-[#0a0a0a] pt-24 pb-12 px-4 md:px-8 relative overflow-hidden">
-      <StaticBackground variant="mesh" />
-      
-      <div className="max-w-7xl mx-auto relative z-10">
-        
-        {/* Tactical Header */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-20 items-center">
-          <div className="lg:col-span-7 space-y-6 animate-in fade-in slide-in-from-left-4 duration-700">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#dbb462]/10 border border-[#dbb462]/20 text-[#dbb462] font-agency font-bold text-xs tracking-widest uppercase mb-4">
-              <ShieldCheck size={12} />
-              ZENITH'S OWN ECOSYSTEM
-            </div>
-            
-            <h1 className="font-agency font-bold text-6xl md:text-9xl leading-tight uppercase tracking-tighter text-white py-4 px-2">
-              DAILY <span className="zenith-gradient-text italic block md:inline pr-8">SCRIMS</span>
-            </h1>
-            
-            <p className="font-body text-[#d1c5b3] text-xl opacity-80 max-w-xl leading-relaxed italic border-l-2 border-[#dbb462]/40 pl-6">
-              Dominate the landscape. Join Pakistan's most prestigious daily competitive protocol and prove your squad's dominance in the server.
-            </p>
+    <div className="min-h-screen bg-[#0a0a0a] overflow-x-hidden">
 
-            <div className="flex flex-wrap gap-6 pt-6">
-              <div className="bg-[#111] border border-white/5 p-8 flex items-center gap-8 group hover:border-[#dbb462]/50 hover:bg-[#161616] transition-all duration-500 min-w-[300px] shadow-2xl relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-[#dbb462]/5 blur-3xl group-hover:bg-[#dbb462]/10 transition-colors" />
-                <div className="p-4 bg-[#dbb462]/10 border border-[#dbb462]/20 text-[#dbb462] group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
-                  <Trophy size={40} />
-                </div>
-                <div className="relative z-10">
-                  <p className="font-agency text-white/30 text-xs tracking-[0.4em] uppercase mb-2">TOTAL PRIZE</p>
-                  <div className="flex items-baseline gap-2">
-                    <p className="font-bebas text-6xl md:text-7xl zenith-gradient-text leading-none tracking-tighter">5,000</p>
-                    <p className="font-bebas text-2xl text-[#dbb462] opacity-80 tracking-widest">PKR</p>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="bg-[#111] border border-white/5 p-8 flex items-center gap-8 group hover:border-white/20 hover:bg-[#161616] transition-all duration-500 min-w-[300px] shadow-2xl relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 blur-3xl" />
-                <div className="p-4 bg-white/5 border border-white/10 text-white/40 group-hover:scale-110 group-hover:-rotate-6 transition-all duration-500">
-                  <Zap size={40} />
-                </div>
-                <div className="relative z-10">
-                  <p className="font-agency text-white/50 text-xs tracking-[0.4em] uppercase mb-2">ENTRY FEE</p>
-                  <div className="flex items-baseline gap-2">
-                    <p className="font-bebas text-6xl md:text-7xl text-white leading-none tracking-tighter">300</p>
-                    <p className="font-bebas text-2xl text-white/60 tracking-widest">PKR</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+      {/* ══════════════════════════════════════
+          PAGE HERO — with image background
+          ══════════════════════════════════════ */}
+      <section className="relative min-h-[70vh] flex items-end border-b border-white/[0.07] overflow-hidden">
 
-          <div className="lg:col-span-5 flex justify-center lg:justify-end">
-            <div className="w-full max-w-[320px] aspect-[3/4] bg-[#111] border border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)] overflow-hidden relative group">
-              <img src="/battle-poster.png" alt="" className="w-full h-full object-cover grayscale-[30%] group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-105" />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent opacity-80" />
-            </div>
-          </div>
+        {/* Background image */}
+        <div className="absolute inset-0 z-0">
+          <img
+            src="/image-3.webp"
+            alt=""
+            className="w-full h-full object-cover object-center scale-105"
+            style={{ filter: 'saturate(0.5) contrast(1.05)' }}
+          />
+          {/* Heavy bottom fade so text is readable */}
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/70 to-[#0a0a0a]/30" />
+          {/* Left fade for text column */}
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a]/95 via-[#0a0a0a]/50 to-transparent" />
         </div>
 
-        {/* 1. Timings Block */}
-        <div className="mb-16">
-          <div className="flex items-center gap-4 mb-8">
-            <div className="h-[2px] w-12 bg-[#dbb462]" />
-            <h2 className="font-agency font-bold text-3xl text-white tracking-[0.2em] uppercase">SCRIM TIMINGS</h2>
+        {/* Gold atmospheric glow */}
+        <div className="absolute top-0 left-0 w-[600px] h-[400px] bg-[#dbb462]/[0.07] blur-[150px] pointer-events-none z-[1]" />
+
+        {/* Content */}
+        <div className="container mx-auto max-w-7xl px-6 lg:px-16 pt-36 pb-16 relative z-10 w-full">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-end">
+
+            {/* Left — headline */}
+            <div className="lg:col-span-7">
+              <div className="flex items-center gap-3 mb-8">
+                <div className="w-8 h-[2px] bg-[#dbb462]" />
+                <span className="font-teko text-[13px] tracking-[0.3em] text-[#dbb462] uppercase">
+                  Zenith Esports · Daily Format
+                </span>
+              </div>
+
+              <h1 className="font-bebas uppercase leading-[0.85] tracking-tight select-none">
+                <span className="block text-[clamp(5rem,13vw,10rem)] text-[#f2f2f2] leading-none">DAILY</span>
+                <span className="block text-[clamp(5rem,13vw,10rem)] zenith-gradient-text leading-none">SCRIMS</span>
+              </h1>
+
+              <p className="font-teko text-[#d1c5b3] text-[18px] opacity-65 max-w-lg mt-6 tracking-[0.08em] leading-relaxed uppercase">
+                Pakistan's most competitive daily scrim format.
+                Three sessions, four maps, real prize money — every single day.
+              </p>
+            </div>
+
+            {/* Right — key numbers */}
+            <div className="lg:col-span-5 flex flex-col gap-[1px] bg-white/[0.07]">
+              <div className="bg-[#111]/90 backdrop-blur-sm px-8 py-6 hover:bg-[#161616] transition-colors">
+                <p className="font-teko text-[11px] tracking-[0.3em] text-[#d1c5b3] opacity-55 uppercase mb-2">
+                  Total Prize Pool
+                </p>
+                <div className="flex items-baseline gap-2">
+                  <span className="font-bebas text-[3.5rem] zenith-gradient-text leading-none">5,000</span>
+                  <span className="font-teko text-lg text-[#dbb462] opacity-70 tracking-widest">PKR</span>
+                </div>
+              </div>
+
+              <div className="bg-[#111]/90 backdrop-blur-sm px-8 py-6 hover:bg-[#161616] transition-colors">
+                <p className="font-teko text-[11px] tracking-[0.3em] text-[#d1c5b3] opacity-55 uppercase mb-2">
+                  Entry Fee
+                </p>
+                <div className="flex items-baseline gap-2">
+                  <span className="font-bebas text-[3.5rem] text-[#f2f2f2] leading-none">300</span>
+                  <span className="font-teko text-lg text-white/50 tracking-widest">PKR / SQUAD</span>
+                </div>
+              </div>
+
+              <div className="bg-[#111]/90 backdrop-blur-sm px-8 py-6 hover:bg-[#161616] transition-colors">
+                <p className="font-teko text-[11px] tracking-[0.3em] text-[#d1c5b3] opacity-55 uppercase mb-2">
+                  Format
+                </p>
+                <span className="font-bebas text-[1.75rem] text-[#f2f2f2] leading-none tracking-wider">
+                  3 SESSIONS · 4 MATCHES EACH
+                </span>
+              </div>
+            </div>
+
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {SESSIONS.map((session) => (
-              <div key={session.id} className="bg-[#111] border border-white/5 p-6 relative group overflow-hidden">
-                <div className="absolute top-0 right-0 w-24 h-24 bg-[#dbb462]/5 blur-2xl group-hover:bg-[#dbb462]/10 transition-colors" />
-                <p className="font-agency font-bold text-[#dbb462] tracking-[0.3em] text-[10px] uppercase mb-2">{session.tag}</p>
-                <div className="flex justify-between items-center">
-                  <h3 className="font-bebas text-5xl text-white tracking-widest leading-none">{session.time}</h3>
-                  <Clock className="text-white/20 group-hover:text-[#dbb462] transition-colors" size={32} />
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════
+          SCRIM SESSIONS
+          ══════════════════════════════════════ */}
+      <section className="border-b border-white/[0.07] relative z-10">
+        <div className="container mx-auto max-w-7xl px-6 lg:px-16 py-20 lg:py-24">
+          <SectionHeader label="Scrim Sessions" />
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-[1px] bg-white/[0.07]">
+            {SESSIONS.map((s, i) => (
+              <div
+                key={s.id}
+                className="bg-[#111] p-8 lg:p-10 relative group overflow-hidden hover:bg-[#161616] transition-colors"
+              >
+                {/* Slide-in top accent */}
+                <div className="absolute top-0 left-0 right-0 h-[2px] zenith-gradient scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
+
+                {/* Watermark index */}
+                <span className="absolute -bottom-5 -right-2 font-bebas text-[8rem] text-white/[0.04] leading-none pointer-events-none select-none">
+                  0{i + 1}
+                </span>
+
+                <div className="relative z-10">
+                  <div className="flex items-center justify-between mb-8">
+                    <span className="font-teko text-[11px] tracking-[0.3em] text-[#d1c5b3] opacity-55 uppercase">
+                      {s.tag}
+                    </span>
+                    <Clock
+                      size={15}
+                      className="text-white/25 group-hover:text-[#dbb462]/70 transition-colors"
+                    />
+                  </div>
+
+                  <div className="mb-8">
+                    <span className="font-teko text-[11px] tracking-[0.25em] text-[#d1c5b3] opacity-45 uppercase block mb-1">
+                      {s.name}
+                    </span>
+                    <div className="flex items-baseline gap-2">
+                      <span className="font-bebas text-[4.25rem] text-[#f2f2f2] leading-none">
+                        {s.time}
+                      </span>
+                      <span className="font-teko text-xl text-white/50 tracking-widest">
+                        {s.ampm}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="border-t border-white/[0.08] pt-6 space-y-2.5">
+                    {s.maps.map((map, mi) => (
+                      <div key={mi} className="flex items-center gap-4">
+                        <span className="font-teko text-[10px] tracking-[0.25em] text-[#d1c5b3] opacity-45 uppercase w-10">
+                          M{mi + 1}
+                        </span>
+                        <span className="font-bebas text-[1.2rem] text-[#f2f2f2] tracking-widest">
+                          {map}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             ))}
           </div>
         </div>
+      </section>
 
-        {/* 2. Map Rotation Block */}
-        <div className="mb-20">
-          <div className="flex items-center gap-4 mb-8">
-            <div className="h-[2px] w-12 bg-[#dbb462]" />
-            <h2 className="font-agency font-bold text-3xl text-white tracking-[0.2em] uppercase">MAP ROTATION</h2>
-          </div>
+      {/* ══════════════════════════════════════
+          MAP ROTATION + PRIZE POOL
+          ══════════════════════════════════════ */}
+      <section className="border-b border-white/[0.07] relative z-10">
+        <div className="container mx-auto max-w-7xl px-6 lg:px-16 py-20 lg:py-24">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24">
 
-          <div className="bg-[#111] border border-white/5 relative overflow-hidden min-h-[400px] flex flex-col lg:flex-row">
-            {/* Visual Side Block */}
-            <div className="lg:w-1/2 relative min-h-[250px] lg:min-h-full">
-              <img 
-                src="/image-4.png" 
-                alt="Map Rotation" 
-                className="absolute inset-0 w-full h-full object-cover grayscale-[40%] group-hover:grayscale-0 transition-all duration-1000"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-[#111]/80 via-transparent to-[#111]" />
-              <div className="absolute bottom-0 left-0 p-8">
-                <div className="px-4 py-1 bg-[#dbb462] text-black font-agency font-bold text-xs tracking-widest inline-block mb-2">
-                  MAP ROTATION
-                </div>
-                <p className="text-white/40 font-body text-xs italic">Current map rotation according to the standards of PUBG Mobile Official Esports.</p>
-              </div>
-            </div>
+            {/* Map Rotation */}
+            <div>
+              <SectionHeader label="Map Rotation" />
 
-            {/* List Block */}
-            <div className="flex-1 p-8 lg:p-12 bg-[#0d0d0d] relative">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {['Erangel', 'Miramar', 'Erangel', 'Rondo'].map((map, idx) => (
-                  <div key={idx} className="group/map p-6 bg-white/[0.02] border border-white/5 hover:border-[#dbb462]/30 transition-all relative overflow-hidden">
-                    <div className="relative z-10 flex flex-col justify-between h-full">
-                      <div className="flex items-center gap-2 mb-4">
-                        <span className="w-1.5 h-1.5 bg-[#dbb462] rounded-full" />
-                        <span className="font-agency text-[11px] text-white/50 tracking-[0.3em]">MATCH 0{idx + 1}</span>
-                      </div>
-                      <h4 className="font-bebas text-3xl text-white tracking-widest uppercase group-hover/map:text-[#dbb462] transition-colors">{map}</h4>
-                    </div>
-                    {/* Tactical ID watermark */}
-                    <span className="absolute -bottom-2 -right-2 font-bebas text-5xl text-white/[0.02] pointer-events-none group-hover/map:text-[#dbb462]/5 transition-colors">
-                      0{idx + 1}
+              <div className="grid grid-cols-2 gap-[1px] bg-white/[0.07]">
+                {MAPS.map((map, idx) => (
+                  <div
+                    key={idx}
+                    className="bg-[#111] px-7 py-8 group relative overflow-hidden hover:bg-[#161616] transition-colors"
+                  >
+                    <div className="absolute top-0 left-0 right-0 h-[1px] zenith-gradient scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
+                    <span className="font-teko text-[10px] tracking-[0.25em] text-[#d1c5b3] opacity-45 uppercase block mb-3">
+                      MATCH 0{idx + 1}
+                    </span>
+                    <span className="font-bebas text-3xl text-[#f2f2f2] tracking-wider block">
+                      {map}
+                    </span>
+                    <span className="absolute -bottom-4 -right-1 font-bebas text-[5rem] text-white/[0.04] leading-none pointer-events-none select-none">
+                      {idx + 1}
                     </span>
                   </div>
                 ))}
               </div>
-              <div className="mt-10 pt-8 border-t border-white/5">
-                <p className="font-agency text-[10px] text-[#dbb462] tracking-[0.4em] uppercase font-bold opacity-40">
-                  Matches follow standard lobby timing protocols
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
 
-        {/* Bottom Grid: Prizes & Contact */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          
-          {/* Prize Distribution */}
-          <div className="space-y-8">
-            <div className="flex items-center gap-4">
-              <div className="h-[2px] w-12 bg-[#dbb462]" />
-              <h2 className="font-agency font-bold text-3xl text-white tracking-[0.2em] uppercase">PRIZE POOL</h2>
-            </div>
-            <div className="grid grid-cols-1 gap-4">
-              {PRIZE_DISTRIBUTION.map((p, idx) => (
-                <div key={idx} className="flex justify-between items-center p-5 bg-[#111] border border-white/5 relative group hover:bg-[#1a1a1a] transition-all">
-                  <div className="flex items-center gap-6">
-                    <div className="w-10 h-10 flex items-center justify-center bg-[#dbb462]/10 border border-[#dbb462]/20 text-[#dbb462]">
-                      {p.icon === 'chicken' ? <ChickenIcon size={20} /> : <Trophy size={18} />}
-                    </div>
-                    <div>
-                      <p className="font-agency text-[11px] text-white/50 tracking-[0.2em] uppercase mb-0.5">{p.sub}</p>
-                      <h4 className="font-bebas text-2xl text-white tracking-widest uppercase">{p.rank}</h4>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <span className="font-bebas text-3xl zenith-gradient-text tracking-wider">{p.amount}</span>
-                  </div>
-                  <div className="absolute bottom-0 left-0 h-[1px] w-0 bg-[#dbb462] group-hover:w-full transition-all duration-500" />
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Book Slots / Contact */}
-          <div className="space-y-8">
-            <div className="flex items-center gap-4">
-              <div className="h-[2px] w-12 bg-[#dbb462]" />
-              <h2 className="font-agency font-bold text-3xl text-white tracking-[0.2em] uppercase">BOOK SLOTS</h2>
-            </div>
-            
-            <div className="bg-[#111] border border-white/5 p-8 relative overflow-hidden group/box">
-              {/* Decorative side accent */}
-              <div className="absolute top-0 left-0 w-1 h-full bg-[#dbb462] opacity-50" />
-              
-              <div className="flex items-center gap-4 mb-6">
-                 <div className="w-10 h-10 rounded-full bg-[#dbb462]/10 border border-[#dbb462]/20 flex items-center justify-center">
-                    <MessageCircle className="text-[#dbb462]" size={20} />
-                 </div>
-                 <span className="font-agency text-[12px] tracking-[0.4em] text-[#dbb462] uppercase font-bold">Official Protocol</span>
-              </div>
-
-              <p className="font-body text-[#d1c5b3] text-lg opacity-80 leading-relaxed mb-10 italic">
-                Secure your squad's presence. Contact our official admins directly on WhatsApp to verify slot availability and complete your registration.
+              <p className="font-teko text-[11px] tracking-[0.2em] text-[#d1c5b3] opacity-40 uppercase mt-5">
+                Follows PUBG Mobile Official Esports rotation standards
               </p>
-              
-              <div className="grid grid-cols-1 gap-4">
-                {ADMINS.map((admin, idx) => (
-                  <a 
+            </div>
+
+            {/* Prize Distribution */}
+            <div>
+              <SectionHeader label="Prize Pool" />
+
+              <div className="flex flex-col gap-[1px] bg-white/[0.07]">
+                {PRIZE_DISTRIBUTION.map((p, idx) => (
+                  <div
                     key={idx}
-                    href={`https://wa.me/${admin.phone}?text=Hi,%20I%20want%20to%20book%20a%20slot%20for%20Daily%20Scrims.`}
-                    target="_blank" rel="noreferrer"
-                    className="group flex items-center justify-between p-6 bg-[#0e0e0e] border border-white/5 hover:border-[#dbb462] transition-all duration-500 relative overflow-hidden"
+                    className="bg-[#111] flex items-center justify-between px-7 py-5 group relative overflow-hidden hover:bg-[#161616] transition-colors"
                   >
-                    <div className="relative z-10">
-                      <div className="flex items-center gap-3 mb-1">
-                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
-                        <p className="font-agency text-[11px] text-white/50 group-hover:text-[#dbb462] tracking-widest uppercase transition-colors">Admin {idx + 1}</p>
+                    <div className="absolute bottom-0 left-0 h-[1px] w-0 zenith-gradient group-hover:w-full transition-all duration-500" />
+
+                    <div className="flex items-center gap-5">
+                      <span className="font-teko text-[11px] tracking-[0.2em] text-[#d1c5b3] opacity-40 uppercase w-6">
+                        {String(idx + 1).padStart(2, '0')}
+                      </span>
+                      <div>
+                        <span className="font-teko text-[10px] tracking-[0.2em] text-[#d1c5b3] opacity-45 uppercase block">
+                          {p.label}
+                        </span>
+                        <span className="font-bebas text-[1.6rem] text-[#f2f2f2] tracking-widest leading-tight">
+                          {p.rank}
+                        </span>
                       </div>
-                      <p className="font-bebas text-3xl text-white tracking-widest">{admin.phone}</p>
                     </div>
 
-                    <div className="relative z-10 flex flex-col items-end">
-                      <span className="font-agency text-[10px] text-[#dbb462] tracking-[0.2em] uppercase mb-1 opacity-0 group-hover:opacity-100 transition-opacity translate-x-4 group-hover:translate-x-0 transition-transform">Click to message →</span>
-                      <div className="w-14 h-14 flex items-center justify-center bg-white/5 rounded-sm border border-white/5 group-hover:bg-[#dbb462] group-hover:border-[#dbb462] transition-all duration-500">
-                        <MessageCircle className="text-[#dbb462] group-hover:text-black transition-colors" size={28} />
-                      </div>
-                    </div>
-
-                    {/* Subtle background glow on hover */}
-                    <div className="absolute inset-0 bg-[#dbb462]/[0.02] opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </a>
+                    <span
+                      className={`font-bebas text-2xl tracking-wider ${
+                        idx === 0 ? 'zenith-gradient-text' : 'text-[#f2f2f2]'
+                      }`}
+                    >
+                      {p.amount}
+                    </span>
+                  </div>
                 ))}
               </div>
+            </div>
 
-              <div className="mt-8 p-4 bg-[#dbb462]/5 border border-[#dbb462]/10 flex items-center gap-4">
-                <div className="w-2 h-2 rounded-full bg-[#dbb462] animate-pulse" />
-                <p className="font-agency text-[11px] tracking-[0.2em] text-[#dbb462] uppercase">Support active 24/7 for booking verification</p>
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════
+          BOOK A SLOT
+          ══════════════════════════════════════ */}
+      <section className="relative z-10">
+        <div className="container mx-auto max-w-7xl px-6 lg:px-16 py-20 lg:py-24">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-14 items-start">
+
+            {/* Left copy */}
+            <div className="lg:col-span-4">
+              <SectionHeader label="Book a Slot" />
+              <p className="font-teko text-[18px] text-[#d1c5b3] opacity-60 tracking-[0.07em] leading-relaxed uppercase max-w-xs">
+                Contact our official admins on WhatsApp to check availability and secure your squad's slot.
+              </p>
+              <div className="mt-8 flex items-center gap-3 px-5 py-4 bg-[#111] border border-white/[0.07]">
+                <div className="w-2 h-2 bg-emerald-400 flex-shrink-0 animate-pulse" />
+                <span className="font-teko text-[11px] tracking-[0.22em] text-[#d1c5b3] opacity-55 uppercase">
+                  Available daily · 12 PM – 2 AM PKT
+                </span>
               </div>
             </div>
-          </div>
 
+            {/* Admin contact stack */}
+            <div className="lg:col-span-8 flex flex-col gap-[1px] bg-white/[0.07]">
+              {ADMINS.map((admin, idx) => (
+                <a
+                  key={idx}
+                  href={`https://wa.me/${admin.wa}?text=Hi%2C%20I%20want%20to%20book%20a%20slot%20for%20Daily%20Scrims.`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="group bg-[#111] flex items-center justify-between px-8 py-7 hover:bg-[#161616] transition-colors relative overflow-hidden"
+                >
+                  {/* Slide-in top line */}
+                  <div className="absolute top-0 left-0 right-0 h-[2px] zenith-gradient scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
+
+                  <div>
+                    <span className="font-teko text-[10px] tracking-[0.3em] text-[#d1c5b3] opacity-50 uppercase block mb-1">
+                      {admin.name}
+                    </span>
+                    <span className="font-bebas text-[2.25rem] text-[#f2f2f2] tracking-widest leading-none">
+                      {admin.phone}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-4">
+                    <span className="font-teko text-[11px] tracking-[0.2em] text-[#dbb462] uppercase opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 transition-all duration-300">
+                      MESSAGE →
+                    </span>
+                    <div className="w-11 h-11 flex items-center justify-center border border-white/[0.08] group-hover:border-[#dbb462]/40 group-hover:bg-[#dbb462]/10 transition-all">
+                      <MessageCircle
+                        size={18}
+                        className="text-white/40 group-hover:text-[#dbb462] transition-colors"
+                      />
+                    </div>
+                  </div>
+                </a>
+              ))}
+            </div>
+
+          </div>
         </div>
-      </div>
+      </section>
+
+    </div>
+  );
+}
+
+/* ── Shared section header ── */
+function SectionHeader({ label }) {
+  return (
+    <div className="flex items-center gap-4 mb-10">
+      <div className="w-8 h-[2px] bg-[#dbb462]" />
+      <h2 className="font-bebas text-[2.25rem] text-[#f2f2f2] tracking-[0.12em] uppercase leading-none">
+        {label}
+      </h2>
     </div>
   );
 }

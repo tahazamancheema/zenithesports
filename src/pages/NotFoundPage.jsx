@@ -5,7 +5,7 @@ export default function NotFoundPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#131313] px-6">
       <div className="text-center animate-page-enter">
-        <span className="font-stretch text-[#f9d07a] text-[10px] tracking-[0.4em] block mb-4">ERROR 404</span>
+        <span className="font-teko text-[#f9d07a] text-[10px] tracking-[0.4em] block mb-4">ERROR 404</span>
         <h1 className="font-bebas text-[20vw] md:text-[15vw] font-black italic tracking-tighter leading-tight pb-2 text-[#e2e2e2] mb-4">
           404
         </h1>
@@ -17,7 +17,7 @@ export default function NotFoundPage() {
         </p>
         <Link
           to="/"
-          className="zenith-gradient text-[#402d00] font-stretch text-xs px-10 py-5 tracking-widest hover:brightness-110 active:scale-95 transition-all inline-block"
+          className="zenith-gradient text-[#402d00] font-teko text-xs px-10 py-5 tracking-widest hover:brightness-110 active:scale-95 transition-all inline-block"
         >
           RETURN TO BASE
         </Link>

@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ShieldAlert, Users, ChevronLeft, Save, Camera, MessageCircle } from 'lucide-react';
+import { Users, ChevronLeft, Camera, MessageCircle } from 'lucide-react';
 import { useTournaments } from '../hooks/useTournaments';
 import { useRegistration } from '../hooks/useRegistration';
 import { useAuth } from '../hooks/useAuth';
 import { useTournamentCountdown } from '../hooks/useTournamentCountdown';
 import { uploadFile } from '../utils/storage';
 import GhostInput from '../components/ui/GhostInput';
-import GradientButton from '../components/ui/GradientButton';
 import toast from 'react-hot-toast';
 
 export default function RegistrationPage() {
@@ -284,50 +283,52 @@ export default function RegistrationPage() {
   };
 
   if (tLoading || aLoading) {
-    return <div className="min-h-screen bg-[#131313] flex items-center justify-center text-[#d1c5b3] font-stretch tracking-widest text-[10px]">VERIFYING ACCOUNT...</div>;
+    return (
+      <div className="min-h-screen bg-[#0a0a0a] flex flex-col items-center justify-center gap-3">
+        <div className="w-12 h-[2px] bg-[#dbb462] animate-pulse" />
+        <span className="font-bebas text-3xl text-[#dbb462] tracking-widest uppercase">Verifying Account</span>
+        <div className="w-12 h-[2px] bg-[#dbb462] animate-pulse" />
+      </div>
+    );
   }
   if (!tournament) return null;
 
   if (phase === 'closed') {
     return (
-      <div className="min-h-screen bg-[#131313] pt-28 pb-20 px-6 md:px-12 flex items-center justify-center animate-page-enter">
-        <div className="max-w-xl w-full space-y-8 text-center">
-          <div className="bg-[#111] border border-[#dbb462]/20 p-10 md:p-16 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-[#dbb462]/5 blur-3xl pointer-events-none" />
-            
-            <div className="flex flex-col items-center gap-6 mb-10">
-              <div className="w-16 h-16 bg-[#dbb462]/10 rounded-full flex items-center justify-center border border-[#dbb462]/20">
-                <MessageCircle size={32} className="text-[#dbb462]" />
+      <div className="min-h-screen bg-[#0a0a0a] pt-28 pb-20 px-6 md:px-12 flex items-center justify-center animate-page-enter">
+        <div className="max-w-xl w-full space-y-6 text-center">
+          <div className="bg-[#0e0e0e] border border-white/[0.06] p-12 relative overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-[2px] zenith-gradient" />
+            <div className="absolute top-0 right-0 w-48 h-48 bg-[#dbb462]/[0.04] blur-[80px] pointer-events-none" />
+            <div className="flex flex-col items-center gap-5 mb-8 relative z-10">
+              <div className="w-14 h-14 bg-[#dbb462]/10 border border-[#dbb462]/20 flex items-center justify-center">
+                <MessageCircle size={26} className="text-[#dbb462]" />
               </div>
-              <h1 className="font-bebas text-6xl text-white uppercase tracking-tight">REGISTRATION CLOSED</h1>
+              <h1 className="font-bebas text-5xl text-white uppercase tracking-tight">REGISTRATION CLOSED</h1>
             </div>
-
-            <p className="font-body text-[#d1c5b3] text-lg leading-relaxed opacity-60 mb-12">
-              Registrations for this tournament have closed. If you have any issues or require assistance, contact our support team.
+            <p className="font-teko text-[17px] text-[#d1c5b3] opacity-45 leading-relaxed mb-10 uppercase tracking-wider relative z-10">
+              Registrations for this tournament have closed. Contact our support team for any queries.
             </p>
-
-            <a 
-              href="https://wa.me/923390715753" 
-              target="_blank" 
+            <a
+              href="https://wa.me/923390715753"
+              target="_blank"
               rel="noreferrer"
-              className="flex flex-col gap-2 w-full bg-[#1a1a1a] border border-white/5 px-6 py-5 group hover:border-[#dbb462]/40 transition-all text-left"
+              className="flex items-center justify-between w-full bg-[#0a0a0a] border border-white/[0.06] px-7 py-5 group hover:border-[#dbb462]/30 transition-all relative z-10"
             >
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 rounded-full bg-[#dbb462] animate-pulse" />
-                <span className="font-teko text-[14px] tracking-[0.2em] text-[#d1c5b3] opacity-60 uppercase">Support Team</span>
-              </div>
-              <div className="flex items-center justify-between">
+              <div className="text-left">
+                <span className="font-teko text-[11px] tracking-[0.3em] text-[#d1c5b3] opacity-30 uppercase block mb-1">Support Team</span>
                 <span className="font-bebas text-2xl text-white uppercase tracking-wider">WhatsApp Support</span>
-                <span className="font-teko text-[18px] tracking-[0.2em] text-[#dbb462] uppercase group-hover:translate-x-1 transition-transform">Join →</span>
               </div>
+              <span className="font-teko text-[13px] tracking-[0.2em] text-[#dbb462] uppercase group-hover:translate-x-1 transition-transform">
+                Contact →
+              </span>
             </a>
           </div>
-
-          <button 
+          <button
             onClick={() => navigate(`/tournaments/${tournamentId}`)}
-            className="font-teko text-[18px] tracking-[0.2em] text-[#dbb462] uppercase hover:underline"
+            className="font-teko text-[16px] tracking-[0.25em] text-[#dbb462] opacity-50 hover:opacity-100 uppercase transition-opacity"
           >
-            Return to Tournament Details
+            ← Return to Tournament Details
           </button>
         </div>
       </div>
@@ -335,238 +336,203 @@ export default function RegistrationPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#131313] pt-28 pb-20 px-6 md:px-12 animate-page-enter">
-      <div className="max-w-4xl mx-auto space-y-8">
-        
-        <button onClick={() => navigate('/tournaments')} className="flex items-center gap-2 text-[#d1c5b3] opacity-60 hover:opacity-100 hover:text-[#dbb462] transition-colors font-teko text-[16px] tracking-widest uppercase">
-          <ChevronLeft size={16} /> Cancel Registration
-        </button>
+    <div className="min-h-screen bg-[#0a0a0a] overflow-x-hidden animate-page-enter">
 
-        <div className="border-b border-white/5 pb-6 mb-10">
-          <span className="font-teko text-[18px] tracking-[0.2em] text-[#dbb462] block mb-2 uppercase">Team Registration</span>
-          <h1 className="font-bebas text-5xl md:text-7xl tracking-tight text-[#f2f2f2] uppercase">
+      {/* ── Page Header ── */}
+      <div className="border-b border-white/[0.05] relative overflow-hidden">
+        <div className="absolute top-0 left-1/4 w-[600px] h-[300px] bg-[#dbb462]/[0.04] blur-[120px] pointer-events-none" />
+        <div className="max-w-4xl mx-auto px-6 md:px-12 pt-32 pb-10 relative z-10">
+          <button
+            onClick={() => navigate('/tournaments')}
+            className="flex items-center gap-2 text-[#d1c5b3] opacity-40 hover:opacity-100 hover:text-[#dbb462] transition-all font-teko text-[14px] tracking-[0.25em] uppercase mb-10"
+          >
+            <ChevronLeft size={14} /> Cancel Registration
+          </button>
+          <div className="flex items-center gap-3 mb-5">
+            <div className="w-8 h-[2px] bg-[#dbb462]" />
+            <span className="font-teko text-[13px] tracking-[0.3em] text-[#dbb462] uppercase">Team Registration</span>
+          </div>
+          <h1 className="font-bebas text-5xl md:text-7xl lg:text-8xl tracking-tight text-[#f2f2f2] uppercase leading-[0.85]">
             {tournament.title}
           </h1>
-          <p className="text-[#d1c5b3] opacity-40 mt-2 font-body text-lg max-w-2xl">{tournament.description}</p>
+          {tournament.description && (
+            <p className="font-teko text-[16px] text-[#d1c5b3] opacity-40 mt-4 uppercase tracking-wider max-w-2xl">
+              {tournament.description}
+            </p>
+          )}
         </div>
+      </div>
 
+      <div className="max-w-4xl mx-auto px-6 md:px-12 py-12 space-y-6">
+
+        {/* Autofill Banner */}
         {userDoc && (userDoc.team_name || userDoc.whatsapp_number) && (
-          <div className="bg-[#dbb462]/10 border border-[#dbb462]/30 p-6 flex flex-col md:flex-row items-center justify-between gap-6 mb-12 animate-in fade-in slide-in-from-top-4">
-            <div className="flex items-center gap-4">
-              <div className="bg-[#dbb462] p-3 text-[#402d00] rounded-sm">
-                <Users size={20} />
+          <div className="bg-[#dbb462]/[0.06] border border-[#dbb462]/25 relative overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-[1px] zenith-gradient" />
+            <div className="flex flex-col md:flex-row items-center justify-between gap-5 p-6">
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 bg-[#dbb462]/15 border border-[#dbb462]/25 flex items-center justify-center flex-shrink-0">
+                  <Users size={18} className="text-[#dbb462]" />
+                </div>
+                <div>
+                  <p className="font-bebas text-xl text-white tracking-wider uppercase">Profile Data Detected</p>
+                  <p className="font-teko text-[13px] tracking-[0.15em] text-[#d1c5b3] opacity-50 uppercase">
+                    Import your saved player details?
+                  </p>
+                </div>
               </div>
-              <div className="text-left">
-                <p className="font-bebas text-2xl text-white">PROFILE DATA DETECTED</p>
-                <p className="font-teko text-[14px] tracking-[0.1em] text-[#d1c5b3] opacity-60 uppercase">
-                  Would you like to import details from your player profile?
-                </p>
-              </div>
+              <button
+                type="button"
+                onClick={handleAutoFill}
+                className="w-full md:w-auto btn-obsidian-primary font-bebas text-[18px] tracking-[0.15em] px-8 py-3 uppercase"
+              >
+                Fill From Profile
+              </button>
             </div>
-            <button 
-              type="button"
-              onClick={handleAutoFill}
-              className="w-full md:w-auto bg-[#dbb462] text-[#402d00] font-bebas text-xl tracking-widest px-8 py-3 hover:brightness-110 active:scale-95 transition-all uppercase"
-            >
-              Fill From Profile
-            </button>
           </div>
         )}
 
-        <form onSubmit={handleRegisterSub} className="space-y-12">
-          {/* Section 1: Team Information */}
-          <div className="bg-[#111] border border-white/5 p-8">
-            <h2 className="font-bebas text-3xl text-white mb-6 flex items-center gap-3">
-              <ShieldAlert className="text-[#dbb462]" size={24} /> 1 - TEAM INFORMATION
-            </h2>
-            
+        <form onSubmit={handleRegisterSub} className="space-y-[1px] bg-white/[0.04]">
+
+          {/* ── Section 1: Team Information ── */}
+          <FormSection number="01" title="Team Information">
             <div className="flex gap-6 items-center mb-8">
-              <div className="w-24 h-24 bg-[#131313] border border-[rgba(78,70,56,0.2)] flex-shrink-0 flex items-center justify-center rounded-full overflow-hidden object-cover">
+              <div className="w-20 h-20 bg-[#0a0a0a] border border-white/[0.08] flex-shrink-0 flex items-center justify-center overflow-hidden">
                 {file ? (
                   <img src={URL.createObjectURL(file)} alt="Logo Preview" className="w-full h-full object-cover" />
                 ) : (
-                  <Users className="text-[#d1c5b3] opacity-20" size={32} />
+                  <Users className="text-[#d1c5b3] opacity-15" size={28} />
                 )}
               </div>
               <div className="flex-1">
-                <label className="font-teko text-[16px] tracking-widest text-[#d1c5b3] uppercase block mb-3 opacity-60">
-                  Team Logo (Optional) {fieldErrors.team_logo && <span className="text-red-400 ml-2 italic">— {fieldErrors.team_logo}</span>}
+                <label className="font-teko text-[13px] tracking-[0.25em] text-[#d1c5b3] uppercase block mb-3 opacity-45">
+                  Team Logo (Optional){fieldErrors.team_logo && <span className="text-red-400 ml-2">— {fieldErrors.team_logo}</span>}
                 </label>
-                <input 
-                  type="file" 
+                <input
+                  type="file"
                   accept="image/*"
-                  onChange={(e) => {
-                    setFile(e.target.files[0]);
-                    clearFieldError('team_logo');
-                  }}
-                  className={`w-full text-[14px] text-[#d1c5b3] file:mr-4 file:py-2 file:px-6 file:border-0 file:bg-[#1f1f1f] file:text-[#dbb462] file:font-teko file:text-[16px] file:cursor-pointer hover:file:bg-[#2a2a2a] file:uppercase file:tracking-widest ${fieldErrors.team_logo ? 'outline outline-1 outline-red-400' : ''}`}
+                  onChange={(e) => { setFile(e.target.files[0]); clearFieldError('team_logo'); }}
+                  className="w-full text-[13px] text-[#d1c5b3] file:mr-4 file:py-2 file:px-6 file:border-0 file:bg-[#1a1a1a] file:text-[#dbb462] file:font-teko file:text-[14px] file:cursor-pointer hover:file:bg-[#222] file:uppercase file:tracking-widest"
                 />
               </div>
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <GhostInput 
-                label="Team Name" 
-                value={form.team_name} 
-                onChange={e => {
-                  setForm(f => ({ ...f, team_name: e.target.value }));
-                  clearFieldError('team_name');
-                }} 
-                required 
-                placeholder="Enter full team name" 
-                error={fieldErrors.team_name}
-              />
-              <GhostInput 
-                label="Captain Real Name" 
-                value={form.real_name} 
-                onChange={e => {
-                  setForm(f => ({ ...f, real_name: e.target.value }));
-                  clearFieldError('real_name');
-                }} 
-                required 
-                placeholder="Enter Captain's full name" 
-                error={fieldErrors.real_name}
-              />
-              <GhostInput 
-                label="Captain's WhatsApp Number" 
-                value={form.whatsapp_number} 
-                onChange={e => {
-                  setForm(f => ({ ...f, whatsapp_number: e.target.value }));
-                  clearFieldError('whatsapp_number');
-                }} 
-                required 
-                placeholder="03XX XXXXXXX (11 Digits)" 
-                error={fieldErrors.whatsapp_number}
-              />
-              <GhostInput 
-                label="Captain's Discord" 
-                value={form.captain_discord} 
-                onChange={e => {
-                  setForm(f => ({ ...f, captain_discord: e.target.value }));
-                  clearFieldError('captain_discord');
-                }} 
-                required 
-                placeholder="Discord Username" 
-                error={fieldErrors.captain_discord}
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <GhostInput label="Team Name" value={form.team_name} onChange={e => { setForm(f => ({ ...f, team_name: e.target.value })); clearFieldError('team_name'); }} required placeholder="Enter full team name" error={fieldErrors.team_name} />
+              <GhostInput label="Captain Real Name" value={form.real_name} onChange={e => { setForm(f => ({ ...f, real_name: e.target.value })); clearFieldError('real_name'); }} required placeholder="Captain's full name" error={fieldErrors.real_name} />
+              <GhostInput label="Captain's WhatsApp" value={form.whatsapp_number} onChange={e => { setForm(f => ({ ...f, whatsapp_number: e.target.value })); clearFieldError('whatsapp_number'); }} required placeholder="03XX XXXXXXX (11 digits)" error={fieldErrors.whatsapp_number} />
+              <GhostInput label="Captain's Discord" value={form.captain_discord} onChange={e => { setForm(f => ({ ...f, captain_discord: e.target.value })); clearFieldError('captain_discord'); }} required placeholder="Discord Username" error={fieldErrors.captain_discord} />
             </div>
-          </div>
+          </FormSection>
 
-          {/* Section 2: Player Information */}
-          <div className="bg-[#111] border border-white/5 p-8">
-            <h2 className="font-bebas text-3xl text-white mb-2">2 - PLAYER INFORMATION</h2>
-            <p className="font-teko text-[16px] tracking-widest text-[#d1c5b3] opacity-40 uppercase mb-8">
-              Minimum 4 players required. Character IDs must be exactly 10-14 digits.
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
+          {/* ── Section 2: Player Roster ── */}
+          <FormSection number="02" title="Player Roster" hint="Min 4 required · Player 5–6 optional · IDs must be 10–14 digits">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               {[1, 2, 3, 4, 5, 6].map(num => (
-                <div key={num} className="space-y-4 bg-[#131313] p-5 border border-white/5 relative">
-                  <span className="absolute -top-3 -left-3 bg-[#dbb462] text-[#131313] w-6 h-6 flex items-center justify-center font-bebas text-lg">
-                    {num}
-                  </span>
-                  <div className="font-bebas text-xl text-white tracking-widest">
-                    Player {num} {num <= 4 ? '*' : '(Optional)'}
+                <div key={num} className="bg-[#0a0a0a] border border-white/[0.05] p-5 relative group hover:border-white/[0.1] transition-colors">
+                  {/* Player number badge */}
+                  <div className="flex items-center gap-3 mb-4">
+                    <span className="font-bebas text-2xl text-[#dbb462] opacity-30 leading-none">{String(num).padStart(2, '0')}</span>
+                    <span className="font-teko text-[12px] tracking-[0.25em] text-[#d1c5b3] opacity-40 uppercase">
+                      Player {num} {num > 4 && '· Optional'}
+                    </span>
                   </div>
-                  <div className="grid grid-cols-1 gap-4">
-                    <GhostInput 
-                      label={`Player ${num} IGN${num <= 4 ? '' : ''}`}
-                      value={form[`player_${num}_ign`]} 
-                      onChange={e => {
-                        setForm(f => ({ ...f, [`player_${num}_ign`]: e.target.value }));
-                        clearFieldError(`player_${num}_ign`);
-                      }} 
-                      required={num <= 4} 
-                      placeholder="In-Game Name" 
+                  <div className="space-y-4">
+                    <GhostInput
+                      label="In-Game Name"
+                      value={form[`player_${num}_ign`]}
+                      onChange={e => { setForm(f => ({ ...f, [`player_${num}_ign`]: e.target.value })); clearFieldError(`player_${num}_ign`); }}
+                      required={num <= 4}
+                      placeholder="IGN"
                       error={fieldErrors[`player_${num}_ign`]}
                     />
-                    <GhostInput 
-                      label={`Player ${num} Character ID${num <= 4 ? '' : ''}`}
-                      value={form[`player_${num}_id`]} 
-                      onChange={e => {
-                        setForm(f => ({ ...f, [`player_${num}_id`]: e.target.value }));
-                        clearFieldError(`player_${num}_id`);
-                      }} 
-                      required={num <= 4} 
-                      placeholder="5XXXXXXXXX" 
+                    <GhostInput
+                      label="Character ID"
+                      value={form[`player_${num}_id`]}
+                      onChange={e => { setForm(f => ({ ...f, [`player_${num}_id`]: e.target.value })); clearFieldError(`player_${num}_id`); }}
+                      required={num <= 4}
+                      placeholder="10–14 digit ID"
                       error={fieldErrors[`player_${num}_id`]}
                     />
                   </div>
                 </div>
               ))}
             </div>
-          </div>
+          </FormSection>
 
-          {/* Verification Screenshots Section */}
+          {/* ── Section 3: Proof Screenshots ── */}
           {tournament.registration_config?.screenshots?.length > 0 && (
-            <div className="bg-[#111] border border-white/5 p-8">
-              <h2 className="font-bebas text-3xl text-white mb-2 flex items-center gap-3">
-                <Camera className="text-[#dbb462]" size={24} /> 3 - REQUIRED PROOF
-              </h2>
-              <p className="font-teko text-[16px] tracking-widest text-[#d1c5b3] opacity-40 uppercase mb-8">
-                Upload the following required documents to proceed.
-              </p>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <FormSection number="03" title="Required Proof" hint="Upload the documents listed below">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 {tournament.registration_config.screenshots.map((ss, idx) => (
                   <div key={idx} className="space-y-3">
-                    <label className="font-teko text-[16px] tracking-widest text-[#d1c5b3] uppercase block opacity-60">
+                    <label className="font-teko text-[13px] tracking-[0.25em] text-[#d1c5b3] uppercase block opacity-45">
                       {ss.label} {ss.required && <span className="text-[#dbb462]">*</span>}
                     </label>
-                    <div className="relative group min-h-[140px] bg-[#131313] border border-[rgba(78,70,56,0.2)] hover:border-[#dbb462]/30 transition-colors flex flex-col items-center justify-center p-4">
+                    <div className="relative group min-h-[130px] bg-[#0a0a0a] border border-white/[0.06] hover:border-[#dbb462]/25 transition-colors flex flex-col items-center justify-center p-4">
                       {screenshotFiles[idx] ? (
-                        <div className="relative w-full h-full flex flex-col items-center">
-                           <img src={URL.createObjectURL(screenshotFiles[idx])} alt="Proof" className="h-20 w-auto object-contain mb-2" />
-                           <span className="text-[14px] text-[#dbb462] font-bebas tracking-widest uppercase truncate max-w-full">{screenshotFiles[idx].name}</span>
-                           <button 
-                             type="button" 
-                             onClick={() => {
-                               const next = [...screenshotFiles];
-                               next[idx] = null;
-                               setScreenshotFiles(next);
-                             }}
-                             className="absolute top-0 right-0 text-red-400 opacity-40 hover:opacity-100 p-1 font-bebas text-sm"
-                           >
-                             REMOVE
-                           </button>
+                        <div className="relative w-full flex flex-col items-center gap-2">
+                          <img src={URL.createObjectURL(screenshotFiles[idx])} alt="Proof" className="h-16 w-auto object-contain" />
+                          <span className="font-teko text-[13px] text-[#dbb462] tracking-widest uppercase truncate max-w-full">
+                            {screenshotFiles[idx].name}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => { const next = [...screenshotFiles]; next[idx] = null; setScreenshotFiles(next); }}
+                            className="font-teko text-[11px] tracking-[0.2em] text-red-400 opacity-50 hover:opacity-100 uppercase transition-opacity"
+                          >
+                            Remove
+                          </button>
                         </div>
                       ) : (
                         <>
-                          <Camera size={24} className="text-[#d1c5b3] opacity-20 mb-2 group-hover:text-[#dbb462] transition-colors" />
-                          <span className="text-[14px] text-[#d1c5b3] opacity-30 group-hover:opacity-60 transition-opacity uppercase tracking-widest font-teko">Select Image</span>
+                          <Camera size={20} className="text-[#d1c5b3] opacity-15 mb-2 group-hover:text-[#dbb462] group-hover:opacity-60 transition-all" />
+                          <span className="font-teko text-[12px] tracking-[0.25em] text-[#d1c5b3] opacity-25 group-hover:opacity-50 uppercase transition-opacity">
+                            Select Image
+                          </span>
                         </>
                       )}
-                      <input 
-                        type="file" 
-                        accept="image/*"
-                        required={ss.required}
-                        onChange={(e) => {
-                          const file = e.target.files[0];
-                          if (file) {
-                            const next = [...screenshotFiles];
-                            next[idx] = file;
-                            setScreenshotFiles(next);
-                          }
-                        }}
-                        className="absolute inset-0 opacity-0 cursor-pointer"
-                      />
+                      <input type="file" accept="image/*" required={ss.required} onChange={(e) => { const f = e.target.files[0]; if (f) { const next = [...screenshotFiles]; next[idx] = f; setScreenshotFiles(next); } }} className="absolute inset-0 opacity-0 cursor-pointer" />
                     </div>
                   </div>
                 ))}
               </div>
-            </div>
+            </FormSection>
           )}
 
-          <div className="flex justify-end pt-6">
-            <button 
-              type="submit" 
+          {/* ── Submit ── */}
+          <div className="bg-[#0e0e0e] px-8 py-6 flex flex-col md:flex-row items-center justify-between gap-5">
+            <p className="font-teko text-[13px] tracking-[0.2em] text-[#d1c5b3] opacity-30 uppercase">
+              By submitting, you confirm all player details are accurate.
+            </p>
+            <button
+              type="submit"
               disabled={submitting || saving}
-              className="btn-obsidian-primary w-full md:w-auto px-20 py-5 font-bebas text-3xl tracking-widest uppercase disabled:opacity-50 disabled:cursor-wait"
+              className="w-full md:w-auto btn-obsidian-primary px-16 py-5 font-bebas text-[26px] tracking-widest uppercase disabled:opacity-40 disabled:cursor-wait"
             >
               {(submitting || saving) ? 'PROCESSING...' : 'REGISTER TEAM'}
             </button>
           </div>
+
         </form>
       </div>
+    </div>
+  );
+}
+
+function FormSection({ number, title, hint, children }) {
+  return (
+    <div className="bg-[#0e0e0e] p-8 relative">
+      <div className="absolute top-0 left-0 right-0 h-[1px] bg-white/[0.04]" />
+      <div className="flex items-start gap-5 mb-7">
+        <span className="font-bebas text-[2.5rem] text-[#dbb462] opacity-15 leading-none select-none">{number}</span>
+        <div>
+          <h2 className="font-bebas text-2xl text-[#f2f2f2] tracking-wider uppercase leading-none mb-1">{title}</h2>
+          {hint && (
+            <p className="font-teko text-[12px] tracking-[0.2em] text-[#d1c5b3] opacity-35 uppercase">{hint}</p>
+          )}
+        </div>
+      </div>
+      {children}
     </div>
   );
 }

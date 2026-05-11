@@ -72,7 +72,7 @@ export default function TournamentsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] pt-20 animate-page-enter">
+    <div className="min-h-screen bg-[#0a0a0a] pt-20 animate-page-enter overflow-x-hidden">
 
       {/* ── Hero ── */}
       <section className="relative py-28 md:py-40 px-6 lg:px-16 bg-[#0e0e0e] overflow-hidden border-b border-white/[0.04]">
@@ -96,6 +96,18 @@ export default function TournamentsPage() {
           </p>
         </div>
       </section>
+
+      {/* ── Stats Strip ── */}
+      <div className="border-b border-white/[0.04] bg-[#0a0a0a]">
+        <div className="container mx-auto max-w-7xl px-6 lg:px-16">
+          <div className="grid grid-cols-2 lg:grid-cols-4 divide-x divide-white/[0.04]">
+            <TourneyStatCell label="Total Events" value={countByStatus.all} />
+            <TourneyStatCell label="Open Now" value={countByStatus.registrations_open} accent />
+            <TourneyStatCell label="In Progress" value={countByStatus.in_progress} />
+            <TourneyStatCell label="Completed" value={countByStatus.completed} />
+          </div>
+        </div>
+      </div>
 
       {/* ── Filter Bar ── */}
       <div className="sticky top-16 md:top-20 z-30 bg-[#0a0a0a]/95 backdrop-blur-xl border-b border-white/[0.04]">
@@ -169,6 +181,17 @@ export default function TournamentsPage() {
           </div>
         )}
       </section>
+    </div>
+  );
+}
+
+function TourneyStatCell({ label, value, accent }) {
+  return (
+    <div className="px-6 lg:px-10 py-5 group relative overflow-hidden">
+      <p className="font-teko text-[11px] tracking-[0.25em] text-[#d1c5b3] opacity-35 uppercase mb-1">{label}</p>
+      <p className={`font-bebas text-3xl leading-none ${accent ? 'zenith-gradient-text' : 'text-[#f2f2f2]'}`}>
+        {value}
+      </p>
     </div>
   );
 }

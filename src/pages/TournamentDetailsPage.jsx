@@ -79,7 +79,7 @@ export default function TournamentDetailsPage() {
   const approvedCount = registrations.filter(r => r.status === 'approved').length;
   const totalCount    = registrations.length;
   const isUserRegistered = user && registrations.some(r => r.user_id === user.id);
-  const isOpen = status === 'registrations_open' && phase === 'closing' && (!max_teams || totalCount < max_teams);
+  const isOpen = status === 'registrations_open' && phase === 'closing' && (!max_teams || approvedCount < max_teams);
   const capacityPct = max_teams ? Math.min((approvedCount / max_teams) * 100, 100) : 100;
 
   const visibleTabs = TABS.filter((tab) => {
@@ -370,7 +370,7 @@ export default function TournamentDetailsPage() {
                       <>
                         {status === 'registrations_open' && phase !== 'closed' ? (
                           // Registrations are open: check capacity
-                          (!max_teams || totalCount < max_teams) ? (
+                          (!max_teams || approvedCount < max_teams) ? (
                             <Link
                               to={user ? `/register/${id}` : '/auth'}
                               className="btn-obsidian-primary w-full py-5 font-bebas text-[22px] tracking-[0.2em] inline-flex items-center justify-center gap-3 uppercase group/cta"
@@ -384,7 +384,6 @@ export default function TournamentDetailsPage() {
                             </div>
                           )
                         ) : (
-                          // Registrations not open yet or already closed (if not handled by phase banner)
                           !user && phase !== 'closed' && (
                             <Link
                               to="/auth"
@@ -428,9 +427,9 @@ function SectionHeader({ title, count }) {
   return (
     <div className="flex items-center gap-4 mb-10">
       <div className="w-8 h-[2px] bg-[#dbb462]" />
-      <h2 className="font-bebas text-4xl md:text-5xl text-[#dbb462] uppercase">{title}</h2>
+      <h2 className="font-bebas text-4xl md:text-5xl text-[#f2f2f2] uppercase">{title}</h2>
       {count !== undefined && (
-        <span className="font-teko text-[14px] tracking-[0.2em] text-[#d1c5b3] opacity-30 uppercase ml-2">{count}</span>
+        <span className="font-teko text-[14px] tracking-[0.2em] text-[#d1c5b3] opacity-30 uppercase ml-2">({count})</span>
       )}
     </div>
   );
@@ -438,9 +437,9 @@ function SectionHeader({ title, count }) {
 
 function QuickStat({ label, value, gold }) {
   return (
-    <div className="bg-[#0e0e0e]/80 backdrop-blur-sm px-6 py-4 flex-1 min-w-[120px]">
-      <span className="font-teko text-[11px] tracking-[0.2em] text-[#d1c5b3] opacity-60 uppercase block mb-1">{label}</span>
-      <span className={`font-bebas text-2xl leading-none ${gold ? 'text-[#dbb462]' : 'text-[#f2f2f2]'}`}>{value}</span>
+    <div className="bg-[#0a0a0a]/80 backdrop-blur-sm px-6 py-5 flex-1 min-w-[110px]">
+      <span className="font-teko text-[10px] tracking-[0.25em] text-[#d1c5b3] opacity-50 uppercase block mb-1.5">{label}</span>
+      <span className={`font-bebas text-2xl leading-none ${gold ? 'zenith-gradient-text' : 'text-[#f2f2f2]'}`}>{value}</span>
     </div>
   );
 }

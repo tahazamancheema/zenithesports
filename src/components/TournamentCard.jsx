@@ -19,9 +19,11 @@ export default function TournamentCard({ tournament, registrationCount = 0, user
   const prizeFormatted = prize_pool ? `PKR ${Number(prize_pool).toLocaleString('en-PK')}` : null;
 
   return (
-    <div className="group relative w-full bg-[#0e0e0e] border border-white/[0.06] hover:border-[#dbb462]/30 transition-all duration-500 overflow-hidden flex flex-col h-full">
-      {/* Gold top edge on hover */}
-      <div className="absolute top-0 left-0 w-full h-[2px] bg-[#dbb462] scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left z-10" />
+    <div className="group relative w-full bg-[#0e0e0e] border border-white/[0.06] hover:border-[#dbb462]/35 transition-all duration-500 overflow-hidden flex flex-col h-full card-hover-glow">
+      {/* Gold top gradient edge on hover */}
+      <div className="absolute top-0 left-0 w-full h-[2px] zenith-gradient scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left z-10" />
+      {/* Ambient glow blob on hover */}
+      <div className="absolute top-0 right-0 w-40 h-40 bg-[#dbb462]/[0.04] blur-[60px] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
 
       {/* ── Poster ── */}
       <Link to={`/tournaments/${id}`} className="relative aspect-[16/9] overflow-hidden block">
@@ -86,12 +88,23 @@ export default function TournamentCard({ tournament, registrationCount = 0, user
 
         {/* Capacity bar */}
         <div className="mb-8">
-          <div className="h-[2px] bg-white/[0.06] relative overflow-hidden">
+          <div className="h-[3px] bg-white/[0.06] relative overflow-hidden">
             <div
               className="absolute left-0 inset-y-0 zenith-gradient transition-all duration-1000"
               style={{ width: slotsPercent ? `${slotsPercent}%` : '0%' }}
             />
+            {slotsPercent && slotsPercent > 0 && (
+              <div
+                className="absolute inset-y-0 w-[2px] bg-white/40 transition-all duration-1000"
+                style={{ left: `${Math.min(slotsPercent, 98)}%` }}
+              />
+            )}
           </div>
+          {slotsPercent !== null && (
+            <p className="font-teko text-[11px] tracking-[0.15em] text-[#d1c5b3] opacity-30 uppercase mt-1.5 text-right">
+              {max_teams && `${Math.round(slotsPercent)}% filled`}
+            </p>
+          )}
         </div>
 
         {/* CTA */}

@@ -36,7 +36,7 @@ export default function AdminDashboard() {
 
   const { tournaments, add: addTournament, update: updateTournament, remove: removeTournament } = useTournaments();
 
-  const [activeTab, setActiveTab] = useState('tournaments');
+  const [activeTab, setActiveTab] = useState('overview');
   // Tournament create/edit modal
   const [tournamentModal, setTournamentModal] = useState({ open: false, data: null });
   // Per-tournament registration panel
@@ -45,6 +45,10 @@ export default function AdminDashboard() {
   const [groupsModal, setGroupsModal] = useState(null); // tournament object
   // Inline registration edit modal
   const [registrationModal, setRegistrationModal] = useState({ open: false, data: null, tournamentId: null });
+  // Rejection reason modal
+  const [rejectModal, setRejectModal] = useState({ open: false, reg: null, reason: 'Incorrect Player ID / Incomplete Screenshots' });
+  // Tournament search
+  const [tournamentSearch, setTournamentSearch] = useState('');
 
   // Auth guard
   React.useEffect(() => {
@@ -59,16 +63,18 @@ export default function AdminDashboard() {
     toast.success(`${reg.team_name} approved!`);
   }
   async function handleReject(reg) {
-    const reason = window.prompt(`Enter rejection reason for ${reg.team_name}:`, 'Incorrect Player ID / Incomplete Screenshots');
-    if (reason === null) return;
+    setRejectModal({ open: true, reg, reason: 'Incorrect Player ID / Incomplete Screenshots' });
+  }
+  async function confirmReject() {
+    const { reg, reason } = rejectModal;
     if (!reason.trim()) return toast.error('Rejection reason is required');
-
-    await updateReg(reg.id, { 
-      status: 'rejected', 
+    await updateReg(reg.id, {
+      status: 'rejected',
       rejection_reason: reason.trim(),
-      group_id: null // Automatically remove from group
+      group_id: null,
     });
-    toast.success(`${reg.team_name} rejected with reason`);
+    toast.success(`${reg.team_name} rejected`);
+    setRejectModal({ open: false, reg: null, reason: '' });
   }
   async function handleDelete(reg) {
     if (!confirm(`Delete ${reg.team_name}? This cannot be undone.`)) return;
@@ -117,7 +123,8 @@ export default function AdminDashboard() {
 
           <nav className="flex-1 space-y-1">
             {[
-              { id: 'tournaments', icon: BarChart3, label: 'Tournaments' },
+              { id: 'overview',     icon: TrendingUp, label: 'Overview' },
+              { id: 'tournaments',  icon: BarChart3,  label: 'Tournaments' },
             ].map(({ id, icon: Icon, label }) => (
               <button
                 key={id}
@@ -167,17 +174,38 @@ export default function AdminDashboard() {
             </div>
           </div>
 
-          {/* ── Quick Stats Overview ── */}
+          {/* ── Quick Stats Strip ── */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-[1px] bg-[rgba(78,70,56,0.15)] mb-10">
-            <QuickStatCard icon={Trophy} label="TOURNAMENTS" value={tournaments.length} />
-            <QuickStatCard icon={Users} label="TOTAL REGISTRATIONS" value={registrations.length} />
-            <QuickStatCard icon={Clock} label="PENDING APPROVAL" value={registrations.filter(r => r.status === 'pending').length} highlight />
-            <QuickStatCard icon={CheckCircle2} label="APPROVED TEAMS" value={registrations.filter(r => r.status === 'approved').length} />
+            <QuickStatCard icon={Trophy}       label="TOURNAMENTS"        value={tournaments.length} />
+            <QuickStatCard icon={Users}        label="TOTAL REGISTRATIONS" value={registrations.length} />
+            <QuickStatCard icon={Clock}        label="PENDING APPROVAL"   value={registrations.filter(r => r.status === 'pending').length}  highlight />
+            <QuickStatCard icon={CheckCircle2} label="APPROVED TEAMS"     value={registrations.filter(r => r.status === 'approved').length} />
           </div>
 
+          {activeTab === 'overview' && (
+            <AnalyticsTab tournaments={tournaments} registrations={registrations} />
+          )}
+
           {activeTab === 'tournaments' && (
+            <div className="space-y-4">
+              {/* Tournament Search */}
+              <div className="flex items-center gap-3 bg-[#1b1b1b] border border-[rgba(78,70,56,0.2)] px-4 py-3 max-w-sm">
+                <Search size={14} className="text-[#d1c5b3] opacity-50 shrink-0" />
+                <input
+                  type="text"
+                  placeholder="Search tournaments..."
+                  value={tournamentSearch}
+                  onChange={e => setTournamentSearch(e.target.value)}
+                  className="bg-transparent text-sm font-teko tracking-widest text-[#d1c5b3] placeholder:opacity-50 focus:outline-none w-full"
+                />
+                {tournamentSearch && (
+                  <button onClick={() => setTournamentSearch('')} className="text-[#d1c5b3] opacity-40 hover:opacity-100">
+                    <X size={12} />
+                  </button>
+                )}
+              </div>
             <TournamentsTab
-              tournaments={tournaments}
+              tournaments={tournaments.filter(t => !tournamentSearch || t.title.toLowerCase().includes(tournamentSearch.toLowerCase()))}
               registrations={registrations}
               onEdit={(t) => setTournamentModal({ open: true, data: t })}
               onDelete={async (t) => {
@@ -203,6 +231,7 @@ export default function AdminDashboard() {
               onViewGroups={(t) => setGroupsModal(t)}
               onExport={handleExport}
             />
+            </div>
           )}
         </main>
       </div>
@@ -303,6 +332,140 @@ export default function AdminDashboard() {
           }
         }}
       />
+
+      {/* ── Rejection Reason Modal ── */}
+      {rejectModal.open && (
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/80 backdrop-blur-sm">
+          <div className="bg-[#131313] border border-red-500/20 w-full max-w-md mx-4 p-8 relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-red-500/60 to-transparent" />
+            <h3 className="font-bebas text-2xl text-red-400 mb-1 uppercase tracking-widest">Reject Registration</h3>
+            <p className="font-teko text-[13px] tracking-widest text-[#d1c5b3] opacity-60 mb-6 uppercase">
+              {rejectModal.reg?.team_name}
+            </p>
+            <label className="font-teko text-[12px] tracking-widest text-[#d1c5b3] opacity-70 uppercase block mb-2">
+              Rejection Reason <span className="text-red-400">*</span>
+            </label>
+            <textarea
+              value={rejectModal.reason}
+              onChange={e => setRejectModal(m => ({ ...m, reason: e.target.value }))}
+              rows={3}
+              autoFocus
+              className="w-full bg-[#0e0e0e] border border-red-500/20 p-3 text-sm text-[#e2e2e2] focus:outline-none focus:border-red-400/50 transition-colors resize-none mb-6 font-mono"
+              placeholder="e.g. Incorrect Player ID / Incomplete Screenshots"
+            />
+            <div className="flex gap-3">
+              <button
+                onClick={() => setRejectModal({ open: false, reg: null, reason: '' })}
+                className="flex-1 border border-white/10 py-3 font-teko text-[13px] tracking-widest text-[#d1c5b3] hover:bg-white/5 transition-colors"
+              >
+                CANCEL
+              </button>
+              <button
+                onClick={confirmReject}
+                className="flex-1 bg-red-500/10 border border-red-500/30 text-red-400 py-3 font-teko text-[13px] tracking-widest hover:bg-red-500/20 transition-colors"
+              >
+                CONFIRM REJECT
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Analytics Tab
+// ─────────────────────────────────────────────────────────────
+function AnalyticsTab({ tournaments, registrations }) {
+  const totalPrize = tournaments.reduce((sum, t) => sum + (Number(t.prize_pool) || 0), 0);
+  const approvedCount = registrations.filter(r => r.status === 'approved').length;
+  const pendingCount = registrations.filter(r => r.status === 'pending').length;
+  const rejectedCount = registrations.filter(r => r.status === 'rejected').length;
+  const approvalRate = registrations.length > 0
+    ? Math.round((approvedCount / registrations.length) * 100)
+    : 0;
+
+  const byTournament = tournaments.map(t => {
+    const regs = registrations.filter(r => r.tournament_id === t.id);
+    return {
+      ...t,
+      total: regs.length,
+      approved: regs.filter(r => r.status === 'approved').length,
+      pending: regs.filter(r => r.status === 'pending').length,
+      rejected: regs.filter(r => r.status === 'rejected').length,
+    };
+  }).sort((a, b) => b.total - a.total);
+
+  return (
+    <div className="space-y-8 animate-page-enter">
+      {/* KPI Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-[1px] bg-[rgba(78,70,56,0.15)]">
+        <AnalyticCard label="Total Prize Value" value={`PKR ${Number(totalPrize).toLocaleString('en-PK')}`} gold />
+        <AnalyticCard label="Approval Rate" value={`${approvalRate}%`} />
+        <AnalyticCard label="Avg Teams / Tournament" value={tournaments.length ? Math.round(registrations.length / tournaments.length) : 0} />
+        <AnalyticCard label="Approved Teams" value={approvedCount} gold />
+        <AnalyticCard label="Pending Review" value={pendingCount} highlight />
+        <AnalyticCard label="Rejected" value={rejectedCount} />
+      </div>
+
+      {/* Per-Tournament Breakdown */}
+      <div>
+        <h3 className="font-bebas text-2xl text-[#f9d07a] tracking-widest mb-4 uppercase">Registration Breakdown</h3>
+        <div className="space-y-3">
+          {byTournament.length === 0 ? (
+            <div className="text-center py-10 bg-[#1b1b1b]">
+              <p className="font-teko text-[13px] tracking-widest text-[#d1c5b3] opacity-40">NO DATA YET</p>
+            </div>
+          ) : (
+            byTournament.map(t => {
+              const maxBar = Math.max(...byTournament.map(x => x.total), 1);
+              return (
+                <div key={t.id} className="bg-[#1b1b1b] border border-[rgba(78,70,56,0.15)] p-5 hover:border-[rgba(78,70,56,0.3)] transition-colors">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <p className="font-bebas text-lg leading-tight text-white">{t.title}</p>
+                      <span className={`font-teko text-[11px] tracking-widest px-2 py-0.5 uppercase border ${
+                        t.status === 'registrations_open' ? 'border-emerald-500/30 text-emerald-400' :
+                        t.status === 'in_progress' ? 'border-blue-500/30 text-blue-400' :
+                        'border-[rgba(78,70,56,0.3)] text-[#d1c5b3]'
+                      }`}>{t.status?.replace('_', ' ')}</span>
+                    </div>
+                    <span className="font-bebas text-2xl text-[#f9d07a]">{t.total}</span>
+                  </div>
+                  {/* Visual bar */}
+                  <div className="w-full bg-[#0e0e0e] h-2 mb-3 overflow-hidden">
+                    <div className="h-full zenith-gradient transition-all duration-1000" style={{ width: `${(t.total / maxBar) * 100}%` }} />
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="text-center">
+                      <p className="font-bebas text-xl text-emerald-400">{t.approved}</p>
+                      <p className="font-teko text-[10px] tracking-widest text-[#d1c5b3] opacity-40 uppercase">Approved</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="font-bebas text-xl text-yellow-500">{t.pending}</p>
+                      <p className="font-teko text-[10px] tracking-widest text-[#d1c5b3] opacity-40 uppercase">Pending</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="font-bebas text-xl text-red-400">{t.rejected}</p>
+                      <p className="font-teko text-[10px] tracking-widest text-[#d1c5b3] opacity-40 uppercase">Rejected</p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AnalyticCard({ label, value, gold, highlight }) {
+  return (
+    <div className={`bg-[#1b1b1b] p-6 ${highlight ? 'border-l-2 border-[#f9d07a]' : ''}`}>
+      <p className="font-teko text-[12px] tracking-widest text-[#d1c5b3] opacity-60 uppercase mb-2">{label}</p>
+      <p className={`font-bebas text-3xl ${gold ? 'text-[#f9d07a]' : highlight ? 'text-[#f9d07a]' : 'text-white'}`}>{value}</p>
     </div>
   );
 }

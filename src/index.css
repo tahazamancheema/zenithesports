@@ -395,3 +395,131 @@ body {
   transform-style: preserve-3d;
   will-change: transform;
 }
+
+/* ─── Ambient Glow System ─── */
+.ambient-glow-top {
+  position: relative;
+}
+.ambient-glow-top::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70%;
+  height: 350px;
+  background: radial-gradient(ellipse at 50% 0%, rgba(219, 180, 98, 0.1) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ─── Gold Glow Effects ─── */
+.glow-gold {
+  box-shadow: 0 0 30px rgba(219, 180, 98, 0.25), 0 0 60px rgba(219, 180, 98, 0.1);
+}
+.glow-gold-sm {
+  box-shadow: 0 0 16px rgba(219, 180, 98, 0.2);
+}
+.glow-gold-text {
+  text-shadow: 0 0 40px rgba(219, 180, 98, 0.5);
+}
+
+/* ─── Gradient Border Cards ─── */
+.gradient-border-card {
+  border: 1px solid transparent;
+  background:
+    linear-gradient(#111111, #111111) padding-box,
+    linear-gradient(135deg, rgba(219, 180, 98, 0.35) 0%, transparent 50%, rgba(219, 180, 98, 0.12) 100%) border-box;
+}
+.gradient-border-card:hover {
+  background:
+    linear-gradient(#111111, #111111) padding-box,
+    linear-gradient(135deg, rgba(219, 180, 98, 0.6) 0%, transparent 50%, rgba(219, 180, 98, 0.25) 100%) border-box;
+}
+
+/* ─── Section Background Glows ─── */
+.section-glow {
+  background:
+    radial-gradient(ellipse at 15% 50%, rgba(219, 180, 98, 0.06) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 50%, rgba(219, 180, 98, 0.04) 0%, transparent 55%);
+}
+.section-glow-bottom {
+  background:
+    radial-gradient(ellipse at 50% 100%, rgba(219, 180, 98, 0.08) 0%, transparent 60%);
+}
+
+/* ─── Enhanced Zenith Gradient Variants ─── */
+.zenith-gradient-warm {
+  background: linear-gradient(135deg, #b8862a 0%, #dbb462 30%, #fbefc4 65%, #e9c16e 100%);
+}
+.zenith-gradient-subtle {
+  background: linear-gradient(135deg, rgba(219, 180, 98, 0.15) 0%, rgba(251, 239, 196, 0.08) 100%);
+}
+.zenith-gradient-border {
+  background: linear-gradient(135deg, #dbb462, #fbefc4 50%, #dbb462);
+}
+
+/* ─── Card Glow on Hover ─── */
+.card-hover-glow {
+  transition: box-shadow 0.4s ease, border-color 0.3s ease;
+}
+.card-hover-glow:hover {
+  box-shadow: 0 8px 40px rgba(219, 180, 98, 0.12), 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* ─── Glowing Input Focus ─── */
+.input-glow:focus {
+  box-shadow: 0 0 0 1px rgba(219, 180, 98, 0.3), 0 0 20px rgba(219, 180, 98, 0.1);
+}
+
+/* ─── Status Strip Gradient ─── */
+.status-strip-open {
+  background: linear-gradient(90deg, rgba(52, 211, 153, 0.08), transparent);
+  border-left: 3px solid rgba(52, 211, 153, 0.5);
+}
+.status-strip-progress {
+  background: linear-gradient(90deg, rgba(96, 165, 250, 0.08), transparent);
+  border-left: 3px solid rgba(96, 165, 250, 0.5);
+}
+.status-strip-completed {
+  background: linear-gradient(90deg, rgba(219, 180, 98, 0.08), transparent);
+  border-left: 3px solid rgba(219, 180, 98, 0.3);
+}
+
+/* ─── Shimmer Animation ─── */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.shimmer {
+  background: linear-gradient(90deg, transparent 25%, rgba(219,180,98,0.2) 50%, transparent 75%);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* ─── Gradient Page Background ─── */
+.bg-zenith-page {
+  background:
+    radial-gradient(ellipse at 0% 0%, rgba(219, 180, 98, 0.05) 0%, transparent 40%),
+    radial-gradient(ellipse at 100% 100%, rgba(219, 180, 98, 0.03) 0%, transparent 40%),
+    #0a0a0a;
+}
+
+/* ─── Admin Dashboard Gradient ─── */
+.admin-sidebar-bg {
+  background: linear-gradient(180deg, #0e0e0e 0%, #131313 60%, #0e0e0e 100%);
+}
+
+/* ─── Pulse Ring Animation ─── */
+@keyframes pulseRing {
+  0% { transform: scale(1); opacity: 0.6; }
+  100% { transform: scale(1.8); opacity: 0; }
+}
+.pulse-ring::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 1px solid rgba(219, 180, 98, 0.5);
+  animation: pulseRing 1.5s ease-out infinite;
+}
