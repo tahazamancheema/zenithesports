@@ -71,7 +71,7 @@ html {
 }
 
 body {
-  background-color: #131313;
+  background-color: #0a0a0a;
   color: #f2f2f2;
   font-family: 'Rajdhani', sans-serif;
   overflow-x: clip;
@@ -89,7 +89,7 @@ body {
 }
 
 .font-agency {
-  font-family: 'Agency FB', sans-serif;
+  font-family: 'Agency FB', 'Rajdhani', sans-serif;
 }
 
 .font-rajdhani {

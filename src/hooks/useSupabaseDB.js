@@ -135,25 +135,32 @@ export function useSupabaseDB(tableName, orderByOption = null, filters = []) {
 
     const heartbeat = setInterval(() => {
       const { data: curData, error: curError, loading: curLoading } = stateRef.current;
-      // Heartbeat: Only sync if not already loading and we have no data or an error
-      if (!curLoading && (curData.length === 0 || curError)) {
-        fetchData();
-      }
-    }, 20000); // 20s heartbeat is plenty for mobile efficiency
+      if (curLoading) return;
+      // Sync data if empty or errored
+      if (curData.length === 0 || curError) fetchData();
+      // Reconnect dead channel even when data exists (channel can silently die)
+      const ch = channelRef.current;
+      if (!ch || ch.state === 'closed' || ch.state === 'errored') subscribeRealtime();
+    }, 30000);
 
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
         fetchData();
+        subscribeRealtime(); // Reconnect WebSocket — browser may have suspended it while hidden
       }
     };
 
+    const handleFocus = () => {
+      fetchData();
+    };
+
     document.addEventListener('visibilitychange', handleVisibilityChange);
-    window.addEventListener('focus', fetchData);
+    window.addEventListener('focus', handleFocus);
 
     return () => {
       clearInterval(heartbeat);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('focus', fetchData);
+      window.removeEventListener('focus', handleFocus);
       if (channelRef.current) {
         supabase.removeChannel(channelRef.current);
       }

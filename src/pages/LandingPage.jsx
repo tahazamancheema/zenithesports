@@ -73,24 +73,23 @@ export default function LandingPage() {
         {/* Low glow — bottom left */}
         <div className="absolute bottom-0 left-0 w-[400px] h-[300px] bg-[#dbb462]/[0.04] blur-[100px] pointer-events-none z-[1]" />
 
-        {/* ── Layer 3: Fine Grid ── */}
+        {/* ── Layer 3: Edge Vignette ── */}
         <div className="absolute inset-0 z-[2] pointer-events-none" style={{
-          backgroundImage:
-            'linear-gradient(rgba(219,180,98,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(219,180,98,0.07) 1px, transparent 1px)',
-          backgroundSize: '60px 60px',
-          maskImage: 'linear-gradient(to bottom, transparent 0%, black 20%, black 70%, transparent 100%)',
-          WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 20%, black 70%, transparent 100%)',
+          background: 'radial-gradient(ellipse 90% 90% at 50% 50%, transparent 40%, rgba(10,10,10,0.55) 100%)',
         }} />
 
-        {/* ── Layer 4: Diagonal Accent Strip ── */}
-        <div className="absolute inset-0 z-[2] pointer-events-none overflow-hidden">
-          <div className="absolute top-0 right-[18%] w-[1px] h-full bg-gradient-to-b from-[#dbb462]/25 via-[#dbb462]/08 to-transparent" />
-          <div className="absolute top-0 right-[35%] w-[1px] h-full bg-gradient-to-b from-transparent via-[#dbb462]/06 to-transparent" />
-          <div className="absolute top-0 left-[8%] w-[1px] h-full bg-gradient-to-b from-transparent via-[#dbb462]/15 to-transparent" />
+        {/* ── Layer 4: Frame Accents ── */}
+        <div className="absolute inset-0 z-[2] pointer-events-none">
+          {/* Top-left corner bracket */}
+          <div className="absolute top-28 lg:top-[130px] left-6 lg:left-16 w-10 h-10 border-t-[1.5px] border-l-[1.5px] border-[#dbb462]/25" />
+          {/* Bottom-right corner bracket */}
+          <div className="absolute bottom-[22%] right-6 lg:right-16 w-10 h-10 border-b-[1.5px] border-r-[1.5px] border-[#dbb462]/15" />
+          {/* Single vertical rule — right side */}
+          <div className="absolute top-0 right-[22%] w-[1px] h-full bg-gradient-to-b from-transparent via-[#dbb462]/10 to-transparent" />
         </div>
 
         {/* ── Layer 5: Scanline ── */}
-        <div className="absolute inset-0 scanline opacity-[0.04] pointer-events-none z-[3]" />
+        <div className="absolute inset-0 scanline opacity-[0.03] pointer-events-none z-[3]" />
 
         {/* ── Main Content: Top Section ── */}
         <div className="relative z-10 flex-1 flex flex-col justify-center pt-28 lg:pt-32 pb-10">

@@ -146,7 +146,7 @@ export default function Navbar() {
 
       {/* Mobile Menu Overlay */}
       {mobileOpen && (
-        <div className="lg:hidden fixed inset-x-0 top-20 bg-[#0a0a0a]/98 backdrop-blur-xl border-b border-[#dbb462]/15 animate-in slide-in-from-top-10 duration-500 z-50">
+        <div className={`lg:hidden fixed inset-x-0 ${scrolled ? 'top-16' : 'top-20'} bg-[#0a0a0a]/98 backdrop-blur-xl border-b border-[#dbb462]/15 animate-in slide-in-from-top-10 duration-500 z-50`}>
           {/* Subtle gradient at top */}
           <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#dbb462]/30 to-transparent" />
           <nav className="flex flex-col p-10 gap-8">

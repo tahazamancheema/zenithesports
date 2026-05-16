@@ -108,15 +108,41 @@ export function AuthProvider({ children }) {
     );
 
     // ── Phase 3: Re-validate session when tab becomes visible ─────────────────
-    // This prevents the Register button from disappearing after switching apps,
-    // since browsers can suspend the auth WebSocket when the tab is inactive.
+    // Light check — only re-fetches profile if the user identity actually changed.
+    // Avoids a full profile round-trip on every focus event.
+    const revalidateSession = async () => {
+      if (!mountedRef.current) return;
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!mountedRef.current) return;
+        const uid = session?.user?.id ?? null;
+        if (uid !== profileUidRef.current) {
+          // Identity changed (signed out in another tab, or new login)
+          profileUidRef.current = uid;
+          if (uid) {
+            setUser(session.user);
+            const doc = await fetchProfile(uid);
+            if (mountedRef.current) setUserDoc(doc);
+          } else {
+            setUser(null);
+            setUserDoc(null);
+          }
+        } else if (uid && session?.user) {
+          // Same user — just refresh the token object, no DB call needed
+          setUser(session.user);
+        }
+      } catch (err) {
+        console.warn('[auth] revalidate:', err.message);
+      }
+    };
+
     const handleVisibility = () => {
       if (document.visibilityState === 'visible' && mountedRef.current) {
-        initSession();
+        revalidateSession();
       }
     };
     const handleFocus = () => {
-      if (mountedRef.current) initSession();
+      if (mountedRef.current) revalidateSession();
     };
 
     document.addEventListener('visibilitychange', handleVisibility);
